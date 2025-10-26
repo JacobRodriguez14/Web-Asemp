@@ -1,0 +1,39 @@
+<aside class="sidebar">
+  <!-- Encabezado -->
+  <div class="sidebar-header">
+   <a class="logo-container" routerLink="/dashboard/home" aria-label="Ir a inicio">
+  <img src="assets/images/LOGO.png" alt="Mi Empresa" class="logo-img">
+</a>
+
+    <!-- <h2>Mi Empresa</h2>-->
+  </div>
+
+  <!-- Navegación -->
+  <nav class="sidebar-nav">
+    <p class="sidebar-section">NAVEGACIÓN</p>
+    <a routerLink="/dashboard/home" routerLinkActive="active">
+      <i data-feather="home"></i>
+      <span>Inicio</span>
+    </a>
+    <a routerLink="/dashboard/clientes" routerLinkActive="active">
+      <i data-feather="users"></i>
+      <span>Clientes</span>
+    </a>
+
+    <p class="sidebar-section">ADMINISTRACIÓN</p>
+    <a routerLink="/dashboard/sat" routerLinkActive="active">
+      <i data-feather="file-text"></i>
+      <span>SAT</span>
+    </a>
+    <a routerLink="/dashboard/reportes" routerLinkActive="active">
+      <i data-feather="bar-chart-2"></i>
+      <span>Reportes</span>
+    </a>
+
+    <p class="sidebar-section">SISTEMA</p>
+    <a routerLink="/dashboard/configuracion" routerLinkActive="active">
+      <i data-feather="settings"></i>
+      <span>Configuración</span>
+    </a>
+  </nav>
+</aside>
