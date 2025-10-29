@@ -46,13 +46,37 @@
         </button>
       </div>
       
-      <div class="user-menu">
-        <div class="user-info">
+      <!-- Menú de usuario -->
+      <div class="user-menu-container">
+        <div class="user-info" (click)="toggleUserMenu()">
           <div class="user-avatar">
-            <span *ngIf="!userAvatar" class="avatar-fallback">US</span>
+            <span *ngIf="userAvatar">{{ userAvatar }}</span>
+            <span *ngIf="!userAvatar" class="avatar-fallback">?</span>
           </div>
-          <span class="user-name">Usuario Sistema</span>
-          <i data-feather="chevron-down"></i>
+
+          <div class="user-details">
+            <span class="user-name">{{ userName }}</span>
+            <small *ngIf="userRol" class="user-role">{{ userRol }}</small>
+          </div>
+
+          <i data-feather="chevron-down" [class.rotated]="isUserMenuOpen"></i>
+        </div>
+        
+        <div class="user-menu" [class.show]="isUserMenuOpen">
+          <button class="user-menu-option" (click)="goToProfile()">
+            <i data-feather="user"></i>
+            <span>Mi Perfil</span>
+          </button>
+          
+          <button class="user-menu-option" (click)="goToSettings()">
+            <i data-feather="settings"></i>
+            <span>Configuración</span>
+          </button>
+          
+          <button class="user-menu-option logout" (click)="logout()">
+            <i data-feather="log-out"></i>
+            <span>Cerrar Sesión</span>
+          </button>
         </div>
       </div>
     </div>

@@ -3,6 +3,7 @@ import { Component, OnInit, Output, EventEmitter, HostListener } from '@angular/
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -13,18 +14,34 @@ import { filter } from 'rxjs/operators';
 })
 export class NavbarComponent implements OnInit {
   @Output() sidebarToggle = new EventEmitter<boolean>();
-  
+
   pageTitle = 'Dashboard';
   breadcrumb = 'Inicio';
   userAvatar: string | null = null;
+  userName = 'Usuario Sistema';
+  userRol = '';
   isSidebarOpen = true;
   currentTheme: 'default' | 'light' | 'dark' | 'custom' = 'default';
   isThemeMenuOpen = false;
+  isUserMenuOpen = false; // 👈 Nuevo: control del menú usuario
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authSrv: AuthService) {}
 
   ngOnInit(): void {
     this.replaceIcons();
+
+    // OBTENER USUARIO LOGUEADO DESDE API
+    this.authSrv.getPerfil().subscribe({
+      next: (res: any) => {
+        const nombreCompleto = `${res.nombres ?? ''} ${res.apellido_paterno ?? ''}`.trim();
+        this.userName = nombreCompleto || res.usuario || 'Usuario';
+        this.userAvatar = this.userName.charAt(0).toUpperCase();
+        this.userRol = res.rol;
+      },
+      error: () => {
+        this.userName = 'Invitado';
+      }
+    });
 
     // Escuchar cambios de ruta
     this.router.events
@@ -40,32 +57,79 @@ export class NavbarComponent implements OnInit {
       document.documentElement.setAttribute('data-theme', storedTheme);
     }
 
-    // ✅ Nuevo: reaplicar configuración guardada (logo y colores)
-    // Antes: this.applyStoredConfig();
-if (this.currentTheme === 'custom') {
-  this.applyStoredConfig();
+    if (this.currentTheme === 'custom') {
+      this.applyStoredConfig();
+    }
+
+    // Detectar ruta actual si se recarga directamente
+    this.updatePageInfo(this.router.url);
+    this.applyThemeLogo(this.currentTheme);
+    this.updateSidebarTextContrast();
+  }
+
+  // 👇 NUEVOS MÉTODOS PARA EL MENÚ DE USUARIO
+  toggleUserMenu(): void {
+    this.isUserMenuOpen = !this.isUserMenuOpen;
+    // Cerrar menú de tema si está abierto
+    if (this.isUserMenuOpen) {
+      this.isThemeMenuOpen = false;
+    }
+    this.replaceIcons();
+  }
+
+  goToProfile(): void {
+    this.isUserMenuOpen = false;
+    this.router.navigate(['/dashboard/perfil']);
+    this.replaceIcons();
+  }
+
+  goToSettings(): void {
+    this.isUserMenuOpen = false;
+    this.router.navigate(['/dashboard/configuracion']);
+    this.replaceIcons();
+  }
+
+ logout(): void {
+  this.isUserMenuOpen = false;
+
+  // ✅ Lógica real de cierre de sesión
+  this.authSrv.logout(); // ← elimina el token y limpia usuario
+  localStorage.clear();  // opcional: limpia todo (tema, configuraciones, etc.)
+
+  // Redirige al login
+  this.router.navigate(['/login']);
+
+  // Forzar recarga para reiniciar el estado global
+  setTimeout(() => window.location.reload(), 300);
+
+  this.replaceIcons();
 }
 
 
-  // ✅ Nuevo: detectar la ruta actual si se recarga directamente
-  this.updatePageInfo(this.router.url);
-
-    this.applyThemeLogo(this.currentTheme); // ✅ sincroniza logo con el tema activo
-
-    this.updateSidebarTextContrast();
-
-
-
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const themeSelector = document.querySelector('.theme-selector');
+    const userMenuContainer = document.querySelector('.user-menu-container');
+    
+    // Cerrar menú de tema si se hace clic fuera
+    if (themeSelector && !themeSelector.contains(event.target as Node)) {
+      this.isThemeMenuOpen = false;
+    }
+    
+    // Cerrar menú de usuario si se hace clic fuera
+    if (userMenuContainer && !userMenuContainer.contains(event.target as Node)) {
+      this.isUserMenuOpen = false;
+    }
+    
+    this.replaceIcons();
   }
 
-  /** ===== NUEVO ===== */
+  // ... (el resto de tus métodos existentes se mantienen igual)
   private applyStoredConfig() {
     const stored = localStorage.getItem('configuracion');
     if (!stored) return;
 
     const c = JSON.parse(stored);
-
-    // Aplica colores sólidos — evita navbar transparente
     if (c.primaryColor)
       document.documentElement.style.setProperty('--color-primary', c.primaryColor);
     if (c.backgroundColor) {
@@ -75,52 +139,32 @@ if (this.currentTheme === 'custom') {
     if (c.textColor)
       document.documentElement.style.setProperty('--color-text', c.textColor);
 
-    // ✅ Aplica logo guardado
     if (c.logo) {
       const sidebarLogo = document.querySelector('.lOGO-img') as HTMLImageElement | null;
       if (sidebarLogo) sidebarLogo.src = c.logo;
     }
   }
 
+  private applyThemeLogo(theme: string) {
+    const sidebarLogo = document.querySelector('.lOGO-img') as HTMLImageElement | null;
+    if (!sidebarLogo) return;
 
-  // === NUEVO: sincronizar logo según tema ===
-private applyThemeLogo(theme: string) {
-  const sidebarLogo = document.querySelector('.lOGO-img') as HTMLImageElement | null;
-  if (!sidebarLogo) return;
-
-  // Si hay un logo personalizado guardado en localStorage, úsalo primero
-  const cfg = localStorage.getItem('configuracion');
-  if (cfg) {
-    const c = JSON.parse(cfg);
-    if (c.logo) {
-      sidebarLogo.src = c.logo;
-      return;
+    const cfg = localStorage.getItem('configuracion');
+    if (cfg) {
+      const c = JSON.parse(cfg);
+      if (c.logo) {
+        sidebarLogo.src = c.logo;
+        return;
+      }
     }
-  }
 
-  // Si no hay logo personalizado, usar el predeterminado por tema
-  switch (theme) {
-    case 'dark':
-      sidebarLogo.src = 'assets/images/LOGO.png'; // ← tu logo blanco
-      break;
-    case 'light':
-    case 'default':
-      sidebarLogo.src = 'assets/images/LOGO.png'; // ← tu logo normal
-      break;
-    default:
-      sidebarLogo.src = 'assets/images/LOGO.png';
-      break;
-  }
-}
-
-  /** ================= */
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent) {
-    const themeSelector = document.querySelector('.theme-selector');
-    if (themeSelector && !themeSelector.contains(event.target as Node)) {
-      this.isThemeMenuOpen = false;
-      this.replaceIcons();
+    switch (theme) {
+      case 'dark':
+        sidebarLogo.src = 'assets/images/LOGO.png';
+        break;
+      default:
+        sidebarLogo.src = 'assets/images/LOGO.png';
+        break;
     }
   }
 
@@ -132,19 +176,46 @@ private applyThemeLogo(theme: string) {
     }, 10);
   }
 
-  updatePageInfo(url: string): void {
-    const routeMap: { [key: string]: { title: string, breadcrumb: string } } = {
-      '/dashboard/home': { title: 'Dashboard', breadcrumb: 'Inicio' },
-      '/dashboard/clientes': { title: 'Clientes', breadcrumb: 'Gestión de Clientes' },
-      '/dashboard/sat': { title: 'SAT', breadcrumb: 'Documentos Fiscales' },
-      '/dashboard/reportes': { title: 'Reportes', breadcrumb: 'Análisis y Reportes' },
-      '/dashboard/configuracion': { title: 'Configuración', breadcrumb: 'Ajustes del Sistema' }
-    };
+updatePageInfo(url: string): void {
+  // 🔹 Quita parámetros, hashes, y limpia IDs numéricos o GUID
+  let cleanUrl = url.split('?')[0].split('#')[0];
 
-    const info = routeMap[url] || { title: 'Dashboard', breadcrumb: 'Inicio' };
-    this.pageTitle = info.title;
-    this.breadcrumb = info.breadcrumb;
+  // 🔹 Divide la ruta en segmentos
+  const segments = cleanUrl.split('/').filter(Boolean);
+
+  // 🔹 Si la última parte es un número o un GUID, la quitamos
+  const last = segments[segments.length - 1];
+  if (/^\d+$/.test(last) || /^[a-f0-9\-]{6,}$/.test(last)) {
+    segments.pop();
   }
+
+  // 🔹 Reconstruye la ruta limpia sin el ID
+  cleanUrl = '/' + segments.join('/');
+
+  // 🔹 Mapa de rutas con textos amigables
+  const routeMap: { [key: string]: { title: string; breadcrumb: string } } = {
+    '/dashboard/home': { title: 'Dashboard', breadcrumb: 'Inicio' },
+    '/dashboard/configuracion': { title: 'Configuración', breadcrumb: 'Ajustes del Sistema' },
+    '/dashboard/usuarios': { title: 'Usuarios', breadcrumb: 'Gestión de Usuarios' },
+    '/dashboard/usuarios/form': { title: 'Usuarios', breadcrumb: 'Registrar o Editar Usuario' },
+    '/dashboard/usuarios/detalle': { title: 'Usuarios', breadcrumb: 'Detalle de Usuario' },
+    '/dashboard/clientes': { title: 'Clientes', breadcrumb: 'Gestión de Clientes' },
+    '/dashboard/sat': { title: 'SAT', breadcrumb: 'Documentos Fiscales' },
+    '/dashboard/reportes': { title: 'Reportes', breadcrumb: 'Análisis y Reportes' },
+  };
+
+  // 🔹 Busca la coincidencia parcial más larga
+  const match = Object.keys(routeMap)
+    .sort((a, b) => b.length - a.length)
+    .find(path => cleanUrl.startsWith(path));
+
+  const info = match ? routeMap[match] : { title: 'Dashboard', breadcrumb: 'Inicio' };
+  this.pageTitle = info.title;
+  this.breadcrumb = info.breadcrumb;
+}
+
+
+
 
   toggleSidebar(): void {
     this.isSidebarOpen = !this.isSidebarOpen;
@@ -154,6 +225,10 @@ private applyThemeLogo(theme: string) {
 
   toggleThemeMenu(): void {
     this.isThemeMenuOpen = !this.isThemeMenuOpen;
+    // Cerrar menú de usuario si está abierto
+    if (this.isThemeMenuOpen) {
+      this.isUserMenuOpen = false;
+    }
     this.replaceIcons();
   }
 
@@ -162,33 +237,31 @@ private applyThemeLogo(theme: string) {
     this.toggleTheme(theme);
     this.replaceIcons();
   }
-toggleTheme(theme: 'default' | 'light' | 'dark' | 'custom') {
-  document.documentElement.setAttribute('data-theme', theme);
-  this.currentTheme = theme;
-  localStorage.setItem('theme', theme);
 
-  if (theme !== 'custom') {
-    // salir de custom: limpia variables en línea
-    document.documentElement.style.removeProperty('--color-primary');
-    document.documentElement.style.removeProperty('--color-navbar');
-    document.documentElement.style.removeProperty('--color-background');
-    document.documentElement.style.removeProperty('--color-text');
-  } else {
-    // volver a custom: aplica configuración guardada
-    const cfg = localStorage.getItem('configuracion');
-    if (cfg) {
-      const c = JSON.parse(cfg);
-      document.documentElement.style.setProperty('--color-primary', c.primaryColor);
-      document.documentElement.style.setProperty('--color-background', c.backgroundColor);
-      document.documentElement.style.setProperty('--color-navbar', c.backgroundColor);
+  toggleTheme(theme: 'default' | 'light' | 'dark' | 'custom') {
+    document.documentElement.setAttribute('data-theme', theme);
+    this.currentTheme = theme;
+    localStorage.setItem('theme', theme);
+
+    if (theme !== 'custom') {
+      document.documentElement.style.removeProperty('--color-primary');
+      document.documentElement.style.removeProperty('--color-navbar');
+      document.documentElement.style.removeProperty('--color-background');
+      document.documentElement.style.removeProperty('--color-text');
+    } else {
+      const cfg = localStorage.getItem('configuracion');
+      if (cfg) {
+        const c = JSON.parse(cfg);
+        document.documentElement.style.setProperty('--color-primary', c.primaryColor);
+        document.documentElement.style.setProperty('--color-background', c.backgroundColor);
+        document.documentElement.style.setProperty('--color-navbar', c.backgroundColor);
+      }
     }
+
+    this.updateSidebarTextContrast();
+    this.applyThemeLogo(theme);
+    this.replaceIcons();
   }
-
-  this.updateSidebarTextContrast();
-  this.applyThemeLogo(theme);
-  this.replaceIcons();
-}
-
 
   updateSidebarTextContrast() {
     const bgColor = getComputedStyle(document.documentElement)

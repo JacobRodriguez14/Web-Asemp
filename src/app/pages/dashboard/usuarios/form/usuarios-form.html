@@ -1,0 +1,159 @@
+<div class="modal fade show" [style.display]="show ? 'block' : 'none'" (click)="cerrarFondo($event)">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-3 overflow-hidden">
+
+      <!-- Encabezado -->
+      <div class="modal-header bg-primary text-white py-3">
+        <h5 class="modal-title">
+          <i class="fas me-2" [class.fa-user-edit]="editando" [class.fa-user-plus]="!editando"></i>
+          {{ editando ? 'Editar Usuario' : 'Nuevo Usuario' }}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="cerrar()"></button>
+      </div>
+
+      <!-- Cuerpo -->
+      <form #formUsuario="ngForm" (ngSubmit)="guardar(formUsuario)" autocomplete="off">
+        <div class="modal-body p-4 bg-light">
+          <div class="row g-3">
+
+            <!-- Nombres -->
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Nombres *</label>
+              <input type="text" class="form-control" name="nombres"
+                     [(ngModel)]="usuario.nombres" required autocomplete="off">
+            </div>
+
+            <!-- Apellido paterno -->
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Apellido Paterno</label>
+              <input type="text" class="form-control" name="apellido_paterno"
+                     [(ngModel)]="usuario.apellido_paterno" autocomplete="off">
+            </div>
+
+            <!-- Apellido materno -->
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Apellido Materno</label>
+              <input type="text" class="form-control" name="apellido_materno"
+                     [(ngModel)]="usuario.apellido_materno" autocomplete="off">
+            </div>
+
+            <!-- Usuario -->
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Usuario *</label>
+              <input type="text" class="form-control" name="usuario"
+                     [(ngModel)]="usuario.usuario" required autocomplete="off">
+            </div>
+
+            <!-- Contraseña -->
+            <div class="col-md-6">
+  <div class="d-flex justify-content-between align-items-center">
+    <label class="form-label fw-semibold mb-0">Contraseña</label>
+    <button *ngIf="editando"
+            type="button"
+            class="btn btn-sm btn-outline-warning py-0 px-2"
+            style="font-size: 0.8rem;"
+            (click)="toggleCampoContrasena()">
+      {{ mostrarCampoContrasena ? 'Cancelar' : 'Restablecer' }}
+    </button>
+  </div>
+
+  <!-- Crear -->
+  <div *ngIf="!editando">
+    <div class="input-group mt-1">
+      <input
+        type="{{ verContrasena ? 'text' : 'password' }}"
+        class="form-control"
+        name="contrasena"
+        [(ngModel)]="usuario.contrasena"
+        placeholder="Escribe una contraseña"
+        required
+        minlength="6"
+        autocomplete="new-password">
+      <button type="button" class="btn btn-outline-secondary"
+              (click)="verContrasena = !verContrasena">
+        <i class="fa" [class.fa-eye]="!verContrasena" [class.fa-eye-slash]="verContrasena"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Editar -->
+  <div *ngIf="editando && campoContrasenaVisible">
+    <div *ngIf="mostrarCampoContrasena" class="mt-1">
+      <div class="input-group">
+        <input
+          type="{{ verContrasena ? 'text' : 'password' }}"
+          class="form-control"
+          name="contrasena_editar"
+          [(ngModel)]="usuario.contrasena"
+          placeholder="Escribe nueva contraseña (opcional)"
+          minlength="6"
+          autocomplete="new-password">
+        <button type="button" class="btn btn-outline-secondary"
+                (click)="verContrasena = !verContrasena">
+           <i [class]="verContrasena ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"></i>
+          
+        </button>
+      </div>
+      <small class="text-muted">
+        Si dejas este campo vacío, la contraseña actual se mantiene.
+      </small>
+    </div>
+  </div>
+</div>
+
+
+            <!-- Correo -->
+            <div class="col-6">
+              <label class="form-label fw-semibold">Correo Electrónico</label>
+              <input type="email" class="form-control" name="correo" [(ngModel)]="usuario.correo">
+            </div>
+
+            <!-- Rol dinámico -->
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Rol</label>
+             <select class="form-select" name="rol_id" [(ngModel)]="usuario.rol_id" required>
+  <option [ngValue]="0" disabled>Seleccionar rol</option>
+  <option *ngFor="let rol of roles" [ngValue]="rol.id">{{ rol.nombre }}</option>
+</select>
+            </div>
+
+            <!-- Departamento dinámico -->
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Departamento</label>
+              <select class="form-select" name="departamento_id" [(ngModel)]="usuario.departamento_id" required>
+  <option [ngValue]="0" disabled>Seleccionar departamento</option>
+  <option *ngFor="let dep of departamentos" [ngValue]="dep.id">{{ dep.nombre }}</option>
+</select>
+            </div>
+
+            <!-- Estatus -->
+            <div class="col-12">
+              <div class="form-check form-switch mt-2">
+                <input class="form-check-input" type="checkbox" name="estatus" [(ngModel)]="usuario.estatus">
+                <label class="form-check-label fw-semibold">Usuario Activo</label>
+              </div>
+              <small class="text-muted">
+                Cuando está desactivado, el usuario no podrá acceder al sistema.
+              </small>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Pie -->
+        <div class="modal-footer d-flex justify-content-end bg-light border-top">
+          <button type="button" class="btn btn-outline-secondary" (click)="cerrar()">
+            <i class="fas fa-times me-2"></i> Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="formUsuario.invalid">
+            <i class="fas me-2" [class.fa-save]="editando" [class.fa-plus]="!editando"></i>
+            {{ editando ? 'Actualizar' : 'Crear' }} Usuario
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Fondo oscuro -->
+<div class="modal-backdrop fade show" *ngIf="show"></div>

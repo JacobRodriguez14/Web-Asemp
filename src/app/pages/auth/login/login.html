@@ -1,5 +1,4 @@
 <div class="auth-wrapper">
-  <!-- Fondo animado con bolitas -->
   <div class="animated-bg">
     <div class="shape shape-1"></div>
     <div class="shape shape-2"></div>
@@ -7,9 +6,7 @@
     <div class="shape shape-4"></div>
   </div>
 
-  <!-- Card del formulario -->
   <div class="auth-card">
-    <!-- Icono y Título -->
     <div class="auth-header">
       <div class="icon-container">
         <i data-feather="lock" class="auth-icon"></i>
@@ -17,21 +14,18 @@
       <h2 class="auth-title">Acceso</h2>
     </div>
 
-    <!-- Formulario -->
     <form class="auth-form" (ngSubmit)="login()">
-      <!-- Email -->
-      <div class="form-group">
-        <input 
-          type="email" 
+      <!-- Usuario o correo -->
+      <div class="form-group"> <!-- 👈 antes era type="email" -->
+        <input  type="text"       
           class="form-control" 
-          placeholder="Correo electrónico"
+          placeholder="Usuario o correo electrónico"
           [(ngModel)]="email"
           name="email"
           required
         >
       </div>
 
-      <!-- Password -->
       <div class="form-group password-group">
         <input
           [type]="showPassword ? 'text' : 'password'"
@@ -50,7 +44,6 @@
         </button>
       </div>
 
-      <!-- Botón -->
       <button 
         type="submit" 
         class="btn-login"
@@ -59,9 +52,11 @@
         <span *ngIf="!loading">Iniciar Sesión</span>
         <div *ngIf="loading" class="loading-spinner"></div>
       </button>
+
+      <!-- 👇 mensaje opcional de error -->
+      <p *ngIf="error" class="error-text">{{ error }}</p>
     </form>
 
-    <!-- Links -->
     <div class="auth-links">
       <p class="link-text">
         ¿Olvidaste tu contraseña? <a href="#" class="link">Restablecer</a>

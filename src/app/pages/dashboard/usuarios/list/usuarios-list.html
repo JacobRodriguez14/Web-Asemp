@@ -1,0 +1,146 @@
+<!-- Lista de usuarios -->
+<div class="container-fluid mt-4">
+  <div class="card shadow-lg border-0 rounded-3 overflow-hidden custom-card">
+    <!-- Header -->
+    <div class="card-header custom-header py-3 px-4">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+          <i data-feather="users" class="me-2 header-icon"></i>
+          <h2 class="h4 mb-0 fw-bold header-title">Gestión de Usuarios</h2>
+        </div>
+
+        <!-- Botón "Nuevo usuario" -->
+        <button class="btn custom-btn-float d-flex align-items-center shadow" (click)="abrirModalNuevo()">
+          <i data-feather="user-plus" class="me-2"></i>
+          <span>Nuevo usuario</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card-body custom-filters border-bottom">
+      <div class="row g-3 align-items-center">
+        <div class="col-md-4">
+          <div class="input-group custom-input-group">
+            <span class="input-group-text custom-input-icon">
+              <i data-feather="search" class="search-icon"></i>
+            </span>
+            <input 
+              type="text" 
+              class="form-control custom-input" 
+              placeholder="Buscar..." 
+              [(ngModel)]="terminoBusqueda" 
+              (input)="filtrarUsuarios()">
+          </div>
+        </div>
+        <div class="col-md-3">
+          <select class="form-select custom-select" [(ngModel)]="criterioBusqueda" (change)="filtrarUsuarios()">
+            <option value="nombres">Por Nombres</option>
+            <option value="apellidos">Por Apellidos</option>
+            <option value="usuario">Por Usuario</option>
+            <option value="correo">Por Correo</option>
+            <option value="departamento">Por Departamento</option>
+            <option value="rol">Por Rol</option>
+          </select>
+        </div>
+        <div class="col-md-5 text-md-end">
+          <span class="custom-text-muted">
+            Mostrando <strong>{{usuariosFiltrados.length}}</strong> de <strong>{{usuarios.length}}</strong> usuarios
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="card-body p-0 custom-table-container">
+      <div class="table-responsive">
+        <table class="table table-striped" [ngClass]="{'table-dark': temaActual === 'dark'}">
+          <thead class="custom-table-header">
+            <tr>
+              <th class="ps-4">ID</th>
+              <th>Nombres</th>
+              <th>Apellido Paterno</th>
+              <th>Apellido Materno</th>
+              <th>Usuario</th>
+              <th>Correo</th>
+              <th>Rol</th>
+              <th>Departamento</th>
+              <th>Estatus</th>
+              <th class="text-center pe-4">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let u of usuariosFiltrados | paginate: { itemsPerPage: 8, currentPage: page }">
+              <td class="fw-bold custom-id ps-4">#{{u.id}}</td>
+              <td>{{u.nombres}}</td>
+              <td>{{u.apellido_paterno}}</td>
+              <td>{{u.apellido_materno}}</td>
+              <td><span class="badge custom-badge-user">{{u.usuario}}</span></td>
+              <td><a [href]="'mailto:'+u.correo" class="text-decoration-none custom-email">{{u.correo}}</a></td>
+              <td><span class="badge custom-badge-rol">{{u.rol?.nombre || '-'}}</span></td>
+              <td><span class="badge custom-badge-department">{{u.departamento?.nombre || '-'}}</span></td>
+              <td>
+                <span class="badge custom-badge-status" [ngClass]="u.estatus ? 'status-active' : 'status-inactive'">
+                  {{u.estatus ? 'Activo' : 'Inactivo'}}
+                </span>
+              </td>
+
+              <!-- Acciones -->
+              <td class="text-center pe-4">
+                <div class="dropdown">
+                  <button 
+                    class="btn btn-light btn-sm border"
+                    type="button" 
+                    id="dropdownActions{{u.id}}" 
+                    data-bs-toggle="dropdown" 
+                    aria-expanded="false">
+                    <i data-feather="more-horizontal"></i>
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-end shadow-sm"
+                      [attr.aria-labelledby]="'dropdownActions' + u.id">
+                    <li>
+                      <button class="dropdown-item d-flex align-items-center gap-2" (click)="abrirEditar(u.id)">
+                        <i data-feather="edit-2" class="text-primary"></i> Editar
+                      </button>
+                    </li>
+                    <li>
+                      <button class="dropdown-item d-flex align-items-center gap-2 text-danger" (click)="eliminar(u.id)">
+                        <i data-feather="trash-2"></i> Eliminar
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="usuariosFiltrados.length===0">
+              <td colspan="10" class="text-center py-5 text-muted">
+                <i data-feather="slash" class="me-2"></i>No se encontraron usuarios
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Paginación -->
+    <div class="card-footer border-0">
+      <div class="d-flex justify-content-center">
+        <pagination-controls 
+          (pageChange)="page=$event"
+          previousLabel="Anterior"
+          nextLabel="Siguiente"
+          class="my-pagination">
+        </pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Formulario modal independiente -->
+<app-usuarios-form
+  *ngIf="mostrarModal"
+  [show]="mostrarModal"
+  [id]="editingId"
+  (saved)="onSaved()"
+  (closed)="cerrarModal()">
+</app-usuarios-form>

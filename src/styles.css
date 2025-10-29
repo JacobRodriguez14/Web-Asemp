@@ -45,3 +45,27 @@ body {
 }
 
 
+
+
+
+
+
+.table {
+  background-color: var(--color-background) !important;
+  color: var(--color-text) !important;
+}
+
+.table thead {
+  background-color: var(--color-navbar) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-primary) !important;
+}
+
+.table-hover tbody tr:hover {
+  background-color: color-mix(in srgb, var(--color-primary) 20%, transparent) !important;
+}
+
+.card {
+  background-color: var(--color-background) !important;
+  border: 1px solid var(--color-navbar) !important;
+}

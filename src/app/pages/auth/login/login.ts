@@ -3,6 +3,8 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FeatherService } from '../../../core/services/feather.service';
+import { AuthService } from '../../../core/services/auth.service'; // 👈 nuevo
+
 
 @Component({
   selector: 'app-login',
@@ -16,17 +18,20 @@ export class Login implements AfterViewInit {
   password = '';
   showPassword = false;
   loading = false;
+  error = ''; // 👈 nuevo
 
-  constructor(private router: Router, private feather: FeatherService) {}
+  constructor(
+    private router: Router,
+    private feather: FeatherService,
+    private authSrv: AuthService // 👈 nuevo
+  ) {}
 
   ngAfterViewInit(): void {
-    // Reemplaza íconos al iniciar
     this.feather.replace();
   }
 
   togglePassword(): void {
     this.showPassword = !this.showPassword;
-    // Actualiza el ícono inmediatamente
     this.feather.replace();
   }
 
@@ -38,14 +43,20 @@ export class Login implements AfterViewInit {
     }
 
     this.loading = true;
-    setTimeout(() => {
-      localStorage.setItem('token', 'demo-token');
-      localStorage.setItem('user', JSON.stringify({
-        email: this.email,
-        name: this.email.split('@')[0]
-      }));
-      this.loading = false;
-      this.router.navigateByUrl('/dashboard/home');
-    }, 1000);
+    this.error = '';
+
+    // 👇 Reemplaza tu setTimeout por llamada real
+    this.authSrv.login({ usuario: this.email, contrasena: this.password })
+      .subscribe({
+        next: () => {
+          this.loading = false;
+          this.router.navigateByUrl('/dashboard/home');
+        },
+        error: (err: any) => {
+  this.loading = false;
+  this.error = err?.error || 'Credenciales inválidas';
+}
+
+      });
   }
 }
