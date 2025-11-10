@@ -1,0 +1,79 @@
+<div class="container mt-4">
+  <h4 class="text-primary">Solicitudes SAT</h4>
+
+  <!-- ===================== FORMULARIO NUEVA SOLICITUD ===================== -->
+  <div class="card mt-3 p-3 shadow-sm">
+    <h6>Crear nueva solicitud</h6>
+    <form (ngSubmit)="crearSolicitud()" #formSolicitud="ngForm">
+      <div class="row g-3">
+        <!-- Cliente -->
+        <div class="col-md-4">
+          <label class="form-label">Cliente</label>
+          <select class="form-select" [(ngModel)]="form.cliente_id" name="cliente_id" required>
+            <option value="" disabled selected>Seleccione un cliente</option>
+            <option *ngFor="let c of clientes" [value]="c.id">{{ c.razon_social }}</option>
+          </select>
+        </div>
+
+        <!-- Tipo -->
+        <div class="col-md-3">
+          <label class="form-label">Tipo solicitud</label>
+          <select class="form-select" [(ngModel)]="form.tipo_solicitud" name="tipo_solicitud" required>
+            <option value="emitidos">Emitidos</option>
+            <option value="recibidos">Recibidos</option>
+          </select>
+        </div>
+
+        <!-- Fechas -->
+        <div class="col-md-3">
+          <label class="form-label">Fecha inicio</label>
+          <input type="date" class="form-control" [(ngModel)]="form.fecha_inicio" name="fecha_inicio" required>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Fecha fin</label>
+          <input type="date" class="form-control" [(ngModel)]="form.fecha_fin" name="fecha_fin" required>
+        </div>
+      </div>
+
+      <div class="mt-3 text-end">
+        <button class="btn btn-primary" [disabled]="formSolicitud.invalid || cargando">
+          Crear solicitud
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ===================== LISTA DE SOLICITUDES ===================== -->
+  <div class="card mt-4 p-3 shadow-sm">
+    <h6>Solicitudes registradas</h6>
+    <table class="table table-sm table-bordered mt-2">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Cliente</th>
+          <th>Tipo</th>
+          <th>Fechas</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let s of solicitudes">
+          <td>{{ s.id }}</td>
+          <td>{{ s.cliente?.razon_social || '—' }}</td>
+          <td>{{ s.tipo_solicitud }}</td>
+          <td>{{ s.fecha_inicio | date }} → {{ s.fecha_fin | date }}</td>
+          <td>{{ s.mensaje || '-' }}</td>
+          <td>
+            <button class="btn btn-sm btn-info me-1" (click)="verificar(s.id)">Verificar</button>
+            <button class="btn btn-sm btn-success" (click)="descargar(s.id)">Descargar</button>
+          </td>
+        </tr>
+        <tr *ngIf="!solicitudes.length">
+          <td colspan="6" class="text-center text-muted">No hay solicitudes registradas</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

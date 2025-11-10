@@ -1,0 +1,140 @@
+<!-- Lista de clientes -->
+<div class="container-fluid mt-4">
+  <div class="card shadow-lg border-0 rounded-3 overflow-hidden custom-card">
+    <!-- Header -->
+    <div class="card-header custom-header py-3 px-4">
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+          <i data-feather="users" class="me-2 header-icon"></i>
+          <h2 class="h4 mb-0 fw-bold header-title">Gestión de Clientes</h2>
+        </div>
+
+        <!-- Botón "Nuevo cliente" -->
+        <button class="btn custom-btn-float-azul d-flex align-items-center shadow" (click)="abrirModalNuevo()">
+          <i data-feather="user-plus" class="me-2"></i>
+          <span>Nuevo cliente</span>
+        </button>
+      </div>
+    </div>
+
+  <!-- Filtros -->
+<div class="card-body custom-filters border-bottom py-3 clientes-filtros pb-5">
+  <div class="row g-3 align-items-center">
+    <div class="col-md-4">
+      <div class="input-group custom-input-group">
+        <span class="input-group-text custom-input-icon">
+          <i data-feather="search" class="search-icon"></i>
+        </span>
+        <input
+          type="text"
+          class="form-control custom-input"
+          placeholder="Buscar..."
+          [(ngModel)]="terminoBusqueda"
+          (input)="filtrarClientes()">
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <select
+  class="form-select custom-select"
+  [(ngModel)]="criterioBusqueda"
+  (change)="filtrarClientes()">
+
+        <option value="razon_social">Por Razón Social</option>
+        <option value="rfc">Por RFC</option>
+        <option value="correo">Por Correo</option>
+        <option value="telefono">Por Teléfono</option>
+      </select>
+    </div>
+
+    <div class="col-md-5 text-md-end">
+      <span class="custom-text-muted">
+        Mostrando <strong>{{clientesFiltrados.length}}</strong> de <strong>{{clientes.length}}</strong> clientes
+      </span>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Tabla -->
+<div class="card-body p-0 custom-table-container">
+  <div class="table-responsive">
+    <table class="table table-striped" [ngClass]="{'table-dark': temaActual === 'dark'}">
+      <thead class="custom-table-header">
+        <tr>
+          <th class="ps-4">ID</th>
+          <th>Razón Social</th>
+          <th>RFC</th>
+          <th>Correo</th>
+          <th>Teléfono</th>
+          <th>Vigencia del Certificado</th>
+          <th>Estatus</th>
+          <th class="text-center pe-4">Acciones</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let c of clientesFiltrados | paginate: { itemsPerPage: 8, currentPage: page }">
+          <td class="fw-bold ps-4">#{{c.id}}</td>
+          <td>{{c.razon_social}}</td>
+          <td>{{c.certificado?.rfc || '-'}}</td>
+          <td>
+            <a [href]="'mailto:'+c.correo_electronico" class="text-decoration-none">
+              {{c.correo_electronico}}
+            </a>
+          </td>
+          <td>{{c.telefono || '-'}}</td>
+          <td>
+            {{c.certificado?.fecha_vigencia_inicio | date:'dd/MM/yyyy'}} -
+            {{c.certificado?.fecha_vigencia_fin | date:'dd/MM/yyyy'}}
+          </td>
+          <td>
+            <span class="badge" [ngClass]="c.estatus ? 'bg-success' : 'bg-secondary'">
+              {{ c.estatus ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+
+          <!-- Acciones -->
+          <td class="text-center pe-4">
+            <div class="btn-group">
+              <button class="btn btn-sm btn-outline-primary me-1" (click)="abrirEditar(c.id)">
+                <i data-feather="edit-2"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-danger" (click)="eliminar(c.id)">
+                <i data-feather="trash-2"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Mensaje sin datos -->
+        <tr *ngIf="clientesFiltrados.length === 0">
+          <td colspan="8" class="text-center py-5 text-muted">
+            <i data-feather="slash" class="me-2"></i>No se encontraron clientes
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Paginación -->
+<div class="card-footer border-0">
+  <div class="d-flex justify-content-center">
+    <pagination-controls
+      (pageChange)="page=$event"
+      previousLabel="Anterior"
+      nextLabel="Siguiente"
+      class="my-pagination">
+    </pagination-controls>
+  </div>
+</div>
+
+<!-- Formulario modal -->
+<app-clientes-form
+  *ngIf="mostrarModal"
+  [show]="mostrarModal"
+  [id]="editingId"
+  (saved)="onSaved()"
+  (closed)="cerrarModal()">
+</app-clientes-form>

@@ -1,0 +1,195 @@
+<div class="modal fade show" [style.display]="show ? 'block' : 'none'" (click)="cerrarFondo($event)">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-3 overflow-hidden">
+
+      <!-- Encabezado -->
+      <div class="modal-header bg-primary text-white py-3">
+        <h5 class="modal-title">
+          <i class="fas me-2" [class.fa-user-edit]="id" [class.fa-user-plus]="!id"></i>
+          {{ id ? 'Editar Cliente' : 'Nuevo Cliente' }}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="cerrarModal()"></button>
+      </div>
+
+      <!-- Cuerpo -->
+      <form [formGroup]="form" (ngSubmit)="enviar()" autocomplete="off">
+        <div class="modal-body p-4">
+          <div class="row g-4">
+
+            <!-- Información Básica -->
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold">Usuario Asignado</label>
+              <select class="form-select" formControlName="usuario_id">
+                <option [ngValue]="0" disabled>Seleccionar usuario disponible</option>
+                <option *ngFor="let u of usuariosDisponibles" [ngValue]="u.id">
+                  {{ u.usuario }} — {{ u.correo }}
+                </option>
+              </select>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold">Razón Social *</label>
+              <input type="text" class="form-control" formControlName="razon_social">
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold">Teléfono</label>
+              <input type="text" class="form-control" formControlName="telefono">
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold">Correo Electrónico</label>
+              <input type="email" class="form-control" formControlName="correo_electronico">
+            </div>
+
+            <!-- Segunda fila de campos -->
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold">Dirección</label>
+              <input type="text" class="form-control" formControlName="direccion">
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold">Honorarios Subtotal *</label>
+              <input type="number" class="form-control" formControlName="honorarios_subtotal">
+            </div>
+
+            <!-- Tercera fila de campos -->
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold">Contraseña del Certificado *</label>
+              <div class="position-relative">
+                <input
+                  [type]="mostrarContrasena ? 'text' : 'password'"
+                  class="form-control pe-5"
+                  formControlName="contrasena"
+                  placeholder="Contraseña del certificado">
+                <i
+                  class="fas position-absolute top-50 end-0 translate-middle-y me-3 text-secondary"
+                  [class.fa-eye]="!mostrarContrasena"
+                  [class.fa-eye-slash]="mostrarContrasena"
+                  style="cursor:pointer; font-size: 0.9rem;"
+                  (click)="mostrarContrasena = !mostrarContrasena">
+                </i>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold">RFC *</label>
+              <input
+                type="text"
+                class="form-control text-uppercase"
+                formControlName="rfc"
+                placeholder="Ejemplo: ABCD123456EF7"
+                maxlength="13">
+              <small class="text-muted">Se detecta automáticamente al subir archivos .cer y .key.</small>
+            </div>
+
+            <!-- Certificados -->
+            <div class="col-12">
+              <div class="certificates-section">
+                <h6 class="certificates-title">
+                  <i class="fas fa-file-signature"></i>
+                  Certificados Digitales SAT
+                </h6>
+
+                <div class="row g-3">
+                  <!-- .cer -->
+                  <div class="col-12 col-md-6">
+                    <label class="form-label fw-semibold">Archivo .cer *</label>
+                    <div class="file-input-group">
+                      <div class="file-input-container">
+                        <input 
+                          type="file"
+                          accept=".cer"
+                          class="file-input"
+                          (change)="onFileChange($event, 'cer'); detectarRFC();">
+                        <div class="file-input-display">
+                          <i class="fas fa-file-signature file-icon"></i>
+                          <div class="file-text">
+                            <div class="file-name" title="{{ form.get('cer')?.value?.name }}">
+                              {{ form.get('cer')?.value?.name || 'Seleccionar archivo .cer' }}
+                            </div>
+                            <div class="file-hint">Extensión .cer, máximo 2MB</div>
+                          </div>
+                          <div class="file-status"
+                               [class.valid]="form.get('cer')?.value"
+                               [class.empty]="!form.get('cer')?.value">
+                            <i class="fas"
+                               [class.fa-check-circle]="form.get('cer')?.value"
+                               [class.fa-file]="!form.get('cer')?.value"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- .key -->
+                  <div class="col-12 col-md-6">
+                    <label class="form-label fw-semibold">Archivo .key *</label>
+                    <div class="file-input-group">
+                      <div class="file-input-container">
+                        <input 
+                          type="file"
+                          accept=".key"
+                          class="file-input"
+                          (change)="onFileChange($event, 'key')">
+                        <div class="file-input-display">
+                          <i class="fas fa-key file-icon"></i>
+                          <div class="file-text">
+                            <div class="file-name" title="{{ form.get('key')?.value?.name }}">
+                              {{ form.get('key')?.value?.name || 'Seleccionar archivo .key' }}
+                            </div>
+                            <div class="file-hint">Extensión .key, máximo 2MB</div>
+                          </div>
+                          <div class="file-status"
+                               [class.valid]="form.get('key')?.value"
+                               [class.empty]="!form.get('key')?.value">
+                            <i class="fas"
+                               [class.fa-check-circle]="form.get('key')?.value"
+                               [class.fa-file]="!form.get('key')?.value"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 🔹 Switch Cliente Activo -->
+            <div class="col-12 mt-3">
+              <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="estatus" formControlName="estatus">
+                <label class="form-check-label fw-semibold" for="estatus">
+                  Cliente Activo
+                </label>
+                <small class="text-muted d-block">
+                  Cuando está desactivado, el cliente no podrá acceder al sistema.
+                </small>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Pie -->
+        <div class="modal-footer d-flex flex-column flex-sm-row justify-content-end gap-2">
+          <button type="button" class="btn btn-rojo flex-fill flex-sm-grow-0" (click)="cerrarModal()">
+            <i class="fas fa-times me-2"></i> Cancelar
+          </button>
+
+          <button
+            type="submit"
+            [ngClass]="id ? 'btn btn-azul' : 'btn btn-verde'"
+            [disabled]="cargando"
+            class="flex-fill flex-sm-grow-0">
+            <i class="fas me-2" [class.fa-save]="id" [class.fa-plus]="!id"></i>
+            {{ id ? 'Actualizar' : 'Registrar' }} Cliente
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Fondo oscuro -->
+<div class="modal-backdrop fade show" *ngIf="show"></div>

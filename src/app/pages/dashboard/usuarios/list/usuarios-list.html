@@ -10,15 +10,19 @@
         </div>
 
         <!-- Botón "Nuevo usuario" -->
-        <button class="btn custom-btn-float d-flex align-items-center shadow" (click)="abrirModalNuevo()">
-          <i data-feather="user-plus" class="me-2"></i>
-          <span>Nuevo usuario</span>
-        </button>
+        <button class="btn custom-btn-float-azul d-flex align-items-center shadow" (click)="abrirModalNuevo()">
+  <i data-feather="user-plus" class="me-2"></i>
+  <span>Nuevo usuario</span>
+</button>
+
       </div>
     </div>
 
     <!-- Filtros -->
-    <div class="card-body custom-filters border-bottom">
+    <div class="card-body custom-filters border-bottom pb-5">
+
+
+
       <div class="row g-3 align-items-center">
         <div class="col-md-4">
           <div class="input-group custom-input-group">
@@ -52,75 +56,98 @@
     </div>
 
     <!-- Tabla -->
-    <div class="card-body p-0 custom-table-container">
-      <div class="table-responsive">
-        <table class="table table-striped" [ngClass]="{'table-dark': temaActual === 'dark'}">
-          <thead class="custom-table-header">
-            <tr>
-              <th class="ps-4">ID</th>
-              <th>Nombres</th>
-              <th>Apellido Paterno</th>
-              <th>Apellido Materno</th>
-              <th>Usuario</th>
-              <th>Correo</th>
-              <th>Rol</th>
-              <th>Departamento</th>
-              <th>Estatus</th>
-              <th class="text-center pe-4">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let u of usuariosFiltrados | paginate: { itemsPerPage: 8, currentPage: page }">
-              <td class="fw-bold custom-id ps-4">#{{u.id}}</td>
-              <td>{{u.nombres}}</td>
-              <td>{{u.apellido_paterno}}</td>
-              <td>{{u.apellido_materno}}</td>
-              <td><span class="badge custom-badge-user">{{u.usuario}}</span></td>
-              <td><a [href]="'mailto:'+u.correo" class="text-decoration-none custom-email">{{u.correo}}</a></td>
-              <td><span class="badge custom-badge-rol">{{u.rol?.nombre || '-'}}</span></td>
-              <td><span class="badge custom-badge-department">{{u.departamento?.nombre || '-'}}</span></td>
-              <td>
-                <span class="badge custom-badge-status" [ngClass]="u.estatus ? 'status-active' : 'status-inactive'">
-                  {{u.estatus ? 'Activo' : 'Inactivo'}}
-                </span>
-              </td>
+    <!-- Tabla -->
+<div class="card-body p-0 custom-table-container">
+  <div class="table-responsive">
+    <table class="table table-striped" [ngClass]="{'table-dark': temaActual === 'dark'}">
+      <thead class="custom-table-header">
+        <tr>
+          <th class="ps-4">ID</th>
+          <th>Nombres</th>
+          <th>Apellido Paterno</th>
+          <th>Apellido Materno</th>
+          <th>Usuario</th>
+          <th>Correo</th>
+          <th>Rol</th>
+          <th>Departamento</th>
+          <th>Estatus</th>
+          <th class="text-center pe-4">Acciones</th>
+        </tr>
+      </thead>
 
-              <!-- Acciones -->
-              <td class="text-center pe-4">
-                <div class="dropdown">
-                  <button 
-                    class="btn btn-light btn-sm border"
-                    type="button" 
-                    id="dropdownActions{{u.id}}" 
-                    data-bs-toggle="dropdown" 
-                    aria-expanded="false">
-                    <i data-feather="more-horizontal"></i>
+      <tbody>
+        <tr *ngFor="let u of usuariosFiltrados | paginate: { itemsPerPage: 8, currentPage: page }">
+          <td data-label="ID" class="fw-bold ps-4">#{{u.id}}</td>
+          <td data-label="Nombres">{{u.nombres}}</td>
+          <td data-label="Apellido Paterno">{{u.apellido_paterno}}</td>
+          <td data-label="Apellido Materno">{{u.apellido_materno}}</td>
+          <td data-label="Usuario">
+            <span class="badge custom-badge-user">{{u.usuario}}</span>
+          </td>
+          <td data-label="Correo">
+            <a [href]="'mailto:'+u.correo" class="text-decoration-none custom-email">{{u.correo}}</a>
+          </td>
+          <td data-label="Rol">
+  <span
+    class="badge custom-badge-rol"
+    [ngClass]="{
+      'rol-cliente': u.rol?.nombre === 'Cliente',
+      'rol-administrador': u.rol?.nombre === 'Administrador',
+      'rol-empleado': u.rol?.nombre === 'Empleado'
+    }"
+  >
+    {{ u.rol?.nombre || '-' }}
+  </span>
+</td>
+
+          <td data-label="Departamento">
+            <span class="badge custom-badge-department">{{u.departamento?.nombre || '-'}}</span>
+          </td>
+          <td data-label="Estatus">
+            <span class="badge custom-badge-status" [ngClass]="u.estatus ? 'status-active' : 'status-inactive'">
+              {{u.estatus ? 'Activo' : 'Inactivo'}}
+            </span>
+          </td>
+
+          <!-- Acciones -->
+          <td data-label="Acciones" class="text-center pe-4">
+            <div class="dropdown">
+              <button 
+                class="btn btn-light btn-sm border"
+                type="button" 
+                id="dropdownActions{{u.id}}" 
+                data-bs-toggle="dropdown" 
+                aria-expanded="false">
+                <i data-feather="more-horizontal"></i>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end shadow-sm"
+                  [attr.aria-labelledby]="'dropdownActions' + u.id">
+                <li>
+                  <button class="dropdown-item d-flex align-items-center gap-2" (click)="abrirEditar(u.id)">
+                    <i data-feather="edit-2" class="text-primary"></i> Editar
                   </button>
-                  <ul class="dropdown-menu dropdown-menu-end shadow-sm"
-                      [attr.aria-labelledby]="'dropdownActions' + u.id">
-                    <li>
-                      <button class="dropdown-item d-flex align-items-center gap-2" (click)="abrirEditar(u.id)">
-                        <i data-feather="edit-2" class="text-primary"></i> Editar
-                      </button>
-                    </li>
-                    <li>
-                      <button class="dropdown-item d-flex align-items-center gap-2 text-danger" (click)="eliminar(u.id)">
-                        <i data-feather="trash-2"></i> Eliminar
-                      </button>
-                    </li>
-                  </ul>
-                </div>
-              </td>
-            </tr>
-            <tr *ngIf="usuariosFiltrados.length===0">
-              <td colspan="10" class="text-center py-5 text-muted">
-                <i data-feather="slash" class="me-2"></i>No se encontraron usuarios
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+                </li>
+                <li>
+                  <button class="dropdown-item d-flex align-items-center gap-2 text-danger" (click)="eliminar(u.id)">
+                    <i data-feather="trash-2"></i> Eliminar
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Mensaje sin datos -->
+        <tr *ngIf="usuariosFiltrados.length === 0">
+          <td colspan="10" class="text-center py-5 text-muted">
+            <i data-feather="slash" class="me-2"></i>No se encontraron usuarios
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
 
     <!-- Paginación -->
     <div class="card-footer border-0">

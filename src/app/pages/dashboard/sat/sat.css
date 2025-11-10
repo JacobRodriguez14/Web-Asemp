@@ -1,0 +1,32 @@
+.container {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+
+h4 {
+  color: #800000;
+}
+
+.btn-success {
+  background-color: #800000;
+  border: none;
+}
+
+.table-dark {
+  background-color: #600000 !important;
+  color: #fff;
+}
+
+.alert-warning {
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  color: #856404;
+}
+
+.spinner-border {
+  width: 2.5rem;
+  height: 2.5rem;
+}

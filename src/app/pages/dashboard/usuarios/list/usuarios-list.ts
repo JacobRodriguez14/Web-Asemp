@@ -5,6 +5,8 @@ import { NgxPaginationModule } from 'ngx-pagination';
 import { UsuariosService, Usuario } from '../../../../core/services/usuarios.service';
 import { UsuariosForm } from '../form/usuarios-form';
 
+import Swal from 'sweetalert2';
+
 declare const feather: any;
 
 @Component({
@@ -99,11 +101,41 @@ export class UsuariosList implements OnInit, AfterViewInit {
     this.cerrarModal();
   }
 
-  eliminar(id: number): void {
-    if (!confirm('¿Eliminar usuario?')) return;
-    this.usuarioSrv.delete(id).subscribe({
-      next: () => this.cargarUsuarios(),
-      error: err => console.error('Error al eliminar', err)
-    });
-  }
+ eliminar(id: number): void {
+  Swal.fire({
+    title: '¿Eliminar usuario?',
+    text: 'Esta acción no se puede deshacer.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: 'Sí, eliminar',
+    cancelButtonText: 'Cancelar'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      this.usuarioSrv.delete(id).subscribe({
+        next: () => {
+          Swal.fire({
+            icon: 'success',
+            title: 'Eliminado',
+            text: 'El usuario ha sido eliminado correctamente.',
+            confirmButtonColor: '#3085d6',
+            timer: 1500,
+            showConfirmButton: false
+          });
+          this.cargarUsuarios();
+        },
+        error: (err) => {
+          console.error('Error al eliminar', err);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo eliminar el usuario.',
+            confirmButtonColor: '#d33'
+          });
+        }
+      });
+    }
+  });
+}
 }

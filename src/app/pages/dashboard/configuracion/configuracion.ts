@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+import Swal from 'sweetalert2';
+
 @Component({
   selector: 'app-configuracion',
   standalone: true,
@@ -144,7 +146,15 @@ applyTheme() {
   onLogoChange(e: any) {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 2 * 1024 * 1024) { alert('Máximo 2MB.'); return; }
+    if (file.size > 2 * 1024 * 1024) {
+  Swal.fire({
+    icon: 'warning',
+    title: 'Archivo demasiado grande',
+    text: 'El tamaño máximo permitido es 2 MB.',
+    confirmButtonColor: '#f6c23e'
+  });
+  return;
+}
 
     const reader = new FileReader();
     reader.onload = () => {
@@ -233,26 +243,59 @@ applyTheme() {
   }
 
   // === Guardar configuración permanente ===
-  saveConfig() {
-    // Solo guarda como custom si realmente se usa custom
-    if (this.currentTheme !== 'custom') {
-      alert('Solo los temas personalizados se guardan permanentemente.');
-      return;
-    }
+saveConfig() {
+  const isPreview = !this.applyGlobally; // usa el slider (applyGlobally)// el slider determina si se aplica global o solo vista previa
+  const root = document.documentElement;
 
-    localStorage.setItem('configuracion', JSON.stringify({
-      primaryColor: this.primaryColor,
-      backgroundColor: this.backgroundColor,
-      textColor: this.textColor,
-      logo: this.previewLogo,
-      theme: 'custom'
-    }));
+  // Siempre aplica la paleta actual a modo de vista previa
+  root.style.setProperty('--primary-color', this.primaryColor);
+  root.style.setProperty('--background-color', this.backgroundColor);
+  root.style.setProperty('--text-color', this.textColor);
 
-    localStorage.setItem('theme', 'custom');
-    document.documentElement.setAttribute('data-theme', 'custom');
-
-    alert('Configuración personalizada guardada.');
+  if (isPreview) {
+    // Solo vista previa: no guarda, solo muestra y pide activar
+    Swal.fire({
+      icon: 'info',
+      title: 'Vista previa activa',
+      text: 'Activa el interruptor para aplicar el tema en toda la página.',
+      confirmButtonColor: '#3085d6'
+    });
+    return;
   }
+
+  // Si el tema no es "custom", solo aplicar sin guardar permanente
+  if (this.currentTheme !== 'custom') {
+    root.setAttribute('data-theme', this.currentTheme);
+    Swal.fire({
+      icon: 'info',
+      title: 'Tema aplicado',
+      text: 'Solo los temas personalizados se guardan permanentemente.',
+      confirmButtonColor: '#3085d6'
+    });
+    return;
+  }
+
+  // Guarda configuración personalizada permanente
+  localStorage.setItem('configuracion', JSON.stringify({
+    primaryColor: this.primaryColor,
+    backgroundColor: this.backgroundColor,
+    textColor: this.textColor,
+    logo: this.previewLogo,
+    theme: 'custom'
+  }));
+  localStorage.setItem('theme', 'custom');
+  root.setAttribute('data-theme', 'custom');
+
+  Swal.fire({
+    icon: 'success',
+    title: 'Configuración guardada',
+    text: 'Tu tema personalizado se ha aplicado y guardado correctamente.',
+    confirmButtonColor: '#3085d6',
+    timer: 1500,
+    showConfirmButton: false
+  });
+}
+
 
   // === Feather icons ===
   private updateFeatherIcons() {

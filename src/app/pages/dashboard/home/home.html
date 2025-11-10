@@ -1,1 +1,66 @@
-<p>home works!</p>
+<div class="dashboard-container">
+
+  <!-- HERO DE BIENVENIDA -->
+  <section class="hero-banner">
+    <div class="hero-overlay"></div>
+    <img src="../../../../assets/images/Bienvenido.jpg" alt="Bienvenido ASEMP" class="hero-image" />
+    <div class="hero-text">
+      <h1>Bienvenido a Asesoría Empresarial</h1>
+      <p>Optimiza tus procesos fiscales con el Panel ASEMP</p>
+    </div>
+  </section>
+
+  <!-- Encabezado -->
+  <div class="header">
+    <h2>Panel Fiscal ASEMP</h2>
+    <p class="subtitle">Resumen general de actividades y solicitudes SAT</p>
+  </div>
+
+  <!-- Tarjetas resumen -->
+  <div class="cards">
+    <div class="card info">
+      <h3>{{ totalSolicitudes }}</h3>
+      <p>Solicitudes SAT</p>
+    </div>
+
+    <div class="card success">
+      <h3>{{ descargasExitosas }}</h3>
+      <p>Descargas exitosas</p>
+    </div>
+
+    <div class="card warning">
+      <h3>{{ solicitudesPendientes }}</h3>
+      <p>Pendientes de verificación</p>
+    </div>
+
+    <div class="card danger">
+      <h3>{{ erroresSat }}</h3>
+      <p>Errores SAT</p>
+    </div>
+  </div>
+
+  <!-- Últimas solicitudes -->
+  <div class="recent">
+    <h4>Últimas solicitudes SAT</h4>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Cliente</th>
+          <th>Tipo</th>
+          <th>Estado</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let s of ultimasSolicitudes">
+          <td>{{ s.id }}</td>
+          <td>{{ s.cliente?.razon_social || '—' }}</td>
+          <td>{{ s.tipo_solicitud }}</td>
+          <td>{{ s.estado_solicitud }}</td>
+          <td>{{ s.fecha_creacion | date:'short' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

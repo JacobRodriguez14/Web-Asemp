@@ -1,23 +1,27 @@
+@import '@fortawesome/fontawesome-free/css/all.min.css';
+
+
+
 :root {
   /* Default (tu tema actual) */
   --color-primary: #802020;
-  --color-navbar: var(--color-background); /* usa el mismo color */
-  --color-background: #f4f7fa;
+  --color-navbar: #f4f7fa; /* usa el mismo color */
+  --color-background: #e7e9ec; /* color de fondo claro f4f7fa*/
   --color-text: #1a1a1a;
 }
 
 /* Tema claro */
 [data-theme='light'] {
   --color-primary: #3f4d67;
-  --color-navbar: var(--color-background); /* usa el mismo color */
-  --color-background: #f4f7fa;
+  --color-navbar: #f4f7fa; /* usa el mismo color */
+  --color-background: #e7e9ec;
   --color-text: #1a1a1a;
 }
 
 /* Tema oscuro */
 [data-theme='dark'] {
   --color-primary: #2b2c2f;
-  --color-navbar: var(--color-background); /* usa el mismo color */
+  --color-navbar: #2f3033; /* usa el mismo color */
   --color-background: #212224;
   --color-text: #e5e7eb;
 }
@@ -39,7 +43,9 @@ body {
 [data-theme='custom'] {
   /* No definas nada aquí.
      Configuracion.ts actualizará los valores dinámicamente. */
+     --dummy: 0; /* placeholder para evitar empty ruleset */
 }
+
 * {
   transition: background-color 0.3s ease, color 0.3s ease, stroke 0.3s ease;
 }

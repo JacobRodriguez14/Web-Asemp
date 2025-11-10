@@ -14,7 +14,7 @@ export interface Usuario {
   contrasena?: string;
   estatus: boolean;
   rol_id: number;
-  departamento_id: number;
+   departamento_id?: number | null; // ✅ permite null
 
   // 👇 Agrega estos campos opcionales
   rol?: { id: number; nombre: string };

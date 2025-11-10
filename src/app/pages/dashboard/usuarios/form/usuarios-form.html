@@ -45,65 +45,71 @@
             </div>
 
             <!-- Contraseña -->
-            <div class="col-md-6">
-  <div class="d-flex justify-content-between align-items-center">
+  <!-- Contraseña -->
+<!-- Contraseña -->
+<div class="col-md-6">
+  <div class="d-flex justify-content-between align-items-center mb-1">
     <label class="form-label fw-semibold mb-0">Contraseña</label>
-    <button *ngIf="editando"
-            type="button"
-            class="btn btn-sm btn-outline-warning py-0 px-2"
-            style="font-size: 0.8rem;"
-            (click)="toggleCampoContrasena()">
+    <button
+      *ngIf="editando"
+      type="button"
+      class="btn btn-sm btn-outline-warning py-0 px-2"
+      style="font-size: 0.8rem;"
+      (click)="toggleCampoContrasena()">
       {{ mostrarCampoContrasena ? 'Cancelar' : 'Restablecer' }}
     </button>
   </div>
 
-  <!-- Crear -->
+  <!-- Crear usuario -->
   <div *ngIf="!editando">
-    <div class="input-group mt-1">
+    <div class="position-relative">
       <input
-        type="{{ verContrasena ? 'text' : 'password' }}"
-        class="form-control"
+        [type]="verContrasena ? 'text' : 'password'"
         name="contrasena"
+        class="form-control pe-5"
         [(ngModel)]="usuario.contrasena"
         placeholder="Escribe una contraseña"
         required
         minlength="6"
         autocomplete="new-password">
-      <button type="button" class="btn btn-outline-secondary"
-              (click)="verContrasena = !verContrasena">
-        <i class="fa" [class.fa-eye]="!verContrasena" [class.fa-eye-slash]="verContrasena"></i>
-      </button>
+      <i
+        class="fas position-absolute top-50 end-0 translate-middle-y me-3 text-secondary"
+        [class.fa-eye]="!verContrasena"
+        [class.fa-eye-slash]="verContrasena"
+        style="cursor:pointer; font-size: 0.9rem; line-height: 1;"
+        (click)="verContrasena = !verContrasena">
+      </i>
     </div>
+    <small class="text-muted">Debe tener al menos 6 caracteres.</small>
   </div>
 
-  <!-- Editar -->
-  <div *ngIf="editando && campoContrasenaVisible">
-    <div *ngIf="mostrarCampoContrasena" class="mt-1">
-      <div class="input-group">
-        <input
-          type="{{ verContrasena ? 'text' : 'password' }}"
-          class="form-control"
-          name="contrasena_editar"
-          [(ngModel)]="usuario.contrasena"
-          placeholder="Escribe nueva contraseña (opcional)"
-          minlength="6"
-          autocomplete="new-password">
-        <button type="button" class="btn btn-outline-secondary"
-                (click)="verContrasena = !verContrasena">
-           <i [class]="verContrasena ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"></i>
-          
-        </button>
-      </div>
-      <small class="text-muted">
-        Si dejas este campo vacío, la contraseña actual se mantiene.
-      </small>
+  <!-- Editar usuario -->
+  <div *ngIf="editando && campoContrasenaVisible && mostrarCampoContrasena">
+    <div class="position-relative">
+      <input
+        [type]="verContrasena ? 'text' : 'password'"
+        name="contrasena_editar"
+        class="form-control pe-5"
+        [(ngModel)]="usuario.contrasena"
+        placeholder="Escribe nueva contraseña (opcional)"
+        minlength="6"
+        autocomplete="new-password">
+      <i
+        class="fas position-absolute top-50 end-0 translate-middle-y me-3 text-secondary"
+        [class.fa-eye]="!verContrasena"
+        [class.fa-eye-slash]="verContrasena"
+        style="cursor:pointer; font-size: 0.9rem; line-height: 1;"
+        (click)="verContrasena = !verContrasena">
+      </i>
     </div>
+    <small class="text-muted">Si dejas este campo vacío, la contraseña actual se mantiene.</small>
   </div>
 </div>
 
 
             <!-- Correo -->
-            <div class="col-6">
+            <div class="col-12 col-md-6">
+
               <label class="form-label fw-semibold">Correo Electrónico</label>
               <input type="email" class="form-control" name="correo" [(ngModel)]="usuario.correo">
             </div>
@@ -117,14 +123,26 @@
 </select>
             </div>
 
-            <!-- Departamento dinámico -->
-            <div class="col-md-6">
-              <label class="form-label fw-semibold">Departamento</label>
-              <select class="form-select" name="departamento_id" [(ngModel)]="usuario.departamento_id" required>
-  <option [ngValue]="0" disabled>Seleccionar departamento</option>
-  <option *ngFor="let dep of departamentos" [ngValue]="dep.id">{{ dep.nombre }}</option>
-</select>
-            </div>
+            <!-- Departamento -->
+<div class="col-md-6">
+  <label class="form-label fw-semibold">Departamento</label>
+
+  <!-- Cuando NO es cliente -->
+  <select
+    *ngIf="!esClienteSeleccionado()"
+    class="form-select"
+    name="departamento_id"
+    [(ngModel)]="usuario.departamento_id"
+    required>
+    <option [ngValue]="0" disabled>Seleccionar departamento</option>
+    <option *ngFor="let dep of departamentos" [ngValue]="dep.id">{{ dep.nombre }}</option>
+  </select>
+
+  <!-- Cuando SÍ es cliente -->
+  <div *ngIf="esClienteSeleccionado()" class="form-control bg-light text-muted">
+    No aplica para clientes
+  </div>
+</div>
 
             <!-- Estatus -->
             <div class="col-12">
@@ -141,15 +159,18 @@
         </div>
 
         <!-- Pie -->
-        <div class="modal-footer d-flex justify-content-end bg-light border-top">
-          <button type="button" class="btn btn-outline-secondary" (click)="cerrar()">
-            <i class="fas fa-times me-2"></i> Cancelar
-          </button>
-          <button type="submit" class="btn btn-primary" [disabled]="formUsuario.invalid">
-            <i class="fas me-2" [class.fa-save]="editando" [class.fa-plus]="!editando"></i>
-            {{ editando ? 'Actualizar' : 'Crear' }} Usuario
-          </button>
-        </div>
+<div class="modal-footer d-flex justify-content-end">
+  <button type="button" class="btn btn-cancelar" (click)="cerrar()">
+    <i class="fas fa-times me-2"></i> Cancelar
+  </button>
+  <button
+    type="submit"
+    [ngClass]="editando ? 'btn btn-actualizar' : 'btn btn-crear'">
+    <i class="fas me-2" [class.fa-save]="editando" [class.fa-plus]="!editando"></i>
+    {{ editando ? 'Actualizar' : 'Crear' }} Usuario
+  </button>
+</div>
+
       </form>
     </div>
   </div>
