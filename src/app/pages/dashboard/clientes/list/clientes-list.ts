@@ -32,7 +32,11 @@ export class ClientesListComponent implements OnInit, AfterViewInit {
   mostrarModal = false;                   // controla la visibilidad del formulario modal
   editingId: number | null = null;        // ID del cliente a editar (null = nuevo registro)
 
-  constructor(private clienteSrv: ClientesService) {}
+  constructor(private clienteSrv: ClientesService) {
+    document.addEventListener('click', () => {
+    this.menu.visible = false;
+  });
+  }
 
   // ==============================
   // CICLO DE VIDA
@@ -42,6 +46,50 @@ export class ClientesListComponent implements OnInit, AfterViewInit {
     this.cargarClientes();   // carga inicial de datos
     this.detectarTema();     // aplica modo claro/oscuro
   }
+
+
+menu = {
+  visible: false,
+  x: 0,
+  y: 0,
+  cliente: null as any
+};
+abrirMenu(event: MouseEvent, cliente: any) {
+  event.stopPropagation();
+
+  if (this.menu.visible && this.menu.cliente?.id === cliente.id) {
+    this.menu.visible = false;
+    return;
+  }
+
+  const btn = event.currentTarget as HTMLElement;
+  const rectBtn = btn.getBoundingClientRect();
+
+  const tablaCard = btn.closest('.tabla-card') as HTMLElement;
+  const rectTabla = tablaCard.getBoundingClientRect();
+
+  const MENU_WIDTH = 300;
+  const centerBtnX = rectBtn.left - rectTabla.left + rectBtn.width / 2;
+
+  this.menu = {
+    visible: true,
+    x: centerBtnX - MENU_WIDTH / 2,
+    y: rectBtn.bottom - rectTabla.top + 8,
+    cliente
+  };
+}
+editarDesdeMenu() {
+  this.abrirEditar(this.menu.cliente.id);
+  this.menu.visible = false;
+}
+
+eliminarDesdeMenu() {
+  this.eliminar(this.menu.cliente.id);
+  this.menu.visible = false;
+}
+
+
+
 
   ngAfterViewInit(): void {
     // Reemplaza íconos Feather después de renderizar la vista

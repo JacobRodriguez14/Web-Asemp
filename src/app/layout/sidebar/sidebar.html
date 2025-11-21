@@ -1,47 +1,82 @@
 <aside class="sidebar">
   <!-- Encabezado -->
   <div class="sidebar-header">
-   <a class="logo-container" routerLink="/dashboard/home" aria-label="Ir a inicio">
-  <img src="assets/images/LOGO.png" alt="Mi Empresa" class="logo-img">
-</a>
-
-    <!-- <h2>Mi Empresa</h2>-->
+    <a class="logo-container" routerLink="/dashboard/home" aria-label="Ir a inicio">
+      <img src="assets/images/LOGO.png" alt="Mi Empresa" class="logo-img">
+    </a>
   </div>
 
   <!-- Navegación -->
   <nav class="sidebar-nav">
+
     <p class="sidebar-section">NAVEGACIÓN</p>
+
+    <!-- Inicio (todos pueden entrar) -->
     <a routerLink="/dashboard/home" routerLinkActive="active">
       <i data-feather="home"></i>
       <span>Inicio</span>
     </a>
 
-     <!-- 👇 NUEVO enlace a Usuarios -->
-    <a routerLink="/dashboard/usuarios" routerLinkActive="active">
+    <!-- Usuarios -->
+    <a *ngIf="sesion.tiene('usuarios.ver')"
+       routerLink="/dashboard/usuarios"
+       routerLinkActive="active">
       <i data-feather="user"></i>
       <span>Usuarios</span>
     </a>
-    
- <a routerLink="/dashboard/clientes" routerLinkActive="active">
-  <i data-feather="users"></i>
-  <span>Clientes</span>
-</a>
 
+    <!-- Clientes -->
+    <a *ngIf="sesion.tiene('clientes.ver')"
+       routerLink="/dashboard/clientes"
+       routerLinkActive="active">
+      <i data-feather="users"></i>
+      <span>Clientes</span>
+    </a>
 
-    <p class="sidebar-section">ADMINISTRACIÓN</p>
-    <a routerLink="/dashboard/sat" routerLinkActive="active">
+    <!-- Departamentos -->
+    <a *ngIf="sesion.tiene('departamentos.ver')"
+       routerLink="/dashboard/departamentos"
+       routerLinkActive="active">
+      <i data-feather="layers"></i>
+      <span>Departamentos</span>
+    </a>
+
+    <!-- Encabezado administración solo si hay algo que mostrar -->
+    <p class="sidebar-section"
+       *ngIf="
+         sesion.tiene('sat.ver') ||
+         sesion.tiene('dashboard.ver')
+       ">
+      ADMINISTRACIÓN
+    </p>
+
+    <!-- SAT -->
+    <a *ngIf="sesion.tiene('sat.ver')"
+       routerLink="/dashboard/sat"
+       routerLinkActive="active">
       <i data-feather="file-text"></i>
       <span>SAT</span>
     </a>
-    <a routerLink="/dashboard/reportes" routerLinkActive="active">
+
+    <!-- Reportes / Dashboard -->
+    <a *ngIf="sesion.tiene('dashboard.ver')"
+       routerLink="/dashboard/reportes"
+       routerLinkActive="active">
       <i data-feather="bar-chart-2"></i>
       <span>Reportes</span>
     </a>
 
-    <p class="sidebar-section">SISTEMA</p>
-    <a routerLink="/dashboard/configuracion" routerLinkActive="active">
-      <i data-feather="settings"></i>
-      <span>Configuración</span>
-    </a>
+    <p class="sidebar-section" *ngIf="rol === 'Administrador'">SISTEMA</p>
+
+
+    <!-- Configuración (solo admin) -->
+    <a *ngIf="rol === 'Administrador'"
+   routerLink="/dashboard/configuracion"
+   routerLinkActive="active">
+   <i data-feather="settings"></i>
+   <span>Configuración</span>
+</a>
+
+
   </nav>
 </aside>

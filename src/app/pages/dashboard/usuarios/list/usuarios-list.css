@@ -6,6 +6,7 @@
 .custom-card {
   background-color: var(--color-navbar) !important;
   border: 1px solid var(--color-navbar) !important;
+
 }
 
 /* HEADER */
@@ -82,29 +83,35 @@
 /* ============================ */
 .custom-table-container {
   background-color: var(--color-navbar) !important;
+  
 }
 
 .custom-table {
   background-color: var(--color-background) !important;
   color: var(--color-text) !important;
   border-color: var(--color-navbar) !important;
+  
 }
 
 .custom-table-header {
   background-color: var(--color-navbar) !important;
   color: var(--color-text) !important;
   border-color: var(--color-primary) !important;
+  
 }
 
 .custom-table-header th {
   border-color: var(--color-primary) !important;
   color: var(--color-text) !important;
   font-weight: 600;
+  
+  
 }
 
 .custom-table-row {
   background-color: var(--color-background) !important;
   border-color: color-mix(in srgb, var(--color-text) 20%, transparent) !important;
+  
 }
 
 .custom-table-row:hover {
@@ -117,6 +124,7 @@
 
 .custom-id {
   color: var(--color-primary) !important;
+  
 }
 
 /* ============================ */
@@ -166,6 +174,7 @@
   background-color: #fff3cd !important; /* fondo mostaza claro */
   color: #856404 !important; /* texto mostaza oscuro */
   border: 1px solid #ffe69c !important;
+  
 }
 
 /* Administrador → Rojo tenue */
@@ -209,43 +218,6 @@
   color: white !important;
 }
 
-/* ============================ */
-/* BOTONES DE ACCIÓN */
-/* ============================ */
-.custom-btn-edit,
-.custom-btn-delete {
-  background-color: transparent !important;
-  border-width: 1.5px !important;
-  transition: all 0.2s ease-in-out;
-}
-
-.custom-btn-edit i,
-.custom-btn-delete i {
-  stroke: currentColor !important;
-  color: inherit !important;
-}
-
-/* Botón editar */
-.custom-btn-edit {
-  border-color: var(--color-primary) !important;
-  color: var(--color-primary) !important;
-}
-
-.custom-btn-edit:hover {
-  background-color: var(--color-primary) !important;
-  color: white !important;
-}
-
-/* Botón eliminar */
-.custom-btn-delete {
-  border-color: #dc3545 !important;
-  color: #dc3545 !important;
-}
-
-.custom-btn-delete:hover {
-  background-color: #dc3545 !important;
-  color: white !important;
-}
 
 /* ============================ */
 /* MENSAJE SIN DATOS */
@@ -267,6 +239,7 @@
   color: var(--color-text) !important;
   background-color: var(--color-navbar) !important;
   border: 1px solid var(--color-primary) !important;
+  
 }
 
 .custom-pagination-controls .ngx-pagination a:hover,
@@ -368,100 +341,6 @@
 }
 
 
-
-
-/* ========================== */
-/* Botón de menú de acciones  */
-/* ========================== */
-.custom-dropdown-btn {
-  background-color: #f8f9fa !important;
-  border-color: #dee2e6 !important;
-  color: #495057 !important;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.4rem 0.55rem;
-}
-
-.custom-dropdown-btn:hover {
-  background-color: #e9ecef !important;
-  border-color: #adb5bd !important;
-}
-
-.custom-dropdown-btn i[data-feather] {
-  stroke: #495057 !important;
-  width: 16px;
-  height: 16px;
-}
-
-/* ========================== */
-/* Dropdown menu estilizado   */
-/* ========================== */
-.dropdown-menu {
-  border-radius: 8px;
-  font-size: 0.9rem;
-  border: 1px solid #dee2e6;
-  min-width: 9rem;
-  padding: 0.3rem 0;
-  animation: fadeIn 0.15s ease-in-out;
-}
-
-.dropdown-item {
-  padding: 0.45rem 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #212529;
-  transition: background 0.15s ease;
-}
-
-.dropdown-item:hover {
-  background-color: rgba(75, 42, 45, 0.07);
-}
-
-/* Animación sutil */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-5px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ========================== */
-/* MODO OSCURO                */
-/* ========================== */
-[data-theme="dark"] .custom-dropdown-btn {
-  background-color: #2b2b2b !important;
-  border-color: #444 !important;
-  color: #ddd !important;
-}
-
-[data-theme="dark"] .custom-dropdown-btn:hover {
-  background-color: #3a3a3a !important;
-  border-color: #555 !important;
-}
-
-[data-theme="dark"] .custom-dropdown-btn i[data-feather] {
-  stroke: #ddd !important;
-}
-
-[data-theme="dark"] .dropdown-menu {
-  background-color: #2b2b2b !important;
-  border-color: #444 !important;
-}
-
-[data-theme="dark"] .dropdown-item {
-  color: #f1f1f1 !important;
-}
-
-[data-theme="dark"] .dropdown-item:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.dropdown-item i[data-feather] {
-  stroke: currentColor !important;
-  stroke-width: 2px;
-}
 
 
 
@@ -586,6 +465,7 @@
   }
 
   table.table {
+    
     display: block;
     width: 100%;
     border: 0;
@@ -599,9 +479,12 @@
     display: flex;
     flex-direction: column;
     gap: 1rem; /* separación entre tarjetas */
+    
   }
 
   table.table tbody tr {
+    
+  position: relative ;
     display: block;
     width: 100%;
     background: var(--color-background);
@@ -622,6 +505,7 @@
     border: none;
     font-size: 0.92rem;
     word-break: break-word;
+    
   }
 
   table.table tbody td::before {
@@ -698,10 +582,12 @@
   background-color: #f8f9fa; /* 🔧 color de fondo del grupo completo */
   transition: all 0.25s ease;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08); /* 🔧 sombra del contenedor */
+  
 }
 .custom-input-group:focus-within {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 30%, transparent);
+
 }
 
 /* =============================================== */
@@ -787,3 +673,114 @@
 
 /* ============================= */
 /* Color a los Roles en el formulario */
+
+
+
+/* ============================= */
+/* BOTÓN ⋮ */
+/* ============================= */
+.menu-trigger {
+  background: #f1f3f4;
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+.menu-trigger:hover {
+  background: #e0e0e0;
+}
+
+.menu-trigger.abierto {
+  background: #d0d0d0 !important;
+  transform: scale(1.05);
+}
+
+/* ============================= */
+/* MENÚ FLOTANTE (FIJO COMO SAT) */
+/* ============================= */
+.menu-flotante {
+  position: absolute !important;
+  z-index: 999999;
+  background: white;
+  padding: 10px;
+  width: 170px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: fadeIn .15s ease-out;
+}
+
+/* ============================= */
+/* FLECHITA */
+/* ============================= */
+.menu-flotante::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  right: 14px;
+  width: 14px;
+  height: 14px;
+  background: white;
+  transform: rotate(45deg);
+  box-shadow: -2px -2px 4px rgba(0,0,0,0.06);
+}
+/* ============================= */
+/* BOTONES DEL MENÚ */
+/* ============================= */
+.accion-btn {
+  display: absolute;
+  align-items: center;
+  gap: 8px;
+
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+
+  font-size: 14px;
+  width: 100%;
+  text-align: left;
+  transition: .2s;
+  color: white;
+}
+
+.accion-btn.editar {
+  background: #007bff;
+}
+.accion-btn.editar:hover {
+  background: #0064cf;
+}
+
+.accion-btn.eliminar {
+  background: #dc3545;
+}
+.accion-btn.eliminar:hover {
+  background: #b52a35;
+}
+
+/* Animación */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================= */
+/* PERMITIR QUE EL MENÚ SALGA FUERA DEL TD */
+/* ============================= */
+td {
+  position: relative;
+  overflow: visible !important;
+}
+.menu-flotante {
+  position: absolute !important;
+}
+
+.tabla-card {
+  position: relative;
+  width: 100%;
+}

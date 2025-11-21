@@ -57,7 +57,7 @@
 
 
   <!-- Tabla -->
-<div class="card-body p-0 custom-table-container">
+<div class="card-body p-0 custom-table-container tabla-card">
   <div class="table-responsive">
     <table class="table table-striped" [ngClass]="{'table-dark': temaActual === 'dark'}">
       <thead class="custom-table-header">
@@ -95,16 +95,16 @@
           </td>
 
           <!-- Acciones -->
-          <td class="text-center pe-4">
-            <div class="btn-group">
-              <button class="btn btn-sm btn-outline-primary me-1" (click)="abrirEditar(c.id)">
-                <i data-feather="edit-2"></i>
-              </button>
-              <button class="btn btn-sm btn-outline-danger" (click)="eliminar(c.id)">
-                <i data-feather="trash-2"></i>
-              </button>
-            </div>
-          </td>
+          <!-- Acciones -->
+<td class="text-center pe-4">
+  <button 
+    class="menu-trigger"
+    (click)="abrirMenu($event, c)"
+    [class.abierto]="menu.visible && menu.cliente?.id === c.id">
+    <i class="fas fa-ellipsis-v"></i>
+  </button>
+</td>
+
         </tr>
 
         <!-- Mensaje sin datos -->
@@ -115,6 +115,23 @@
         </tr>
       </tbody>
     </table>
+
+
+ <!-- MENÚ FLOTANTE -->
+    <div 
+      class="menu-flotante"
+      *ngIf="menu.visible"
+      [ngStyle]="{ top: menu.y + 'px', left: menu.x + 'px' }"
+    >
+      <button class="accion-btn editar" (click)="editarDesdeMenu()">
+        <i class="fas fa-pen"></i> Editar
+      </button>
+
+      <button class="accion-btn eliminar" (click)="eliminarDesdeMenu()">
+        <i class="fas fa-trash"></i> Eliminar
+      </button>
+    </div>
+
   </div>
 </div>
 

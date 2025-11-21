@@ -1,6 +1,7 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { SesionService } from '../../core/services/sesion.service'; // 👈 IMPORTANTE
 
 @Component({
   selector: 'app-sidebar',
@@ -10,8 +11,14 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./sidebar.css']
 })
 export class SidebarComponent implements OnInit {
+
+  // 👇 ESTA propiedad permite usar sesion.tiene('permiso') en el HTML
+  public sesion = inject(SesionService);
+
   isCollapsed = false;
   isMobile = false;
+
+  public rol = localStorage.getItem('rol'); 
 
   // Control de tema
   currentTheme: 'default' | 'light' | 'dark' | 'custom' = 'default';
@@ -39,14 +46,14 @@ export class SidebarComponent implements OnInit {
       this.currentTheme = storedTheme;
       document.documentElement.setAttribute('data-theme', storedTheme);
     }
-// Observa cambios de tema y de variables CSS aplicadas al <html>
-const observer = new MutationObserver(() => this.updateSidebarTextContrast());
-observer.observe(document.documentElement, {
-  attributes: true,
-  attributeFilter: ['data-theme', 'style']
-});
 
-    // Actualizar contraste inicial
+    // Observa cambios para actualizar contraste
+    const observer = new MutationObserver(() => this.updateSidebarTextContrast());
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme', 'style']
+    });
+
     this.updateSidebarTextContrast();
   }
 
@@ -77,7 +84,6 @@ observer.observe(document.documentElement, {
     this.currentTheme = theme;
     localStorage.setItem('theme', theme);
 
-    // Si cambia a tema distinto de custom, limpiar colores personalizados
     if (theme !== 'custom') {
       document.documentElement.style.removeProperty('--color-primary');
       document.documentElement.style.removeProperty('--color-navbar');
@@ -86,7 +92,6 @@ observer.observe(document.documentElement, {
       document.documentElement.style.removeProperty('--color-text-sidebar');
     }
 
-    // Si vuelve a custom, cargar colores guardados
     if (theme === 'custom') {
       const cfg = localStorage.getItem('configuracion');
       if (cfg) {
@@ -97,11 +102,10 @@ observer.observe(document.documentElement, {
       }
     }
 
-    // Recalcular contraste del texto del sidebar
     this.updateSidebarTextContrast();
   }
 
-  // Calcular automáticamente el color de texto del sidebar según fondo
+  // Calcular automáticamente el color del texto del sidebar
   updateSidebarTextContrast() {
     const bgColor = getComputedStyle(document.documentElement)
       .getPropertyValue('--color-primary')

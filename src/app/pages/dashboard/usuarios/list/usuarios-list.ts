@@ -27,12 +27,72 @@ export class UsuariosList implements OnInit, AfterViewInit {
   mostrarModal = false;
   editingId: number | null = null;
 
-  constructor(private usuarioSrv: UsuariosService) {}
+  constructor(private usuarioSrv: UsuariosService) {
+ document.addEventListener("click", () => {
+    this.menu.visible = false;
+  });
+  }
+
+
 
   ngOnInit(): void {
     this.cargarUsuarios();
     this.detectarTema();
   }
+
+
+// Menú flotante
+menu = {
+  visible: false,
+  x: 0,
+  y: 0,
+  usuario: null as any
+};
+
+abrirMenu(event: MouseEvent, usuario: any) {
+  event.stopPropagation();
+
+  // Si ya está abierto para este usuario → cerrar
+  if (this.menu.visible && this.menu.usuario?.id === usuario.id) {
+    this.menu.visible = false;
+    return;
+  }
+
+  const btn = event.currentTarget as HTMLElement;
+  const rectBtn = btn.getBoundingClientRect();          // botón
+  const tablaCard = btn.closest('.tabla-card') as HTMLElement;
+  const rectTabla = tablaCard.getBoundingClientRect();  // contenedor
+
+  // Ancho aproximado del menú (ajústalo si cambias el CSS)
+  const MENU_WIDTH = 300;
+
+  // Centro del botón, relativo al contenedor
+  const centerBtnX = rectBtn.left - rectTabla.left + rectBtn.width / 2;
+
+  this.menu = {
+    visible: true,
+    // centramos el menú en el botón
+    x: centerBtnX - MENU_WIDTH / 2,
+    y: rectBtn.bottom - rectTabla.top + 8,
+    usuario
+  };
+}
+
+
+
+
+editarDesdeMenu() {
+  this.abrirEditar(this.menu.usuario.id);
+  this.menu.visible = false;
+}
+
+eliminarDesdeMenu() {
+  this.eliminar(this.menu.usuario.id);
+  this.menu.visible = false;
+}
+
+
+
 
   ngAfterViewInit(): void {
     setTimeout(() => feather?.replace(), 0);

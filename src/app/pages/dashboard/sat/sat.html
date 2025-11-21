@@ -1,79 +1,398 @@
-<div class="container mt-4">
-  <h4 class="text-primary">Solicitudes SAT</h4>
+<div class="sat-container">
+  <!-- ===== ENCABEZADO ===== -->
+  <div class="sat-header">
+    <h2>Gestión de Solicitudes SAT</h2>
+    <p>Consulta, verifica y descarga CFDI de forma automatizada</p>
+  </div>
 
-  <!-- ===================== FORMULARIO NUEVA SOLICITUD ===================== -->
-  <div class="card mt-3 p-3 shadow-sm">
-    <h6>Crear nueva solicitud</h6>
+  <!-- ===== FORMULARIO ===== -->
+  <div class="solicitud-card">
+    <h5 class="section-title">Nueva solicitud</h5>
     <form (ngSubmit)="crearSolicitud()" #formSolicitud="ngForm">
-      <div class="row g-3">
-        <!-- Cliente -->
-        <div class="col-md-4">
-          <label class="form-label">Cliente</label>
-          <select class="form-select" [(ngModel)]="form.cliente_id" name="cliente_id" required>
-            <option value="" disabled selected>Seleccione un cliente</option>
-            <option *ngFor="let c of clientes" [value]="c.id">{{ c.razon_social }}</option>
-          </select>
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Seleccionar cliente</label>
+          <div class="autocomplete">
+            <input type="text" placeholder="Buscar cliente por nombre o RFC..." class="form-control"
+                   [(ngModel)]="busquedaCliente" name="busquedaCliente"
+                   (input)="filtrarClientes()" (focus)="mostrarLista = true" autocomplete="off" />
+            <ul *ngIf="mostrarLista && clientesFiltrados.length" class="autocomplete-list">
+              <li *ngFor="let c of clientesFiltrados" (click)="seleccionarCliente(c)">
+                <div class="client-option">
+                  <span class="nombre">{{ c.razon_social }}</span>
+                  <small>{{ c.rfc }} · {{ c.correo_electronico }}</small>
+                </div>
+              </li>
+            </ul>
+          </div>
         </div>
 
-        <!-- Tipo -->
-        <div class="col-md-3">
-          <label class="form-label">Tipo solicitud</label>
+        <div class="form-group">
+          <label>Tipo de solicitud</label>
           <select class="form-select" [(ngModel)]="form.tipo_solicitud" name="tipo_solicitud" required>
             <option value="emitidos">Emitidos</option>
             <option value="recibidos">Recibidos</option>
           </select>
         </div>
 
-        <!-- Fechas -->
-        <div class="col-md-3">
-          <label class="form-label">Fecha inicio</label>
-          <input type="date" class="form-control" [(ngModel)]="form.fecha_inicio" name="fecha_inicio" required>
+        <div class="form-group">
+          <label>Fecha inicio</label>
+          <input type="date" class="form-control" [(ngModel)]="form.fecha_inicio" name="fecha_inicio" required />
         </div>
 
-        <div class="col-md-3">
-          <label class="form-label">Fecha fin</label>
-          <input type="date" class="form-control" [(ngModel)]="form.fecha_fin" name="fecha_fin" required>
+        <div class="form-group">
+          <label>Fecha fin</label>
+          <input type="date" class="form-control" [(ngModel)]="form.fecha_fin" name="fecha_fin" required />
         </div>
       </div>
 
-      <div class="mt-3 text-end">
-        <button class="btn btn-primary" [disabled]="formSolicitud.invalid || cargando">
-          Crear solicitud
+      <div class="text-end mt-3">
+        <button class="btn btn-asemp" [disabled]="formSolicitud.invalid || cargando">
+          <span *ngIf="!cargando">Crear solicitud</span>
+          <span *ngIf="cargando" class="spinner-border spinner-border-sm"></span>
         </button>
       </div>
     </form>
   </div>
 
-  <!-- ===================== LISTA DE SOLICITUDES ===================== -->
-  <div class="card mt-4 p-3 shadow-sm">
-    <h6>Solicitudes registradas</h6>
-    <table class="table table-sm table-bordered mt-2">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Cliente</th>
-          <th>Tipo</th>
-          <th>Fechas</th>
-          <th>Estado</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let s of solicitudes">
-          <td>{{ s.id }}</td>
-          <td>{{ s.cliente?.razon_social || '—' }}</td>
-          <td>{{ s.tipo_solicitud }}</td>
-          <td>{{ s.fecha_inicio | date }} → {{ s.fecha_fin | date }}</td>
-          <td>{{ s.mensaje || '-' }}</td>
-          <td>
-            <button class="btn btn-sm btn-info me-1" (click)="verificar(s.id)">Verificar</button>
-            <button class="btn btn-sm btn-success" (click)="descargar(s.id)">Descargar</button>
-          </td>
-        </tr>
-        <tr *ngIf="!solicitudes.length">
-          <td colspan="6" class="text-center text-muted">No hay solicitudes registradas</td>
-        </tr>
-      </tbody>
-    </table>
+
+  <div class="solicitud-card">
+    <h5 class="section-title">Filtros de Busqueda</h5>
+<div class="row mb-3 g-3">
+
+  <!-- Texto general -->
+  <div class="col-md-4">
+    <input type="text" class="form-control" placeholder="Buscar..."
+           [(ngModel)]="texto"
+           (input)="page = 1; cargarSolicitudes()">
+  </div>
+
+  <!-- Tipo -->
+  <div class="col-md-2">
+    <select class="form-select"
+            [(ngModel)]="filtroTipo"
+            (change)="page = 1; cargarSolicitudes()">
+      <option [ngValue]="null">Todos</option>
+      <option value="emitidos">Emitidos</option>
+      <option value="recibidos">Recibidos</option>
+    </select>
+  </div>
+
+  <!-- Fecha inicio -->
+<div class="col-md-2">
+  <input type="date" class="form-control"
+         [(ngModel)]="filtroFechaInicio"
+         (change)="onCambioFechas()">
+</div>
+
+<!-- Fecha fin -->
+<div class="col-md-2">
+  <input type="date" class="form-control"
+         [(ngModel)]="filtroFechaFin"
+         (change)="onCambioFechas()">
+</div>
+
+
+</div>
+</div>
+
+
+  <!-- ===== FILTROS ===== -->
+  <div class="filtro-tabs">
+  <button (click)="setFiltro('todas')" [class.active]="filtro==='todas'">Todas</button>
+  <button (click)="setFiltro('pendientes')" [class.active]="filtro==='pendientes'">Pendientes</button>
+  <button (click)="setFiltro('terminadas')" [class.active]="filtro==='terminadas'">Terminadas</button>
+  <button (click)="setFiltro('error')" [class.active]="filtro==='error'">Con error</button>
+</div>
+
+  <!---->
+<div class="text-end mb-3 custom-text-muted">
+  Mostrando 
+  <strong>{{mostrandoDesde}}</strong> – 
+  <strong>{{mostrandoHasta}}</strong>
+  de 
+  <strong>{{totalSolicitudes}}</strong> solicitudes
+</div>
+
+
+
+  <!-- ===== TABLA ===== -->
+  <div class="tabla-card">
+    <h5 class="section-title">Solicitudes registradas</h5>
+
+    <!--TABLE-STRIPED ES PARA LOS COLORES ARTENADOS EN ESTE CASO GRIS-->
+    <!--table al principio pone mi diseno blanco-->
+    <!--sin table pone colores pastel-->
+    <table class="table table-striped text-center tabla-sat"
+       [ngClass]="{'table-dark': temaActual === 'dark'}">
+
+
+  <!-- ================= CABECERA ================= -->
+  <thead>
+    <tr>
+      <!-- Identificadores -->
+      <th>ID</th>
+      <th>Usuario</th>
+      <th>Cliente</th>
+
+      <!-- Certificado 
+      <th>Certificado</th>-->
+
+      <!-- Datos de solicitud -->
+      <th>Tipo solicitud</th>
+      <th>RFC Emisor</th>
+      <!--<th>RFC Receptor</th>-->
+
+      <!-- Fechas
+      <th>Fecha inicio</th>
+      <th>Fecha fin</th> -->
+      <th>Rango de Fechas</th>
+      <th>Fecha creación</th>
+      <th>Última verificación</th>
+
+      <!-- Estado SAT -->
+      <th>Código estado SAT</th>
+      <th>Estado (num)</th>
+      <th>Mensaje SAT</th>
+
+      <!-- Token 
+      <th>Token</th>-->
+
+      <!-- Acciones -->
+      <th>Acciones</th>
+    </tr>
+  </thead>
+
+  <!-- ================= CUERPO ================= -->
+<tbody class="text-center">
+  <ng-container *ngFor="let s of solicitudes">
+    <tr>
+
+      <td>{{ s.id }}</td>
+      <td>{{ s.usuario }}</td>
+      <td>{{ s.cliente }}</td>
+      <td>{{ s.tipo_solicitud }}</td>
+      <td>{{ s.rfc_emisor }}</td>
+    <!--<td>{{ s.rfc_receptor }}</td>-->
+
+      <td>
+        {{ s.fecha_inicio | date:'shortDate' }} → 
+        {{ s.fecha_fin | date:'shortDate' }}
+      </td>
+
+      <td>{{ s.fecha_creacion | date:'short' }}</td>
+      <td>{{ s.fecha_ultima_verificacion | date:'short' }}</td>
+
+      <td>{{ s.codigo_estado_texto }}</td>
+
+      <td>
+        <!-- Estado numérico con badge de color -->
+          <span class="estado"
+               [ngClass]="{
+  'estado-aceptada':  s.estado_solicitud === 1,
+  'estado-proceso':   s.estado_solicitud === 2,
+  'estado-ok':        s.estado_solicitud === 3,
+  'estado-error':     s.estado_solicitud === 4,
+  'estado-rechazada': s.estado_solicitud === 5,
+  'estado-vencida':   s.estado_solicitud === 6,
+  'estado-creada':    s.estado_solicitud === 0
+}">
+          {{ s.estado_solicitud_texto }}
+        </span>
+      </td>
+
+       <td>{{ s.mensaje || s.codigo_estado_texto || 'Sin verificar' }}</td>
+<td class="acciones-menu">
+  <button class="menu-trigger" (click)="abrirMenu($event, s)">
+    <i class="fas fa-ellipsis-v"></i>
+  </button>
+</td>
+
+
+
+
+    </tr>
+  </ng-container>
+
+  <!-- Sin resultados -->
+  <tr *ngIf="solicitudes.length === 0">
+    <td colspan="18" class="text-center text-muted">
+      No hay solicitudes para mostrar
+    </td>
+  </tr>
+</tbody>
+
+</table>
+<!-- 🔥 AQUÍ VA EL MENÚ, DENTRO DE tabla-card -->
+  <div 
+    class="menu-flotante" 
+    *ngIf="menu.visible"
+    [ngStyle]="{'top.px': menu.y, 'left.px': menu.x}"
+  
+    >
+
+    <button
+      class="accion-btn verificar"
+      [class.desactivado]="menu.solicitud.estado_solicitud === 3"
+      (click)="onIntentarVerificar(menu.solicitud)">
+      <i class="fas fa-sync-alt"></i> Verificar
+    </button>
+
+    <button
+      class="accion-btn descargar"
+      (click)="abrirDetalle(menu.solicitud)">
+      <i class="fas fa-download"></i> Descargar
+    </button>
+
+
+    <button
+  class="accion-btn detalle"
+  style="background:#6f42c1"
+  (click)="abrirHistorialVerificaciones(menu.solicitud)">
+  <i class="fas fa-info-circle"></i> Historial
+</button>
+
+  </div>
+
+
+
+
+<!-- PAGINACION -->
+<div class="d-flex justify-content-center align-items-center gap-3 my-3">
+
+  <button class="btn btn-outline-secondary"
+          [disabled]="page <= 1"
+          (click)="cambiarPagina(page - 1)">
+    Anterior
+  </button>
+
+  <span>Página {{page}} de {{paginasTotales}}</span>
+
+  <button class="btn btn-outline-secondary"
+          [disabled]="page >= paginasTotales"
+          (click)="cambiarPagina(page + 1)">
+    Siguiente
+  </button>
+
+</div>
+
+
+<sat-historial-verificaciones
+  [visible]="historialVisible"
+  [historial]="historialDatos"
+  [solicitud]="solicitudHistorial"
+  (cerrar)="historialVisible = false">
+</sat-historial-verificaciones>
+
+
+  </div>
+</div>
+
+<!-- ===== MODAL DETALLE ===== -->
+<div class="modal-backdrop" *ngIf="modalAbierto" (click)="cerrarModal()"></div>
+<div class="modal" *ngIf="modalAbierto" role="dialog" aria-modal="true">
+  <div class="modal-header">
+    <div class="header-title">
+      <h5>Detalle solicitud #{{ solicitudActual?.id }}</h5>
+      <span class="cliente-name">{{ solicitudActual?.cliente }}</span>
+
+    </div>
+    <button class="btn-close" (click)="cerrarModal()" aria-label="Cerrar">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <div class="modal-body">
+    <!-- Información Principal -->
+    <div class="info-grid">
+      <div class="info-item">
+        <label>Estado</label>
+        <span class="estado-badge" [ngClass]="{
+          'estado-pendiente': solicitudActual?.estado_solicitud === 1,
+          'estado-completado': solicitudActual?.estado_solicitud === 3,
+          'estado-error': solicitudActual?.estado_solicitud === 0
+        }">
+          {{ solicitudActual?.mensaje || 'Sin verificar' }}
+        </span>
+      </div>
+      <div class="info-item">
+        <label>Token SAT</label>
+        <span class="value">{{ solicitudActual?.token || '—' }}</span>
+      </div>
+      <div class="info-item">
+        <label>Última verificación</label>
+        <span class="value">{{ solicitudActual?.fecha_ultima_verificacion | date:'short' }}</span>
+      </div>
+    </div>
+
+    <!-- Descarga Principal -->
+    <div class="download-section">
+      <button class="btn-download-main" (click)="descargarUltimoZip(solicitudActual)">
+        <i class="fas fa-file-archive"></i>
+        Descargar ZIP completo
+      </button>
+    </div>
+
+    <!-- Archivos -->
+    <div class="files-section">
+      <!-- PDFs -->
+      <div class="file-category">
+        <div class="category-header">
+          <h6><i class="fas fa-file-pdf"></i> PDF ({{ pdfs(solicitudActual?.id).length }})</h6>
+        </div>
+        <div class="file-list" *ngIf="pdfs(solicitudActual?.id).length; else noPdf">
+          <div class="file-item" *ngFor="let a of pdfs(solicitudActual?.id)">
+            <div class="file-info">
+              <span class="file-name">{{ a.nombre }}</span>
+              <span class="file-size">{{ (a.bytes ?? a.tamano) | number }} bytes</span>
+            </div>
+            <div class="file-actions">
+              <button class="btn-action btn-view" (click)="abrirArchivo(solicitudActual.id, 'pdf', a.nombre)">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="btn-action btn-download" (click)="descargarArchivo(solicitudActual.id, 'pdf', a.nombre)">
+                <i class="fas fa-download"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <ng-template #noPdf>
+          <div class="empty-state">No hay archivos PDF</div>
+        </ng-template>
+      </div>
+
+      <!-- XMLs -->
+      <div class="file-category">
+        <div class="category-header">
+          <h6><i class="fas fa-file-code"></i> XML ({{ xmls(solicitudActual?.id).length }})</h6>
+        </div>
+        <div class="file-list" *ngIf="xmls(solicitudActual?.id).length; else noXml">
+          <div class="file-item" *ngFor="let a of xmls(solicitudActual?.id)">
+            <div class="file-info">
+              <span class="file-name">{{ a.nombre }}</span>
+              <span class="file-size">{{ (a.bytes ?? a.tamano) | number }} bytes</span>
+            </div>
+            <div class="file-actions">
+              <button class="btn-action btn-view" (click)="abrirArchivo(solicitudActual.id, 'xml', a.nombre)">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="btn-action btn-download" (click)="descargarArchivo(solicitudActual.id, 'xml', a.nombre)">
+                <i class="fas fa-download"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <ng-template #noXml>
+          <div class="empty-state">No hay archivos XML</div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn-close-footer" (click)="cerrarModal()">
+      <i class="fas fa-times"></i>
+      Cerrar
+    </button>
   </div>
 </div>

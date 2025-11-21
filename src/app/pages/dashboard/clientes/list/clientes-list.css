@@ -339,6 +339,7 @@
     border: none;
     overflow-x: hidden;
     padding: 0 5px;
+    overflow: visible !important;
   }
 
   table.table {
@@ -516,3 +517,141 @@
 
 /* ============================= */
 /* Color a los Roles en el formulario */
+
+
+
+
+
+
+/* ============================= */
+/* BOTÓN ⋮ */
+/* ============================= */
+.menu-trigger {
+  background: #f1f3f4;
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+.menu-trigger:hover {
+  background: #e0e0e0;
+}
+
+.menu-trigger.abierto {
+  background: #d0d0d0 !important;
+  transform: scale(1.05);
+  
+}
+
+
+/* ============================= */
+/* MENÚ FLOTANTE (FIJO COMO SAT) */
+/* ============================= */
+.menu-flotante {
+  position: absolute !important;
+  z-index: 999999;
+  background: white;
+  padding: 10px;
+  width: 170px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: fadeIn .15s ease-out;
+}
+
+/* ============================= */
+/* FLECHITA */
+/* ============================= */
+.menu-flotante::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  right: 14px;
+  width: 14px;
+  height: 14px;
+  background: white;
+  transform: rotate(45deg);
+  box-shadow: -2px -2px 4px rgba(0,0,0,0.06);
+}
+/* ============================= */
+/* BOTONES DEL MENÚ */
+/* ============================= */
+.accion-btn {
+  display: absolute;
+  align-items: center;
+  gap: 8px;
+
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+
+  font-size: 14px;
+  width: 100%;
+  text-align: left;
+  transition: .2s;
+  color: white;
+  
+}
+
+.accion-btn.editar {
+  background: #007bff;
+}
+.accion-btn.editar:hover {
+  background: #0064cf;
+}
+
+.accion-btn.eliminar {
+  background: #dc3545;
+}
+.accion-btn.eliminar:hover {
+  background: #b52a35;
+}
+
+/* Animación */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================= */
+/* PERMITIR QUE EL MENÚ SALGA FUERA DEL TD */
+/* ============================= */
+td {
+  position: relative;
+  overflow: visible !important;
+}
+.menu-flotante {
+  position: absolute !important;
+  
+}
+
+/* PERMITIR QUE EL MENÚ SALGA COMPLETO */
+.tabla-card {
+  position: relative !important;
+  overflow: visible !important;
+  z-index: 1;
+}
+
+.table-responsive {
+  overflow: visible !important;
+}
+
+
+.custom-card {
+  overflow: visible !important;
+}
+
+.custom-table-container {
+  overflow: visible !important;
+}
+
+.card-body {
+  overflow: visible !important;
+}
+

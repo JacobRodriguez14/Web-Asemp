@@ -1,54 +1,92 @@
 // src/app/core/services/auth.service.ts
-import { Injectable } from '@angular/core';                    // 👈 Necesario para que Angular reconozca el servicio
-import { HttpClient } from '@angular/common/http';             // 👈 Cliente HTTP para peticiones al backend
-import { environment } from '../../../environments/environment'; // 👈 Contiene la URL base de la API
+
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 import { tap } from 'rxjs/operators';
+import { SesionService } from './sesion.service';   // 👈 Importante para manejar permisos
 
-// 👇 Esta línea es OBLIGATORIA: indica que el servicio se puede inyectar globalmente
+// 👇 Con esto Angular conoce el servicio globalmente
 @Injectable({ providedIn: 'root' })
-export class AuthService {                                     // 👈 Asegúrate de que diga exactamente "export class AuthService"
-  private api = `${environment.apiUrl}/api/auth`;                  // 👈 Base URL: https://localhost:7183/api/auth
+export class AuthService {
 
-  constructor(private http: HttpClient) {}                     // 👈 Angular inyecta el cliente HTTP aquí
+  // URL base: https://localhost:7183/api/auth
+  private api = `${environment.apiUrl}/api/auth`;
 
-  // --- LOGIN ---
+  constructor(
+    private http: HttpClient,
+    private sesion: SesionService          // 👈 Inyectamos SesionService
+  ) {}
+
+  // ======================================================
+  // ===============  LOGIN DEL USUARIO ====================
+  // ======================================================
   login(credenciales: { usuario: string; contrasena: string }) {
-    return this.http
-      .post<{ token: string; usuario: string; rol: string }>(  // 👈 Petición POST al endpoint /api/auth/login
-        `${this.api}/login`,
-        credenciales
-      )
-      .pipe(
-        tap((res) => {
-          // Guarda los datos devueltos por la API en localStorage
-          localStorage.setItem('token', res.token);
-          localStorage.setItem('usuario', res.usuario);
-          localStorage.setItem('rol', res.rol);
-        })
-      );
-  }
 
-  // --- PERFIL ---
-  getPerfil() {                                                // 👈 Método que faltaba: obtiene los datos del usuario logueado
-    return this.http.get<{ id: number; usuario: string; rol: string }>(
-      `${this.api}/me`                                         // 👈 Endpoint GET /api/auth/me (requiere token)
+    // 👇 IMPORTANTE: el backend ahora regresa "permisos"
+    return this.http.post<{
+      token: string;
+      usuario: string;
+      rol: string;
+      permisos: string[];
+    }>(
+      `${this.api}/login`,
+      credenciales
+    )
+    .pipe(
+      tap((res) => {
+
+        // --- Guardar datos en localStorage ---
+        localStorage.setItem('token', res.token);
+        localStorage.setItem('usuario', res.usuario);
+        localStorage.setItem('rol', res.rol);
+
+        // 👇 Guardamos permisos en localStorage
+        localStorage.setItem('permisos', JSON.stringify(res.permisos));
+
+        // 👇 Guardamos permisos en memoria (sesión actual)
+        this.sesion.setPermisos(res.permisos);
+      })
     );
   }
 
-  // --- LOGOUT ---
-  logout() {                                                   // 👈 Elimina token y datos guardados
+  // ======================================================
+  // ===============  OBTENER PERFIL  ======================
+  // ======================================================
+  getPerfil() {
+    return this.http.get<{
+      id: number;
+      usuario: string;
+      rol: string;
+      permisos?: string[];
+    }>(`${this.api}/me`);
+  }
+
+  // ======================================================
+  // ===================== LOGOUT ==========================
+  // ======================================================
+  logout() {
+    // Limpia el localStorage completo
     localStorage.removeItem('token');
     localStorage.removeItem('usuario');
     localStorage.removeItem('rol');
+    localStorage.removeItem('permisos');
+
+    // Limpia permisos en la sesión actual
+    this.sesion.setPermisos([]);
   }
 
-  // --- TOKEN ---
-  get token() {                                                // 👈 Getter: devuelve el token actual (si existe)
+  // ======================================================
+  // ==================== TOKEN ============================
+  // ======================================================
+  get token() {
     return localStorage.getItem('token');
   }
 
-  // --- ESTADO ---
-  get estaAutenticado(): boolean {                             // 👈 Retorna true si existe token (usuario logueado)
+  // ======================================================
+  // ================ ESTADO DEL LOGIN =====================
+  // ======================================================
+  get estaAutenticado(): boolean {
     return !!this.token;
   }
 }

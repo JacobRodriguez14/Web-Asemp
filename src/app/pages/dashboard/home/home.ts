@@ -21,30 +21,35 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarDatosDashboard();
-  window.addEventListener('scroll', this.handleScroll);
+    window.addEventListener('scroll', this.handleScroll);
   }
 
-handleScroll = (): void => {
-  const banner = document.querySelector('.hero-image') as HTMLElement;
-  if (banner) {
-    const offset = window.scrollY * 0.3; // velocidad media (puedes subir a 0.7)
-    banner.style.transform = `translateY(${offset * 0.2}px) scale(1.1)`; // mueve menos para no cortar
-  }
-};
+  handleScroll = (): void => {
+    const banner = document.querySelector('.hero-image') as HTMLElement;
+    if (banner) {
+      const offset = window.scrollY * 0.3;
+      banner.style.transform = `translateY(${offset * 0.2}px) scale(1.1)`;
+    }
+  };
 
   cargarDatosDashboard(): void {
     this.satService.getSolicitudes().subscribe({
       next: (data: any[]) => {
+
         this.totalSolicitudes = data.length;
+
         this.descargasExitosas = data.filter(s => s.estado_solicitud === 3).length;
+
         this.solicitudesPendientes = data.filter(s => s.estado_solicitud === 1).length;
-        this.erroresSat = data.filter(s => s.estado_solicitud === 0).length;
+
+        this.erroresSat = data.filter(s => s.estado_solicitud === 0 || s.estado_solicitud === 4).length;
 
         this.ultimasSolicitudes = data
           .sort((a, b) => new Date(b.fecha_creacion).getTime() - new Date(a.fecha_creacion).getTime())
           .slice(0, 5);
       },
-      error: (err) => console.error('Error cargando solicitudes:', err)
+      error: (err: any) => console.error('Error cargando solicitudes:', err)
     });
   }
+
 }
