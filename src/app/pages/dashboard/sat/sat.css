@@ -610,9 +610,9 @@ button.btn-sm:hover {
 }
 
 .estado-creada {
-  background: #fff7d1;
-  color: #856404;
-  border: 1px solid #ffeaa7;
+  background: #ffe3d1;
+  color: #854204;
+  border: 1px solid #ffc7a7;
 }
 
 
@@ -901,7 +901,7 @@ button.btn-sm:hover {
 .estado-error      { background:#fde2e2; color:#842029; border:1px solid #f5c6cb; }
 .estado-rechazada  { background:#f0f0f0; color:#6c757d; border:1px solid #d6d6d6; }
 .estado-vencida    { background:#ffe8d6; color:#b3521e; border:1px solid #ffdabf; }
-.estado-creada     { background:#fff7d1; color:#856404; border:1px solid #ffeaa7; }
+.estado-creada     { background:#fde2e2; color:#842029; border:1px solid #f5c6cb; }
 
 /* ===== BOTONES DE ACCIÓN ===== */
 .acciones-compactas button {
@@ -982,3 +982,451 @@ button.btn-sm:hover {
 }
 
 
+
+
+
+
+.sat-loading-overlay {
+  position: fixed;
+  inset: 0; /* top:0; right:0; bottom:0; left:0 */
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 99999; /* por encima de tablas, modales, etc. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sat-loading-box {
+  background: #ffffff;
+  padding: 20px 30px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  min-width: 260px;
+}
+
+.sat-loading-box .spinner-border {
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: 10px;
+}
+
+.sat-loading-box p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+
+
+
+
+/* ===== FILTROS DESPLEGABLES ===== */
+.filters-card {
+  background: var(--color-navbar);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.filters-header {
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-bottom: 1px solid #e2e8f0;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.filters-header:hover {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.header-content i {
+  color: var(--color-primary);
+  font-size: 1.1rem;
+}
+
+.section-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.toggle-icon {
+  color: #64748b;
+  transition: transform 0.3s ease;
+}
+
+.toggle-icon.rotated {
+  transform: rotate(180deg);
+}
+
+/* ===== CUERPO DE FILTROS ===== */
+.filters-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.3s ease;
+  background: white;
+}
+
+.filters-body.expanded {
+  max-height: 300px;
+  padding: 1.5rem;
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filter-label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-label i {
+  color: var(--color-primary);
+  width: 16px;
+  font-size: 0.8rem;
+}
+
+/* ===== CONTROLES DE FORMULARIO MEJORADOS ===== */
+.form-control-improved,
+.form-select-improved {
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.65rem 1rem;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  background: white;
+  color: #374151;
+  width: 100%;
+}
+
+.form-control-improved:focus,
+.form-select-improved:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent);
+}
+
+.search-input-wrapper {
+  position: relative;
+}
+
+.search-input-wrapper i {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.search-input-wrapper input {
+  padding-left: 2.5rem;
+}
+
+/* ===== BOTONES DE ACCIÓN ===== */
+.filter-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.btn-clear-filters {
+  background: transparent;
+  border: 1px solid #dc2626;
+  color: #dc2626;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-clear-filters:hover {
+  background: #dc2626;
+  color: white;
+  transform: translateY(-1px);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .filters-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .filters-body.expanded {
+    padding: 1rem;
+    max-height: 500px;
+  }
+  
+  .filters-header {
+    padding: 1rem;
+  }
+  
+  .filter-actions {
+    justify-content: center;
+  }
+}
+
+/* ===== MODO OSCURO ===== */
+[data-theme="dark"] .filters-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .filters-header {
+  background: linear-gradient(135deg, #334155 0%, #475569 100%);
+  border-bottom-color: #475569;
+}
+
+[data-theme="dark"] .section-title {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .filters-body {
+  background: #1e293b;
+}
+
+[data-theme="dark"] .form-control-improved,
+[data-theme="dark"] .form-select-improved {
+  background: #334155;
+  border-color: #475569;
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .filter-label {
+  color: #cbd5e1;
+}
+
+
+/* Solo estas clases adicionales son necesarias */
+
+/* Header específico para formulario de solicitud */
+.filters-header .fa-plus-circle {
+  color: var(--color-primary);
+}
+
+/* Ajuste para grid del formulario - MODIFICADO PARA 4 COLUMNAS */
+.filters-grid-improved {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr; /* 4 columnas en una fila */
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  align-items: end;
+  overflow: visible !important; /* El grid ya no corta nada */
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+/* Ajustes para campos compactos */
+.filters-grid-improved .filter-group-improved {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filters-grid-improved .filter-label {
+  font-size: 0.85rem;
+  white-space: nowrap;
+  margin-bottom: 0;
+}
+
+.filters-grid-improved .form-control-improved,
+.filters-grid-improved .form-select-improved {
+  padding: 0.6rem 0.75rem;
+  font-size: 0.85rem;
+  min-height: 42px;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .filters-grid-improved {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .filters-grid-improved {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Autocomplete mejorado (si no lo tienes ya) */
+.autocomplete-improved {
+  position: relative !important;
+  overflow: visible !important;
+  z-index: 10;
+}
+
+
+/* Cada celda también debe permitir contenido flotante */
+.filter-group-improved {
+  position: relative !important;
+  overflow: visible !important;
+  z-index: 10;
+}
+
+/* MENU POR ENCIMA DEL GRID */
+.autocomplete-list-improved {
+  position: absolute !important;
+  top: calc(100% + 2px);
+  left: 0;
+  right: 0;
+
+  background: white;
+  border: 2px solid var(--color-primary);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+
+  max-height: 240px;
+  overflow-y: auto;
+
+  z-index: 9999999 !important;
+
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+
+
+.autocomplete-list-improved li {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background-color 0.2s ease;
+}
+
+.autocomplete-list-improved li:hover {
+  background: #f8fafc;
+}
+
+.autocomplete-list-improved li:last-child {
+  border-bottom: none;
+}
+
+.client-option-improved {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.client-name {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 0.9rem;
+}
+
+.client-details {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.client-rfc {
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+.client-separator {
+  color: #64748b;
+}
+
+.client-email {
+  color: #64748b;
+}
+
+/* Botón específico para crear solicitud */
+.btn-create-request {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 0.75rem 2rem;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+.btn-create-request:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.btn-create-request:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-create-request.loading {
+  background: #64748b;
+}
+.search-input-wrapper input {
+  padding-left: 40px !important; /* espacio para ícono */
+}
+
+
+/* CORRIGE el contenedor del formulario que está cortando el autocomplete */
+.filters-card,
+.card-body,
+.filters-body,
+.solicitud-form {
+  overflow: visible !important;
+}
+
+
+/* FORMULARIOS EXPANDIDOS → permiten menú, autocomplete, etc */
+.filters-body.expanded,
+.solicitud-body.expanded {
+  overflow: visible !important;
+  max-height: 1000px; /* animación opcional */
+  transition: all 0.25s ease;
+}
+
+/* FORMULARIOS COLAPSADOS → se ocultan completamente */
+.filters-body.collapsed,
+.solicitud-body.collapsed {
+  overflow: hidden !important;
+  max-height: 0 !important;
+  transition: all 0.25s ease;
+}

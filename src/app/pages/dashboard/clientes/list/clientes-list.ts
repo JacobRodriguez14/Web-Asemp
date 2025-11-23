@@ -5,14 +5,24 @@ import { NgxPaginationModule } from 'ngx-pagination';
 import { ClientesService, ClienteLista, ClienteDetalle } from '../../../../core/services/clientes.service';
 
 import { ClientesFormComponent } from '../form/clientes-form';
+
+import { PermisoDirective } from '../../../../shared/directivas/permiso.directive';
+
+
+
 import Swal from 'sweetalert2';
 
 declare const feather: any;
 
+interface ClienteListaOrdenable extends ClienteLista {
+  rfc?: string;
+  fecha_vigencia?: string;
+}
+
 @Component({
   selector: 'app-clientes-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgxPaginationModule, ClientesFormComponent],
+  imports: [CommonModule, FormsModule, NgxPaginationModule, ClientesFormComponent, PermisoDirective],
   templateUrl: './clientes-list.html',
   styleUrls: ['./clientes-list.css']
 })
@@ -22,8 +32,9 @@ export class ClientesListComponent implements OnInit, AfterViewInit {
   // VARIABLES PRINCIPALES
   // ==============================
 
-  clientes: ClienteLista[] = [];            // lista completa de clientes
-  clientesFiltrados: ClienteLista[] = [];   // lista filtrada para búsqueda
+  clientes: ClienteListaOrdenable[] = [];
+clientesFiltrados: ClienteListaOrdenable[] = [];
+  // lista filtrada para búsqueda
   terminoBusqueda = '';                // texto del input de búsqueda
   criterioBusqueda: 'razon_social' | 'rfc' | 'correo' | 'telefono' = 'razon_social'; // criterio seleccionado
   page = 1;                            // página actual para paginación
@@ -46,6 +57,56 @@ export class ClientesListComponent implements OnInit, AfterViewInit {
     this.cargarClientes();   // carga inicial de datos
     this.detectarTema();     // aplica modo claro/oscuro
   }
+
+// ============================================================
+// ORDENAMIENTO UNIVERSAL
+// ============================================================
+
+
+
+// ============================================================
+// ORDENAMIENTO UNIVERSAL
+// ============================================================
+
+orden = {
+  columna: '' as keyof ClienteListaOrdenable,
+  asc: true
+};
+
+ordenarPor(columna: keyof ClienteListaOrdenable) {
+  if (this.orden.columna === columna) {
+    this.orden.asc = !this.orden.asc;
+  } else {
+    this.orden.columna = columna;
+    this.orden.asc = true;
+  }
+
+  this.clientesFiltrados.sort((a, b) => {
+    let x: any = a[columna];
+    let y: any = b[columna];
+
+    if (x == null) x = '';
+    if (y == null) y = '';
+
+    if (typeof x === 'string') x = x.toLowerCase();
+    if (typeof y === 'string') y = y.toLowerCase();
+
+    return this.orden.asc ? (x > y ? 1 : -1) : (x > y ? -1 : 1);
+  });
+}
+
+getIconoOrden(columna: keyof ClienteListaOrdenable) {
+  if (this.orden.columna !== columna) {
+    return 'fas fa-sort orden-icon neutro';
+  }
+  return this.orden.asc
+    ? 'fas fa-sort-up orden-icon activo'
+    : 'fas fa-sort-down orden-icon activo';
+}
+
+// ==============================
+
+
 
 
 menu = {
@@ -119,16 +180,22 @@ eliminarDesdeMenu() {
   // CRUD - OBTENER DATOS
   // ==============================
 
-  cargarClientes(): void {
-    this.clienteSrv.getLista().subscribe({
-      next: res => {
-        this.clientes = res;
-        this.clientesFiltrados = res;
-        this.refreshIcons();
-      },
-      error: err => console.error('Error al cargar clientes', err)
-    });
-  }
+ cargarClientes(): void {
+  this.clienteSrv.getLista().subscribe({
+    next: res => {
+      this.clientes = res.map(c => ({
+        ...c,
+        rfc: c.certificado?.rfc || '',
+        fecha_vigencia: c.certificado?.fecha_vigencia_fin || ''
+
+      }));
+
+      this.clientesFiltrados = [...this.clientes];
+      this.refreshIcons();
+    },
+    error: err => console.error('Error al cargar clientes', err)
+  });
+}
 
   // ==============================
   // FILTRO DE BÚSQUEDA

@@ -194,15 +194,35 @@ updatePageInfo(url: string): void {
 
   // 🔹 Mapa de rutas con textos amigables
   const routeMap: { [key: string]: { title: string; breadcrumb: string } } = {
-    '/dashboard/home': { title: 'Dashboard', breadcrumb: 'Inicio' },
-    '/dashboard/configuracion': { title: 'Configuración', breadcrumb: 'Ajustes del Sistema' },
-    '/dashboard/usuarios': { title: 'Usuarios', breadcrumb: 'Gestión de Usuarios' },
-    '/dashboard/usuarios/form': { title: 'Usuarios', breadcrumb: 'Registrar o Editar Usuario' },
-    '/dashboard/usuarios/detalle': { title: 'Usuarios', breadcrumb: 'Detalle de Usuario' },
-    '/dashboard/clientes': { title: 'Clientes', breadcrumb: 'Gestión de Clientes' },
-    '/dashboard/sat': { title: 'SAT', breadcrumb: 'Documentos Fiscales' },
-    '/dashboard/reportes': { title: 'Reportes', breadcrumb: 'Análisis y Reportes' },
-  };
+  '/dashboard/home': { title: 'Dashboard', breadcrumb: 'Inicio' },
+  '/dashboard/configuracion': { title: 'Configuración', breadcrumb: 'Ajustes del Sistema' },
+
+  // USUARIOS
+  '/dashboard/usuarios': { title: 'Usuarios', breadcrumb: 'Gestión de Usuarios' },
+  '/dashboard/usuarios/form': { title: 'Usuarios', breadcrumb: 'Registrar o Editar Usuario' },
+  '/dashboard/usuarios/detalle': { title: 'Usuarios', breadcrumb: 'Detalle de Usuario' },
+
+  // CLIENTES
+  '/dashboard/clientes': { title: 'Clientes', breadcrumb: 'Gestión de Clientes' },
+
+  // DEPARTAMENTOS
+  '/dashboard/departamentos': { title: 'Departamentos', breadcrumb: 'Gestión de Departamentos' },
+  '/dashboard/departamentos/form': { title: 'Departamentos', breadcrumb: 'Registrar Departamento' },
+  '/dashboard/departamentos/detalle': { title: 'Departamentos', breadcrumb: 'Detalle de Departamento' },
+
+  // SEGURIDAD DEL SISTEMA
+  '/dashboard/seguridad': { title: 'Seguridad del Sistema', breadcrumb: 'Roles, Acciones y Permisos' },
+
+  // CERTIFICADOS
+  '/dashboard/certificados': { title: 'Certificados', breadcrumb: 'Descarga de Certificados' },
+
+  // SAT
+  '/dashboard/sat': { title: 'SAT', breadcrumb: 'Documentos Fiscales' },
+
+  // REPORTES
+  '/dashboard/reportes': { title: 'Reportes', breadcrumb: 'Análisis y Reportes' },
+};
+
 
   // 🔹 Busca la coincidencia parcial más larga
   const match = Object.keys(routeMap)

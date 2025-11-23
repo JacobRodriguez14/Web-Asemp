@@ -10,10 +10,13 @@
         </div>
 
         <!-- Botón "Nuevo departamento" - Ahora abre modal -->
-        <button class="btn custom-btn-float-azul d-flex align-items-center shadow" (click)="abrirModalNuevo()">
-          <i data-feather="plus" class="me-2"></i>
-          <span>Nuevo departamento</span>
-        </button>
+        <button class="btn custom-btn-float-azul d-flex align-items-center shadow"
+        *permiso="'departamentos.crear'"
+        (click)="abrirModalNuevo()">
+  <i data-feather="plus" class="me-2"></i>
+  <span>Nuevo departamento</span>
+</button>
+
       </div>
     </div>
 
@@ -57,13 +60,23 @@
       <div class="table-responsive">
         <table class="table table-striped" [ngClass]="{'table-dark': temaActual === 'dark'}">
           <thead class="custom-table-header">
-            <tr>
-              <th class="ps-4">ID</th>
-              <th>Nombre</th>
-              <th>Descripción</th>
-              <th class="text-center pe-4">Acciones</th>
-            </tr>
-          </thead>
+  <tr>
+    <th class="th-sortable ps-4" (click)="ordenarPor('id')">
+      ID <i [ngClass]="getIconoOrden('id')"></i>
+    </th>
+
+    <th class="th-sortable" (click)="ordenarPor('nombre')">
+      Nombre <i [ngClass]="getIconoOrden('nombre')"></i>
+    </th>
+
+    <th class="th-sortable" (click)="ordenarPor('descripcion')">
+      Descripción <i [ngClass]="getIconoOrden('descripcion')"></i>
+    </th>
+
+    <th class="text-center pe-4">Acciones</th>
+  </tr>
+</thead>
+
 
           <tbody>
             <tr *ngFor="let d of departamentosFiltrados | paginate: { itemsPerPage: 8, currentPage: page }">
@@ -97,13 +110,19 @@
           *ngIf="menu.visible"
           [ngStyle]="{ top: menu.y + 'px', left: menu.x + 'px' }"
         >
-          <button class="accion-btn editar" (click)="editarDesdeMenu()">
-            <i class="fas fa-pen"></i> Editar
-          </button>
+          <button class="accion-btn editar"
+        *permiso="'departamentos.editar'"
+        (click)="editarDesdeMenu()">
+  <i class="fas fa-pen"></i> Editar
+</button>
 
-          <button class="accion-btn eliminar" (click)="eliminarDesdeMenu()">
-            <i class="fas fa-trash"></i> Eliminar
-          </button>
+
+          <button class="accion-btn eliminar"
+        *permiso="'departamentos.eliminar'"
+        (click)="eliminarDesdeMenu()">
+  <i class="fas fa-trash"></i> Eliminar
+</button>
+
         </div>
       </div>
     </div>

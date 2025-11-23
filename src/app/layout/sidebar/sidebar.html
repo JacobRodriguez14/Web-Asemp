@@ -11,7 +11,7 @@
 
     <p class="sidebar-section">NAVEGACIÓN</p>
 
-    <!-- Inicio (todos pueden entrar) -->
+    <!-- Inicio -->
     <a routerLink="/dashboard/home" routerLinkActive="active">
       <i data-feather="home"></i>
       <span>Inicio</span>
@@ -41,12 +41,33 @@
       <span>Departamentos</span>
     </a>
 
-    <!-- Encabezado administración solo si hay algo que mostrar -->
+
+
+    <!-- NUEVA PÁGINA DE SEGURIDAD (TABS) -->
+    <a *ngIf="sesion.tiene('roles.ver') ||
+              sesion.tiene('acciones.ver') ||
+              sesion.tiene('roles.permisos')"
+       routerLink="/dashboard/seguridad"
+       routerLinkActive="active">
+      <i data-feather="shield"></i>
+      <span>Seguridad</span>
+    </a>
+
+
+    <a *ngIf="sesion.tiene('certificados.ver')"
+   routerLink="/dashboard/certificados"
+   routerLinkActive="active">
+   <i data-feather="key"></i>
+   <span>Certificados</span>
+</a>
+
+
+
+    <!-- ======================================== -->
+    <!-- ADMINISTRACIÓN -->
+    <!-- ======================================== -->
     <p class="sidebar-section"
-       *ngIf="
-         sesion.tiene('sat.ver') ||
-         sesion.tiene('dashboard.ver')
-       ">
+       *ngIf="sesion.tiene('sat.ver') || sesion.tiene('dashboard.ver')">
       ADMINISTRACIÓN
     </p>
 
@@ -58,7 +79,7 @@
       <span>SAT</span>
     </a>
 
-    <!-- Reportes / Dashboard -->
+    <!-- Reportes -->
     <a *ngIf="sesion.tiene('dashboard.ver')"
        routerLink="/dashboard/reportes"
        routerLinkActive="active">
@@ -66,17 +87,17 @@
       <span>Reportes</span>
     </a>
 
-    <p class="sidebar-section" *ngIf="rol === 'Administrador'">SISTEMA</p>
+    <p class="sidebar-section" *ngIf="rol === 'Administrador'">
+      SISTEMA
+    </p>
 
-
-    <!-- Configuración (solo admin) -->
+    <!-- Configuración -->
     <a *ngIf="rol === 'Administrador'"
-   routerLink="/dashboard/configuracion"
-   routerLinkActive="active">
-   <i data-feather="settings"></i>
-   <span>Configuración</span>
-</a>
-
+       routerLink="/dashboard/configuracion"
+       routerLinkActive="active">
+       <i data-feather="settings"></i>
+       <span>Configuración</span>
+    </a>
 
   </nav>
 </aside>

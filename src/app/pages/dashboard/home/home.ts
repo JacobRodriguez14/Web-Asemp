@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SatService } from '../../../core/services/sat.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -17,39 +18,66 @@ export class HomeComponent implements OnInit {
   erroresSat = 0;
   ultimasSolicitudes: any[] = [];
 
-  constructor(private satService: SatService) {}
+  rol: string | null = null;
+
+  constructor(
+    private satService: SatService,
+    private auth: AuthService
+  ) { }
 
   ngOnInit(): void {
-    this.cargarDatosDashboard();
-    window.addEventListener('scroll', this.handleScroll);
+    this.rol = this.auth.getRol();
+
+    if (this.rol !== 'Cliente') {
+      this.cargarDatosDashboard();
+    }
   }
 
-  handleScroll = (): void => {
-    const banner = document.querySelector('.hero-image') as HTMLElement;
-    if (banner) {
-      const offset = window.scrollY * 0.3;
-      banner.style.transform = `translateY(${offset * 0.2}px) scale(1.1)`;
+ cargarDatosDashboard(): void {
+  this.satService.getSolicitudes().subscribe({
+    next: (data: any[]) => {
+
+      // === CONTADORES ===
+      this.totalSolicitudes = data.length;
+
+      this.descargasExitosas = data.filter(s => s.estado_solicitud === 3).length;
+
+      this.solicitudesPendientes = data.filter(s =>
+        s.estado_solicitud === 1 || s.estado_solicitud === 2
+      ).length;
+
+      this.erroresSat = data.filter(s =>
+        s.estado_solicitud === 0 ||
+        s.estado_solicitud === 4 ||
+        s.estado_solicitud === 5 ||
+        s.estado_solicitud === 6
+      ).length;
+
+      // === ÚLTIMAS 5 SOLICITUDES ===
+      this.ultimasSolicitudes = data
+        .sort((a, b) =>
+          new Date(b.fecha_creacion).getTime() -
+          new Date(a.fecha_creacion).getTime()
+        )
+        .slice(0, 5);
+    },
+    error: (err) => console.error('Error cargando solicitudes:', err)
+  });
+}
+
+
+  // ===== Mismo método que usas en el SAT =====
+  getEstadoTexto(estado: number): string {
+    switch (estado) {
+      case 0: return 'Creada';
+      case 1: return 'Pendiente';
+      case 2: return 'En proceso';
+      case 3: return 'Correcta';
+      case 4: return 'Error';
+      case 5: return 'Rechazada';
+      case 6: return 'Vencida';
+      default: return '—';
     }
-  };
-
-  cargarDatosDashboard(): void {
-    this.satService.getSolicitudes().subscribe({
-      next: (data: any[]) => {
-
-        this.totalSolicitudes = data.length;
-
-        this.descargasExitosas = data.filter(s => s.estado_solicitud === 3).length;
-
-        this.solicitudesPendientes = data.filter(s => s.estado_solicitud === 1).length;
-
-        this.erroresSat = data.filter(s => s.estado_solicitud === 0 || s.estado_solicitud === 4).length;
-
-        this.ultimasSolicitudes = data
-          .sort((a, b) => new Date(b.fecha_creacion).getTime() - new Date(a.fecha_creacion).getTime())
-          .slice(0, 5);
-      },
-      error: (err: any) => console.error('Error cargando solicitudes:', err)
-    });
   }
 
 }

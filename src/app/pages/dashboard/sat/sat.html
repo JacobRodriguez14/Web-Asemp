@@ -5,97 +5,199 @@
     <p>Consulta, verifica y descarga CFDI de forma automatizada</p>
   </div>
 
-  <!-- ===== FORMULARIO ===== -->
-  <div class="solicitud-card">
-    <h5 class="section-title">Nueva solicitud</h5>
-    <form (ngSubmit)="crearSolicitud()" #formSolicitud="ngForm">
-      <div class="form-grid">
-        <div class="form-group full">
-          <label>Seleccionar cliente</label>
-          <div class="autocomplete">
-            <input type="text" placeholder="Buscar cliente por nombre o RFC..." class="form-control"
-                   [(ngModel)]="busquedaCliente" name="busquedaCliente"
-                   (input)="filtrarClientes()" (focus)="mostrarLista = true" autocomplete="off" />
-            <ul *ngIf="mostrarLista && clientesFiltrados.length" class="autocomplete-list">
-              <li *ngFor="let c of clientesFiltrados" (click)="seleccionarCliente(c)">
-                <div class="client-option">
-                  <span class="nombre">{{ c.razon_social }}</span>
-                  <small>{{ c.rfc }} · {{ c.correo_electronico }}</small>
+<div class="filters-card">
+  <div class="filters-header" (click)="toggleSolicitudForm()">
+    <div class="header-content">
+      <i class="fas fa-plus-circle"></i>
+      <h5 class="section-title">Nueva Solicitud</h5>
+    </div>
+    <i class="fas fa-chevron-down toggle-icon" [class.rotated]="solicitudFormExpanded"></i>
+  </div>
+
+  <div class="filters-body" [class.expanded]="solicitudFormExpanded" [class.collapsed]="!solicitudFormExpanded">
+
+
+    <form (ngSubmit)="crearSolicitud()" #formSolicitud="ngForm" class="solicitud-form">
+
+      <div class="filters-grid-improved">
+
+        <!-- CLIENTE -->
+        <div class="filter-group-improved full-cell">
+          <label class="filter-label">
+            <i class="fas fa-user"></i> Seleccionar cliente
+          </label>
+
+          <div class="autocomplete-improved">
+            <div class="search-input-wrapper">
+              <input type="text"
+                     placeholder="Buscar cliente por nombre o RFC..."
+                     class="form-control-improved search-input"
+                     [(ngModel)]="busquedaCliente"
+                     name="busquedaCliente"
+                     (input)="filtrarClientes()"
+                     (focus)="mostrarLista = true"
+                     autocomplete="off" />
+              <i class="fas fa-search search-icon-inside"></i>
+            </div>
+
+            <ul *ngIf="mostrarLista && clientesFiltrados.length"
+                class="autocomplete-list-improved">
+              <li *ngFor="let c of clientesFiltrados"
+                  (click)="seleccionarCliente(c)">
+                <div class="client-option-improved">
+                  <span class="client-name">{{ c.razon_social }}</span>
+                  <div class="client-details">
+                    <span class="client-rfc">{{ c.rfc }}</span>
+                    <span class="client-separator">•</span>
+                    <span class="client-email">{{ c.correo_electronico }}</span>
+                  </div>
                 </div>
               </li>
             </ul>
           </div>
         </div>
 
-        <div class="form-group">
-          <label>Tipo de solicitud</label>
-          <select class="form-select" [(ngModel)]="form.tipo_solicitud" name="tipo_solicitud" required>
-            <option value="emitidos">Emitidos</option>
-            <option value="recibidos">Recibidos</option>
+        <!-- TIPO -->
+        <div class="filter-group-improved">
+          <label class="filter-label">
+            <i class="fas fa-tasks"></i> Tipo de solicitud
+          </label>
+          <select class="form-select-improved"
+                  [(ngModel)]="form.tipo_solicitud"
+                  name="tipo_solicitud"
+                  required>
+            <option value="">Seleccionar tipo...</option>
+            <option value="emitidos">CFDI Emitidos</option>
+            <option value="recibidos">CFDI Recibidos</option>
           </select>
         </div>
 
-        <div class="form-group">
-          <label>Fecha inicio</label>
-          <input type="date" class="form-control" [(ngModel)]="form.fecha_inicio" name="fecha_inicio" required />
+        <!-- FECHA INICIO -->
+        <div class="filter-group-improved">
+          <label class="filter-label">
+            <i class="fas fa-calendar-alt"></i> Fecha inicio
+          </label>
+          <input type="date"
+                 class="form-control-improved"
+                 [(ngModel)]="form.fecha_inicio"
+                 name="fecha_inicio"
+                 required />
         </div>
 
-        <div class="form-group">
-          <label>Fecha fin</label>
-          <input type="date" class="form-control" [(ngModel)]="form.fecha_fin" name="fecha_fin" required />
+        <!-- FECHA FIN -->
+        <div class="filter-group-improved">
+          <label class="filter-label">
+            <i class="fas fa-calendar-check"></i> Fecha fin
+          </label>
+          <input type="date"
+                 class="form-control-improved"
+                 [(ngModel)]="form.fecha_fin"
+                 name="fecha_fin"
+                 required />
         </div>
+
       </div>
 
-      <div class="text-end mt-3">
-        <button class="btn btn-asemp" [disabled]="formSolicitud.invalid || cargando">
-          <span *ngIf="!cargando">Crear solicitud</span>
-          <span *ngIf="cargando" class="spinner-border spinner-border-sm"></span>
+      <!-- BOTÓN -->
+      <div class="filter-actions">
+        <button class="btn-create-request"
+                [disabled]="formSolicitud.invalid || cargando"
+                *permiso="'sat.crear_solicitud'"
+                [class.loading]="cargando">
+
+          <span class="btn-content">
+            <i class="fas fa-paper-plane" *ngIf="!cargando"></i>
+            <span class="spinner-border spinner-border-sm" *ngIf="cargando"></span>
+            {{ cargando ? 'Creando solicitud...' : 'Crear Solicitud' }}
+          </span>
+
         </button>
       </div>
+
     </form>
+
+  </div>
+</div>
+
+<!-- ===== FILTROS DE BÚSQUEDA MEJORADOS ===== -->
+<div class="filters-card">
+  <div class="filters-header" (click)="toggleFilters()">
+    <div class="header-content">
+      <i class="fas fa-filter"></i>
+      <h5 class="section-title">Filtros de Búsqueda</h5>
+    </div>
+    <i class="fas fa-chevron-down toggle-icon" [class.rotated]="filtersExpanded"></i>
   </div>
 
+ <div class="filters-body" 
+     [class.expanded]="filtersExpanded"
+     [class.collapsed]="!filtersExpanded">
 
-  <div class="solicitud-card">
-    <h5 class="section-title">Filtros de Busqueda</h5>
-<div class="row mb-3 g-3">
+    <div class="filters-grid">
+      <!-- Búsqueda general -->
+      <div class="filter-group">
+        <label class="filter-label">
+          <i class="fas fa-search"></i>
+          Buscar
+        </label>
+        <div class="search-input-wrapper">
+          <input type="text" 
+                 class="form-control-improved" 
+                 placeholder="Buscar en solicitudes..."
+                 [(ngModel)]="texto"
+                 (input)="page = 1; cargarSolicitudes()">
+        </div>
+      </div>
 
-  <!-- Texto general -->
-  <div class="col-md-4">
-    <input type="text" class="form-control" placeholder="Buscar..."
-           [(ngModel)]="texto"
-           (input)="page = 1; cargarSolicitudes()">
+      <!-- Tipo de solicitud -->
+      <div class="filter-group">
+        <label class="filter-label">
+          <i class="fas fa-tasks"></i>
+          Tipo
+        </label>
+        <select class="form-select-improved"
+                [(ngModel)]="filtroTipo"
+                (change)="page = 1; cargarSolicitudes()">
+          <option [ngValue]="null">Todos los tipos</option>
+          <option value="emitidos">Emitidos</option>
+          <option value="recibidos">Recibidos</option>
+        </select>
+      </div>
+
+      <!-- Fecha inicio -->
+      <div class="filter-group">
+        <label class="filter-label">
+          <i class="fas fa-calendar-alt"></i>
+          Fecha inicio
+        </label>
+        <input type="date" 
+               class="form-control-improved"
+               [(ngModel)]="filtroFechaInicio"
+               (change)="onCambioFechas()">
+      </div>
+
+      <!-- Fecha fin -->
+      <div class="filter-group">
+        <label class="filter-label">
+          <i class="fas fa-calendar-check"></i>
+          Fecha fin
+        </label>
+        <input type="date" 
+               class="form-control-improved"
+               [(ngModel)]="filtroFechaFin"
+               (change)="onCambioFechas()">
+      </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="filter-actions">
+      <button class="btn-clear-filters" (click)="limpiarFiltros()">
+        <i class="fas fa-broom"></i>
+        Limpiar filtros
+      </button>
+    </div>
   </div>
-
-  <!-- Tipo -->
-  <div class="col-md-2">
-    <select class="form-select"
-            [(ngModel)]="filtroTipo"
-            (change)="page = 1; cargarSolicitudes()">
-      <option [ngValue]="null">Todos</option>
-      <option value="emitidos">Emitidos</option>
-      <option value="recibidos">Recibidos</option>
-    </select>
-  </div>
-
-  <!-- Fecha inicio -->
-<div class="col-md-2">
-  <input type="date" class="form-control"
-         [(ngModel)]="filtroFechaInicio"
-         (change)="onCambioFechas()">
 </div>
-
-<!-- Fecha fin -->
-<div class="col-md-2">
-  <input type="date" class="form-control"
-         [(ngModel)]="filtroFechaFin"
-         (change)="onCambioFechas()">
-</div>
-
-
-</div>
-</div>
-
 
   <!-- ===== FILTROS ===== -->
   <div class="filtro-tabs">
@@ -189,7 +291,7 @@
         <!-- Estado numérico con badge de color -->
           <span class="estado"
                [ngClass]="{
-  'estado-aceptada':  s.estado_solicitud === 1,
+  'estado-pendiente':  s.estado_solicitud === 1,
   'estado-proceso':   s.estado_solicitud === 2,
   'estado-ok':        s.estado_solicitud === 3,
   'estado-error':     s.estado_solicitud === 4,
@@ -231,26 +333,35 @@
   
     >
 
-    <button
-      class="accion-btn verificar"
-      [class.desactivado]="menu.solicitud.estado_solicitud === 3"
-      (click)="onIntentarVerificar(menu.solicitud)">
-      <i class="fas fa-sync-alt"></i> Verificar
-    </button>
-
-    <button
-      class="accion-btn descargar"
-      (click)="abrirDetalle(menu.solicitud)">
-      <i class="fas fa-download"></i> Descargar
-    </button>
+   <button
+  class="accion-btn verificar"
+  [class.desactivado]="menu.solicitud.estado_solicitud === 3"
+  (click)="onIntentarVerificar(menu.solicitud)"
+  *permiso="'sat.verificar_solicitud'"
+>
+  <i class="fas fa-sync-alt"></i> Verificar
+</button>
 
 
     <button
+  class="accion-btn descargar"
+  (click)="abrirDetalle(menu.solicitud)"
+  *permiso="'sat.descargar_zip'"
+>
+  <i class="fas fa-download"></i> Descargar
+</button>
+
+
+
+<button
   class="accion-btn detalle"
   style="background:#6f42c1"
-  (click)="abrirHistorialVerificaciones(menu.solicitud)">
+  (click)="abrirHistorialVerificaciones(menu.solicitud)"
+  *permiso="'sat.ver_detalle'"
+>
   <i class="fas fa-info-circle"></i> Historial
 </button>
+
 
   </div>
 
@@ -287,6 +398,12 @@
 
   </div>
 </div>
+
+
+
+
+
+
 
 <!-- ===== MODAL DETALLE ===== -->
 <div class="modal-backdrop" *ngIf="modalAbierto" (click)="cerrarModal()"></div>
@@ -327,10 +444,15 @@
 
     <!-- Descarga Principal -->
     <div class="download-section">
-      <button class="btn-download-main" (click)="descargarUltimoZip(solicitudActual)">
-        <i class="fas fa-file-archive"></i>
-        Descargar ZIP completo
-      </button>
+      <button 
+  class="btn-download-main"
+  (click)="descargarUltimoZip(solicitudActual)"
+  *permiso="'sat.descargar_zip'"
+>
+  <i class="fas fa-file-archive"></i>
+  Descargar ZIP completo
+</button>
+
     </div>
 
     <!-- Archivos -->
@@ -347,12 +469,22 @@
               <span class="file-size">{{ (a.bytes ?? a.tamano) | number }} bytes</span>
             </div>
             <div class="file-actions">
-              <button class="btn-action btn-view" (click)="abrirArchivo(solicitudActual.id, 'pdf', a.nombre)">
-                <i class="fas fa-eye"></i>
-              </button>
-              <button class="btn-action btn-download" (click)="descargarArchivo(solicitudActual.id, 'pdf', a.nombre)">
-                <i class="fas fa-download"></i>
-              </button>
+              <button 
+  class="btn-action btn-view"
+  (click)="abrirArchivo(solicitudActual.id, 'pdf', a.nombre)"
+  *permiso="'sat.descargar_zip'"
+>
+  <i class="fas fa-eye"></i>
+</button>
+
+              <button 
+  class="btn-action btn-download"
+  (click)="descargarArchivo(solicitudActual.id, 'pdf', a.nombre)"
+  *permiso="'sat.descargar_zip'"
+>
+  <i class="fas fa-download"></i>
+</button>
+
             </div>
           </div>
         </div>

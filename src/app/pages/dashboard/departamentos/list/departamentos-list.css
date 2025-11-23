@@ -420,3 +420,33 @@ td {
   background-color: #bb2d3b !important;
   color: #f8f9fa !important;
 }
+
+
+/* Columnas ordenables */
+.th-sortable {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.th-sortable i {
+  margin-left: 6px;
+}
+
+/* Iconos */
+.orden-icon {
+  font-size: 0.75rem;
+  opacity: 0.4;
+  transition: opacity 0.15s ease, transform 0.15s ease, color 0.15s ease;
+}
+
+.orden-icon.activo {
+  opacity: 1;
+  color: var(--color-primary);
+}
+
+.th-sortable:hover .orden-icon {
+  opacity: 1;
+  color: var(--color-primary);
+  transform: translateY(-1px);
+}

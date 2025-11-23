@@ -10,10 +10,13 @@
         </div>
 
         <!-- Botón "Nuevo cliente" -->
-        <button class="btn custom-btn-float-azul d-flex align-items-center shadow" (click)="abrirModalNuevo()">
-          <i data-feather="user-plus" class="me-2"></i>
-          <span>Nuevo cliente</span>
-        </button>
+        <button class="btn custom-btn-float-azul d-flex align-items-center shadow"
+        *permiso="'clientes.crear'"
+        (click)="abrirModalNuevo()">
+  <i data-feather="user-plus" class="me-2"></i>
+  <span>Nuevo cliente</span>
+</button>
+
       </div>
     </div>
 
@@ -61,17 +64,47 @@
   <div class="table-responsive">
     <table class="table table-striped" [ngClass]="{'table-dark': temaActual === 'dark'}">
       <thead class="custom-table-header">
-        <tr>
-          <th class="ps-4">ID</th>
-          <th>Razón Social</th>
-          <th>RFC</th>
-          <th>Correo</th>
-          <th>Teléfono</th>
-          <th>Vigencia del Certificado</th>
-          <th>Estatus</th>
-          <th class="text-center pe-4">Acciones</th>
-        </tr>
-      </thead>
+  <tr>
+
+    <!-- ID -->
+    <th class="th-sortable ps-4" (click)="ordenarPor('id')">
+      ID <i [ngClass]="getIconoOrden('id')"></i>
+    </th>
+
+    <!-- Razón social -->
+    <th class="th-sortable" (click)="ordenarPor('razon_social')">
+      Razón Social <i [ngClass]="getIconoOrden('razon_social')"></i>
+    </th>
+
+    <!-- RFC (dentro de certificado) -->
+    <th class="th-sortable" (click)="ordenarPor('rfc')">
+      RFC <i [ngClass]="getIconoOrden('rfc')"></i>
+    </th>
+
+    <!-- Correo -->
+    <th class="th-sortable" (click)="ordenarPor('correo_electronico')">
+      Correo <i [ngClass]="getIconoOrden('correo_electronico')"></i>
+    </th>
+
+    <!-- Teléfono -->
+    <th class="th-sortable" (click)="ordenarPor('telefono')">
+      Teléfono <i [ngClass]="getIconoOrden('telefono')"></i>
+    </th>
+
+    <!-- Vigencia del certificado -->
+    <th class="th-sortable" (click)="ordenarPor('fecha_vigencia')">
+      Vigencia del Certificado <i [ngClass]="getIconoOrden('fecha_vigencia')"></i>
+    </th>
+
+    <!-- Estatus -->
+    <th class="th-sortable" (click)="ordenarPor('estatus')">
+      Estatus <i [ngClass]="getIconoOrden('estatus')"></i>
+    </th>
+
+    <th class="text-center pe-4">Acciones</th>
+  </tr>
+</thead>
+
 
       <tbody>
         <tr *ngFor="let c of clientesFiltrados | paginate: { itemsPerPage: 8, currentPage: page }">
@@ -123,13 +156,19 @@
       *ngIf="menu.visible"
       [ngStyle]="{ top: menu.y + 'px', left: menu.x + 'px' }"
     >
-      <button class="accion-btn editar" (click)="editarDesdeMenu()">
-        <i class="fas fa-pen"></i> Editar
-      </button>
+      <button class="accion-btn editar"
+        *permiso="'clientes.editar'"
+        (click)="editarDesdeMenu()">
+  <i class="fas fa-pen"></i> Editar
+</button>
 
-      <button class="accion-btn eliminar" (click)="eliminarDesdeMenu()">
-        <i class="fas fa-trash"></i> Eliminar
-      </button>
+
+     <button class="accion-btn eliminar"
+        *permiso="'clientes.eliminar'"
+        (click)="eliminarDesdeMenu()">
+  <i class="fas fa-trash"></i> Eliminar
+</button>
+
     </div>
 
   </div>

@@ -5,20 +5,28 @@ import { NgxPaginationModule } from 'ngx-pagination';
 import { UsuariosService, Usuario } from '../../../../core/services/usuarios.service';
 import { UsuariosForm } from '../form/usuarios-form';
 
+import { PermisoDirective } from '../../../../shared/directivas/permiso.directive';
+
 import Swal from 'sweetalert2';
 
 declare const feather: any;
 
+interface UsuarioOrdenable extends Usuario {
+  rol_nombre?: string;
+  departamento_nombre?: string;
+}
+
 @Component({
   selector: 'app-usuarios-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, NgxPaginationModule, UsuariosForm],
+  imports: [CommonModule, FormsModule, NgxPaginationModule, UsuariosForm, PermisoDirective],
   templateUrl: './usuarios-list.html',
   styleUrls: ['./usuarios-list.css']
 })
 export class UsuariosList implements OnInit, AfterViewInit {
-  usuarios: Usuario[] = [];
-  usuariosFiltrados: Usuario[] = [];
+ usuarios: UsuarioOrdenable[] = [];
+usuariosFiltrados: UsuarioOrdenable[] = [];
+
   terminoBusqueda = '';
   criterioBusqueda: 'nombres' | 'apellidos' | 'usuario' | 'correo' | 'departamento' | 'rol' = 'nombres';
   page = 1;
@@ -27,6 +35,7 @@ export class UsuariosList implements OnInit, AfterViewInit {
   mostrarModal = false;
   editingId: number | null = null;
 
+  
   constructor(private usuarioSrv: UsuariosService) {
  document.addEventListener("click", () => {
     this.menu.visible = false;
@@ -39,6 +48,50 @@ export class UsuariosList implements OnInit, AfterViewInit {
     this.cargarUsuarios();
     this.detectarTema();
   }
+
+//ordenar tabla
+
+// ============================================================
+// ORDENAMIENTO UNIVERSAL
+// ============================================================
+
+orden = {
+  columna: '' as keyof UsuarioOrdenable,
+  asc: true
+};
+
+ordenarPor(columna: keyof UsuarioOrdenable) {
+  if (this.orden.columna === columna) {
+    this.orden.asc = !this.orden.asc;
+  } else {
+    this.orden.columna = columna;
+    this.orden.asc = true;
+  }
+
+  this.usuariosFiltrados.sort((a, b) => {
+    let x = a[columna];
+    let y = b[columna];
+
+    if (x == null) x = '';
+    if (y == null) y = '';
+
+    if (typeof x === 'string') x = x.toLowerCase();
+    if (typeof y === 'string') y = y.toLowerCase();
+
+    return this.orden.asc ? (x > y ? 1 : -1) : (x > y ? -1 : 1);
+  });
+}
+
+getIconoOrden(columna: keyof UsuarioOrdenable) {
+  if (this.orden.columna !== columna) {
+    return 'fas fa-sort orden-icon neutro';
+  }
+  return this.orden.asc
+    ? 'fas fa-sort-up orden-icon activo'
+    : 'fas fa-sort-down orden-icon activo';
+}
+// ============================================================
+
 
 
 // Menú flotante
@@ -110,15 +163,21 @@ eliminarDesdeMenu() {
   }
 
   cargarUsuarios(): void {
-    this.usuarioSrv.getAll().subscribe({
-      next: res => {
-        this.usuarios = res;
-        this.usuariosFiltrados = res;
-        this.refreshIcons();
-      },
-      error: err => console.error('Error al cargar usuarios', err)
-    });
-  }
+  this.usuarioSrv.getAll().subscribe({
+    next: res => {
+      this.usuarios = res.map(u => ({
+        ...u,
+        rol_nombre: u.rol?.nombre || '',
+        departamento_nombre: u.departamento?.nombre || ''
+      }));
+
+      this.usuariosFiltrados = [...this.usuarios];
+      this.refreshIcons();
+    },
+    error: err => console.error('Error al cargar usuarios', err)
+  });
+}
+
 
   filtrarUsuarios(): void {
     const t = this.terminoBusqueda.trim().toLowerCase();

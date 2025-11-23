@@ -184,3 +184,34 @@
   padding: 6px;
   border-bottom: 1px solid #ddd;
 }
+
+
+.separator {
+  height: 30px;
+}
+
+.tabla-dashboard {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla-dashboard th {
+  background: var(--color-primary);
+  color: white;
+  padding: 10px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.tabla-dashboard td {
+  padding: 8px;
+  text-align: center;
+  background: #f8f8f8;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.tabla-dashboard tr:hover td {
+  background: #ececec;
+}
+
+

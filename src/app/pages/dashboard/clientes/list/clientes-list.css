@@ -655,3 +655,37 @@ td {
   overflow: visible !important;
 }
 
+
+
+/* Columnas ordenables */
+.th-sortable {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.th-sortable span {
+  margin-right: 4px;
+}
+
+/* Iconos */
+.orden-icon {
+  font-size: 0.75rem;
+  opacity: 0.4;
+  transition: opacity 0.15s ease, transform 0.15s ease, color 0.15s ease;
+}
+
+.orden-icon.activo {
+  opacity: 1;
+  color: var(--color-primary) !important;
+}
+
+.th-sortable:hover .orden-icon {
+  opacity: 1;
+  color: var(--color-primary) !important;
+  transform: translateY(-1px);
+}
+
+.orden-icon.neutro {
+  color: inherit;
+}

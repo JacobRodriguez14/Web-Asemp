@@ -11,6 +11,10 @@ import { environment } from '../../../../environments/environment';
 
 import { HistorialVerificacionesComponent } from '../sat/historial-verificaciones/historial-verificaciones';
 
+import { PermisoDirective } from '../../../shared/directivas/permiso.directive';
+
+import { finalize } from 'rxjs/operators';
+
 
 //PAGINACION
 import { NgxPaginationModule } from 'ngx-pagination';
@@ -35,7 +39,8 @@ interface ArchivoDto {
   CommonModule,
   FormsModule,
   NgxPaginationModule,
-  HistorialVerificacionesComponent
+  HistorialVerificacionesComponent,
+  PermisoDirective
 ]
 
 
@@ -123,7 +128,36 @@ onIntentarVerificar(s: any) {
 }
 
 
+// Nueva propiedad para controlar el despliegue
+  filtersExpanded: boolean = false; // Puedes cambiar a false si quieres que inicie cerrado
 
+  // Método para toggle del filtro
+  toggleFilters(): void {
+    this.filtersExpanded = !this.filtersExpanded;
+  }
+
+  // Método para limpiar filtros (opcional)
+  limpiarFiltros(): void {
+    this.texto = '';
+    this.filtroTipo = null;
+    this.filtroFechaInicio = null;
+    this.filtroFechaFin = null;
+    this.page = 1;
+    this.cargarSolicitudes();
+  }
+
+solicitudFormExpanded: boolean = true;
+
+  toggleSolicitudForm(): void {
+    this.solicitudFormExpanded = !this.solicitudFormExpanded;
+    if (!this.solicitudFormExpanded) {
+    this.mostrarLista = false;   // 🔥 oculta autocomplete
+  }
+
+  }
+
+  
+  //------------------------------
 
 menu = {
   visible: false,
@@ -353,14 +387,15 @@ cerrarModal() {
 
 
   // ===== Solicitudes =====
-cargarSolicitudes() {
+cargarSolicitudes(aplicarFiltro: boolean = false) {
   const filtros: any = {
     pagina: this.page,
     tamano: this.itemsPerPage
   };
 
   if (this.texto) filtros.texto = this.texto;
-  if (this.filtroEstados != null) filtros.estado = this.filtroEstados;
+  if (this.filtroEstados != null) filtros.estadoLista = this.filtroEstados;
+
   if (this.filtroTipo) filtros.tipo = this.filtroTipo;
   if (this.filtroFechaInicio) filtros.fecha_inicio = this.filtroFechaInicio;
   if (this.filtroFechaFin) filtros.fecha_fin = this.filtroFechaFin;
@@ -371,6 +406,11 @@ cargarSolicitudes() {
       this.totalSolicitudes = resp.total;
       this.paginasTotales = resp.paginas;
 
+      this.solicitudesFiltradas = [...resp.datos];
+
+      if (aplicarFiltro) {
+        this.actualizarFiltrado();  // ← ahora sí se filtra con datos reales
+      }
       this.actualizarRango();
     },
     error: () => Swal.fire('Error', 'No se pudieron cargar las solicitudes', 'error')
@@ -378,44 +418,29 @@ cargarSolicitudes() {
 }
 
 
-
   /*setFiltro(f: 'todas'|'pendientes'|'terminadas'|'error') {
     this.filtro = f;
   }*/
-
 setFiltro(tipo: 'todas' | 'pendientes' | 'terminadas' | 'error') {
-  
   this.filtro = tipo;
 
   switch (tipo) {
-
-    case 'pendientes':
-      this.filtroEstados = [0, 1, 2];
-      break;
-
-    case 'terminadas':
-      this.filtroEstados = [3];
-      break;
-
-    case 'error':
-      // LOS CORRECTOS
-      this.filtroEstados = [4, 5, 6];
-      break;
-
-    default:
-      this.filtroEstados = null;
-      break;
+    case 'pendientes': this.filtroEstados = [1, 2]; break;
+    case 'terminadas': this.filtroEstados = [3]; break;
+    case 'error': this.filtroEstados = [0, 4, 5, 6]; break;
+    default: this.filtroEstados = null; break;
   }
 
   this.page = 1;
 
-  this.cargarSolicitudes();
-  this.actualizarFiltrado();
+  this.cargarSolicitudes(true);  // ← AQUÍ
 }
+
+
 
 actualizarFiltrado() {
 
-  let lista = [...this.solicitudes];
+  let lista = [...this.solicitudesFiltradas];
 
   if (this.filtro === 'error') {
 
@@ -424,24 +449,25 @@ actualizarFiltrado() {
       const estado = Number(s.estado_solicitud);
       const codigo = s.codigo_estado?.toString() ?? null;
 
-      const esEstadoError = [4, 5, 6].includes(estado);
-      const esCodigoError = codigo !== null && codigo !== '5000';
+      const esEstadoError = [4, 5, 6, 0].includes(estado);
+
+      // si codigo es null, vacío o distinto a 5000 = error
+      const esCodigoError = !codigo || codigo !== '5000';
 
       return esEstadoError || esCodigoError;
     });
   }
 
- else if (this.filtro === 'terminadas') {
-  lista = lista.filter(s =>
-    Number(s.estado_solicitud) === 3 &&
-    s.codigo_estado === '5000'
-  );
-}
-
+  else if (this.filtro === 'terminadas') {
+    lista = lista.filter(s =>
+      Number(s.estado_solicitud) === 3 &&
+      s.codigo_estado === '5000'
+    );
+  }
 
   else if (this.filtro === 'pendientes') {
     lista = lista.filter(s =>
-      [0, 1, 2].includes(Number(s.estado_solicitud))
+      [1, 2].includes(Number(s.estado_solicitud))
     );
   }
 
@@ -488,26 +514,49 @@ getSolicitudesFiltradas() {
 
 
 
-  crearSolicitud() {
-    const f = this.form || {};
-    if (!f.cliente_id || !f.tipo_solicitud || !f.fecha_inicio || !f.fecha_fin) {
-      Swal.fire('Advertencia', 'Debe completar todos los campos', 'warning');
-      return;
-    }
-
-    this.cargando = true;
-    this.satService.crearSolicitud(f).subscribe({
-      next: () => {
-        this.cargando = false;
-        Swal.fire('Éxito', 'Solicitud creada correctamente', 'success');
-        this.cargarSolicitudes();
-      },
-      error: () => {
-        this.cargando = false;
-        Swal.fire('Error', 'Error creando la solicitud', 'error');
-      }
-    });
+crearSolicitud() {
+  const f = this.form || {};
+  if (!f.cliente_id || !f.tipo_solicitud || !f.fecha_inicio || !f.fecha_fin) {
+    Swal.fire('Advertencia', 'Debe completar todos los campos', 'warning');
+    return;
   }
+
+  this.cargando = true;
+
+  // NUEVO: Swal de carga mientras se llama al servicio
+  Swal.fire({
+    title: 'Creando solicitud',
+    text: 'Consultando SAT, por favor espere…',
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    didOpen: () => {
+      Swal.showLoading();
+    }
+  });
+
+  this.satService.crearSolicitud(f).subscribe({
+    next: () => {
+      this.cargando = false;
+
+      // NUEVO: cerrar el Swal de carga
+      Swal.close();
+
+      // IGUAL que antes
+      Swal.fire('Éxito', 'Solicitud creada correctamente', 'success');
+      this.cargarSolicitudes();
+    },
+    error: () => {
+      this.cargando = false;
+
+      // NUEVO: cerrar el Swal de carga
+      Swal.close();
+
+      // IGUAL que antes
+      Swal.fire('Error', 'Error creando la solicitud', 'error');
+    }
+  });
+}
+
 
 cambiarPagina(p: number) {
   if (p < 1 || p > this.paginasTotales) return;
@@ -516,35 +565,69 @@ cambiarPagina(p: number) {
 }
 
 
+//carga
+// al inicio de la clase
+cargandoPantalla = false;
 
-  // ===== Acciones por fila =====
-  onVerificar(s: any) {
-    this.verificando[s.id] = true;
-    this.satService.verificarSolicitud(s.id).subscribe({
-      next: (res: any) => {
-        if (res?.detalles) {
-          s._detalle = {
-            archivoZip: res.detalles.archivoZip,
-            carpetaXml: res.detalles.carpetaXml,
-            carpetaPdf: res.detalles.carpetaPdf
-          };
-        }
+onVerificar(s: any) {
+  this.verificando[s.id] = true;
 
-        if (res?.ok && res?.detalles?.estado === 3) {
-          Swal.fire('Completado', 'Solicitud verificada y CFDIs descargados en el servidor.', 'success');
-        } else {
-          Swal.fire('Verificación', res?.mensaje || 'Solicitud aún en proceso.', 'info');
-        }
+  Swal.fire({
+    title: 'Verificando solicitud',
+    text: 'Consultando SAT, por favor espere…',
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    didOpen: () => {
+      Swal.showLoading();
+    }
+  });
 
-        this.cargarSolicitudes();
-        this.verificando[s.id] = false;
-      },
-      error: (e) => {
-        this.verificando[s.id] = false;
-        Swal.fire('Error', e?.error?.mensaje || 'No se pudo verificar la solicitud.', 'error');
+  this.satService.verificarSolicitud(s.id).subscribe({
+    next: (res: any) => {
+      this.verificando[s.id] = false;
+
+      // Cerrar el loading ANTES de lanzar el mensaje final
+      Swal.close();
+
+      if (res?.detalles) {
+        s._detalle = {
+          archivoZip: res.detalles.archivoZip,
+          carpetaXml: res.detalles.carpetaXml,
+          carpetaPdf: res.detalles.carpetaPdf
+        };
       }
-    });
-  }
+
+      if (res?.ok && res?.detalles?.estado === 3) {
+        Swal.fire(
+          'Completado',
+          'Solicitud verificada y CFDIs descargados en el servidor.',
+          'success'
+        );
+      } else {
+        Swal.fire(
+          'Verificación',
+          res?.mensaje || 'Solicitud aún en proceso.',
+          'info'
+        );
+      }
+
+      this.cargarSolicitudes();
+    },
+    error: (e) => {
+      this.verificando[s.id] = false;
+
+      // Cerrar el loading ANTES del mensaje de error
+      Swal.close();
+
+      Swal.fire(
+        'Error',
+        e?.error?.mensaje || 'No se pudo verificar la solicitud.',
+        'error'
+      );
+    }
+  });
+}
+
 
 // estado para evitar dobles cargas
 cargandoDetalle: Record<number, boolean> = {};

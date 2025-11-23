@@ -1,0 +1,100 @@
+<div class="certificados-container">
+  <div class="card-acciones">
+
+    <!-- HEADER MEJORADO -->
+    <div class="card-header">
+      <div class="header-content">
+        <h3>Certificados SAT</h3>
+        <p class="subtitle">
+          Descarga de archivos del certificado (.cer, .key, .pfx) y contraseña.
+        </p>
+      </div>
+
+      <!-- BUSCADOR MEJORADO -->
+      <div class="search-wrapper">
+        <input type="text"
+               class="form-control"
+               placeholder="Buscar por cliente, RFC o ID…"
+               [(ngModel)]="busqueda">
+      </div>
+    </div>
+
+    <!-- BODY MEJORADO -->
+    <div class="card-body">
+
+      <div class="table-wrapper">
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th style="width: 70px;">ID</th>
+              <th>Cliente</th>
+              <th>RFC</th>
+              <th>.CER</th>
+              <th>.KEY</th>
+              <th>.PFX</th>
+              <th>Contraseña</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <!-- usar certificadosFiltrados -->
+            <tr *ngFor="let c of certificadosFiltrados">
+              <td>
+                <span class="id-badge">{{ c.id }}</span>
+              </td>
+              <td>{{ c.cliente }}</td>
+              <td>
+                <code class="rfc-code">{{ c.rfc }}</code>
+              </td>
+
+              <!-- CER -->
+              <td class="acciones">
+                <button class="btn-sm btn-azul" 
+                        (click)="descargar(c, 'cer')"
+                        title="Descargar .CER">
+                  <i data-feather="download"></i>
+                </button>
+              </td>
+
+              <!-- KEY -->
+              <td class="acciones">
+                <button class="btn-sm btn-azul" 
+                        (click)="descargar(c, 'key')"
+                        title="Descargar .KEY">
+                  <i data-feather="download"></i>
+                </button>
+              </td>
+
+              <!-- PFX -->
+              <td class="acciones">
+                <button class="btn-sm btn-azul" 
+                        (click)="descargar(c, 'pfx')"
+                        title="Descargar .PFX">
+                  <i data-feather="download"></i>
+                </button>
+              </td>
+
+              <!-- PASSWORD -->
+              <td class="acciones">
+                <button class="btn-sm btn-verde" 
+                        (click)="descargar(c, 'password')"
+                        title="Ver contraseña">
+                  <i data-feather="eye"></i>
+                </button>
+              </td>
+            </tr>
+
+            <tr *ngIf="certificadosFiltrados.length === 0">
+              <td colspan="7" class="sin-datos">
+                <i data-feather="file-text" style="width: 48px; height: 48px; margin-bottom: 1rem;"></i>
+                <div>No hay certificados registrados</div>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>

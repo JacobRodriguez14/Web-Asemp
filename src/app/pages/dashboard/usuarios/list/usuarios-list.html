@@ -14,10 +14,13 @@
           </div>
 
           <!-- Botón "Nuevo usuario" -->
-          <button class="btn custom-btn-float-azul d-flex align-items-center shadow" (click)="abrirModalNuevo()">
-            <i data-feather="user-plus" class="me-2"></i>
-            <span>Nuevo usuario</span>
-          </button>
+          <button class="btn custom-btn-float-azul d-flex align-items-center shadow"
+        *permiso="'usuarios.crear'"
+        (click)="abrirModalNuevo()">
+  <i data-feather="user-plus" class="me-2"></i>
+  <span>Nuevo usuario</span>
+</button>
+
         </div>
       </div>
 
@@ -62,19 +65,51 @@
         <div class="table-responsive">
           <table class="table table-striped" [ngClass]="{'table-dark': temaActual === 'dark'}">
             <thead class="custom-table-header">
-              <tr>
-                <th class="ps-4">ID</th>
-                <th>Nombres</th>
-                <th>Apellido Paterno</th>
-                <th>Apellido Materno</th>
-                <th>Usuario</th>
-                <th>Correo</th>
-                <th>Rol</th>
-                <th>Departamento</th>
-                <th>Estatus</th>
-                <th class="text-center pe-4">Acciones</th>
-              </tr>
-            </thead>
+  <tr>
+
+    <th class="th-sortable ps-4" (click)="ordenarPor('id')">
+      ID <i [ngClass]="getIconoOrden('id')"></i>
+    </th>
+
+    <th class="th-sortable" (click)="ordenarPor('nombres')">
+      Nombres <i [ngClass]="getIconoOrden('nombres')"></i>
+    </th>
+
+    <th class="th-sortable" (click)="ordenarPor('apellido_paterno')">
+      Apellido Paterno <i [ngClass]="getIconoOrden('apellido_paterno')"></i>
+    </th>
+
+    <th class="th-sortable" (click)="ordenarPor('apellido_materno')">
+      Apellido Materno <i [ngClass]="getIconoOrden('apellido_materno')"></i>
+    </th>
+
+    <th class="th-sortable" (click)="ordenarPor('usuario')">
+      Usuario <i [ngClass]="getIconoOrden('usuario')"></i>
+    </th>
+
+    <th class="th-sortable" (click)="ordenarPor('correo')">
+      Correo <i [ngClass]="getIconoOrden('correo')"></i>
+    </th>
+
+    <th class="th-sortable" (click)="ordenarPor('rol_nombre')">
+      Rol <i [ngClass]="getIconoOrden('rol_nombre')"></i>
+    </th>
+
+    <th class="th-sortable" (click)="ordenarPor('departamento_nombre')">
+      Departamento <i [ngClass]="getIconoOrden('departamento_nombre')"></i>
+    </th>
+
+    <th class="th-sortable" (click)="ordenarPor('estatus')">
+      Estatus <i [ngClass]="getIconoOrden('estatus')"></i>
+    </th>
+
+    <th class="text-center pe-4">
+      Acciones
+    </th>
+
+  </tr>
+</thead>
+
 
             <tbody>
               <tr *ngFor="let u of usuariosFiltrados | paginate: { itemsPerPage: 8, currentPage: page }">
@@ -152,13 +187,18 @@
       *ngIf="menu.visible"
       [ngStyle]="{ top: menu.y + 'px', left: menu.x + 'px' }">
 
-      <button class="accion-btn editar" (click)="editarDesdeMenu()">
-        <i class="fas fa-pen"></i> Editar
-      </button>
+      <button class="accion-btn editar"
+        *permiso="'usuarios.editar'"
+        (click)="editarDesdeMenu()">
+  <i class="fas fa-pen"></i> Editar
+</button>
 
-      <button class="accion-btn eliminar" (click)="eliminarDesdeMenu()">
-        <i class="fas fa-trash"></i> Eliminar
-      </button>
+<button class="accion-btn eliminar"
+        *permiso="'usuarios.eliminar'"
+        (click)="eliminarDesdeMenu()">
+  <i class="fas fa-trash"></i> Eliminar
+</button>
+
     </div>
 
   </div><!-- tabla-card -->

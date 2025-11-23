@@ -89,4 +89,9 @@ export class AuthService {
   get estaAutenticado(): boolean {
     return !!this.token;
   }
+
+  getRol(): string | null {
+  return localStorage.getItem('rol');
+}
+
 }
