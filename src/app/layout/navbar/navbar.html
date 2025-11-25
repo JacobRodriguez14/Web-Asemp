@@ -51,7 +51,7 @@
       <div class="user-menu-container">
         <div class="user-info" (click)="toggleUserMenu()">
           <div class="user-avatar">
-            <span *ngIf="userAvatar">{{ userAvatar }}</span>
+            <span *ngIf="userAvatar">{{userAvatar}}{{userAvatarApellido}}</span>
             <span *ngIf="!userAvatar" class="avatar-fallback">?</span>
           </div>
 

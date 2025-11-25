@@ -316,6 +316,21 @@ abrirDetalle(s: any) {
 }
 
 
+//generar pdf desde xml
+generarPdf(xml: string, solicitudId: number) {
+  this.satService.generarPdfDesdeXml(solicitudId, xml).subscribe({
+    next: (res) => {
+      const blob = res.body!;
+      const url = window.URL.createObjectURL(blob);
+      window.open(url, "_blank"); // Abrir PDF en otra pestaña
+    },
+    error: () => {
+      Swal.fire("Error", "No se pudo generar el PDF", "error");
+    }
+  });
+}
+
+
 /*abrirDetalle(s: any) {
   this.solicitudActual = { ...s };
   this.modalAbierto = true;

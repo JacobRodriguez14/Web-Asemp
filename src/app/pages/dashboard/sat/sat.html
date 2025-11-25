@@ -455,9 +455,9 @@
 
     </div>
 
-    <!-- Archivos -->
+     <!--Archivos--> 
     <div class="files-section">
-      <!-- PDFs -->
+      <!--PDFs 
       <div class="file-category">
         <div class="category-header">
           <h6><i class="fas fa-file-pdf"></i> PDF ({{ pdfs(solicitudActual?.id).length }})</h6>
@@ -492,7 +492,7 @@
           <div class="empty-state">No hay archivos PDF</div>
         </ng-template>
       </div>
-
+-->
       <!-- XMLs -->
       <div class="file-category">
         <div class="category-header">
@@ -511,6 +511,11 @@
               <button class="btn-action btn-download" (click)="descargarArchivo(solicitudActual.id, 'xml', a.nombre)">
                 <i class="fas fa-download"></i>
               </button>
+               <!-- Generar PDF -->
+  <button class="btn-action btn-pdf" 
+          (click)="generarPdf(a.nombre, solicitudActual.id)">
+    <i class="fas fa-file-pdf"></i>
+  </button>
             </div>
           </div>
         </div>

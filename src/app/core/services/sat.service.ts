@@ -80,6 +80,19 @@ obtenerVerificaciones(id: number) {
 }
 
 
+//generar pdf
+generarPdfDesdeXml(solicitudId: number, xml: string) {
+  return this.http.get(
+    `${environment.apiUrl}/api/sat/descargas/${solicitudId}/generar-pdf`,
+    { params: { xml }, responseType: 'blob', observe: 'response' }
+  );
+}
+
+
+
+
+
+
 
   getArchivoBlob(
     solicitudId: number,
@@ -95,6 +108,8 @@ obtenerVerificaciones(id: number) {
       responseType: 'blob'
     });
   }
+
+  
 
   // ---------- (Opcional) URLs antiguas si aún las usabas en algún lado ----------
   urlZip(id: number)       { return `${this.descargasUrl}/${id}/zip`; }

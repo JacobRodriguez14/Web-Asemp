@@ -651,10 +651,11 @@ button.btn-sm:hover {
 /* Archivos - MÁS GRANDES Y LARGOS */
 .files-section {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /*grid-template-columns: 1fr 1fr;*/
   gap: 1.5rem;
   flex: 1;
 }
+
 
 .file-category {
   border: 1px solid #e5e7eb;
@@ -662,8 +663,12 @@ button.btn-sm:hover {
   background: #fff;
   display: flex;
   flex-direction: column;
-  min-height: 300px; /* Más alto */
+
+  width: 100%;         /* ← ESTO LO HACE DEL ANCHO COMPLETO */
+  height: 100%;        /* Estira si el contenedor es alto */
+  min-height: 300px;
 }
+
 
 .category-header {
   padding: 1rem;
@@ -769,6 +774,18 @@ button.btn-sm:hover {
   background: #3a7bc8;
   transform: scale(1.1);
 }
+
+
+.btn-pdf {
+  background: #d93025;
+  color: #fff1f1;
+}
+
+.btn-pdf:hover {
+  background: #b1281e;
+  transform: scale(1.1);
+}
+
 
 .empty-state {
   padding: 2rem;

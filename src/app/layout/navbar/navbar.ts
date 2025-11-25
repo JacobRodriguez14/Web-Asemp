@@ -18,7 +18,9 @@ export class NavbarComponent implements OnInit {
   pageTitle = 'Dashboard';
   breadcrumb = 'Inicio';
   userAvatar: string | null = null;
+  userAvatarApellido: string | null = null;
   userName = 'Usuario Sistema';
+  userApellido = 'Apellido Usuario';
   userRol = '';
   isSidebarOpen = true;
   currentTheme: 'default' | 'light' | 'dark' | 'custom' = 'default';
@@ -36,6 +38,8 @@ export class NavbarComponent implements OnInit {
         const nombreCompleto = `${res.nombres ?? ''} ${res.apellido_paterno ?? ''}`.trim();
         this.userName = nombreCompleto || res.usuario || 'Usuario';
         this.userAvatar = this.userName.charAt(0).toUpperCase();
+        this.userApellido =  res.apellido_paterno || 'Apellido';
+        this.userAvatarApellido = this.userApellido.charAt(0).toUpperCase();
         this.userRol = res.rol;
       },
       error: () => {
