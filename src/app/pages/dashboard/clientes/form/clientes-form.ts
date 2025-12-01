@@ -32,25 +32,113 @@ export class ClientesFormComponent {
   rfcDetectado = false;
   mostrarContrasena = false;
 
+
+  // 🔥 Nueva variable para controlar la visibilidad de retenciones
+  mostrarRetenciones = false;
+
   // ✅ Información del certificado leído
   certInfo: any = null;
 
-  constructor(private fb: FormBuilder, private api: ClientesService) {
-    this.form = this.fb.group({
-  usuario_id: [0, [Validators.required]],
-  razon_social: ['', [Validators.required, Validators.minLength(3)]],
-  telefono: [''],
-  correo_electronico: ['', [Validators.email]],
-  direccion: [''],
-  honorarios_subtotal: [0, [Validators.required, Validators.min(0)]],
-  rfc: [''],
-  contrasena: ['', [Validators.required]],
-  cer: [null], // 👈 sin required
-  key: [null], // 👈 sin required
-  estatus: [true]
-});
+constructor(private fb: FormBuilder, private api: ClientesService) {
+  this.form = this.fb.group({
+    usuario_id: [null, Validators.required],  // obligatorio
 
+    razon_social: ['', [Validators.required, Validators.minLength(3)]],
+
+    telefono: [
+      '',
+      [
+        Validators.pattern(/^(\+52\s?)?(\d{3})[-\s]?\d{3}[-\s]?\d{4}$/)
+      ]
+    ],
+
+    correo_electronico: ['', [Validators.email]],
+
+    direccion: [''],
+
+    honorarios_subtotal: [
+      0,
+      [
+        Validators.required,
+        Validators.min(0),
+        Validators.pattern(/^\d+(\.\d{1,2})?$/) // solo números y hasta 2 decimales
+      ]
+    ],
+
+    rfc: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern(/^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$/i)
+      ]
+    ],
+
+    contrasena: [
+      '',
+      [
+        Validators.required,
+        Validators.minLength(6)
+      ]
+    ],
+
+    cer: [null],
+    key: [null],
+
+    estatus: [true],
+
+    // 🔥 NUEVOS CAMPOS
+    usa_retenciones: [false],
+    porc_isr_ret: [0.10],
+    porc_iva_ret: [0.106667],
+  });
+
+  // 🔥 Validación dinámica de retenciones
+  this.form.get("usa_retenciones")?.valueChanges.subscribe((val: boolean) => {
+
+    if (val) {
+      this.form.get("porc_isr_ret")?.setValidators([
+        Validators.required, Validators.min(0)
+      ]);
+
+      this.form.get("porc_iva_ret")?.setValidators([
+        Validators.required, Validators.min(0)
+      ]);
+    } else {
+      this.form.get("porc_isr_ret")?.clearValidators();
+      this.form.get("porc_iva_ret")?.clearValidators();
+    }
+
+    this.form.get("porc_isr_ret")?.updateValueAndValidity();
+    this.form.get("porc_iva_ret")?.updateValueAndValidity();
+  });
+}
+
+
+formatearTelefono() {
+  let tel = this.form.get('telefono')?.value || '';
+
+  // quitar todo lo que no sea dígito
+  tel = tel.replace(/\D/g, '');
+
+  // si empieza con 52, quitarlo temporalmente
+  let tieneLada52 = false;
+  if (tel.startsWith("52")) {
+    tieneLada52 = true;
+    tel = tel.substring(2);
   }
+
+  // aplicar formato solo si hay 10 dígitos
+  if (tel.length >= 4 && tel.length <= 6) {
+    tel = tel.replace(/(\d{3})(\d{1,3})/, "$1-$2");
+  } else if (tel.length > 6) {
+    tel = tel.replace(/(\d{3})(\d{3})(\d{1,4})/, "$1-$2-$3");
+  }
+
+  if (tieneLada52) tel = "+52 " + tel;
+
+  this.form.get('telefono')?.setValue(tel, { emitEvent: false });
+}
+
 
 // ==============================================================
   // 🔹 Cargar usuarios disponibles para asignar
@@ -58,41 +146,55 @@ export class ClientesFormComponent {
   usuariosDisponibles: any[] = [];
 
 ngOnInit() {
-  // Cargar usuarios disponibles
-  this.api.getUsuariosDisponibles().subscribe({
-    next: (res) => (this.usuariosDisponibles = res),
-  });
+    // Cargar usuarios disponibles
+    this.api.getUsuariosDisponibles().subscribe({
+      next: (res) => (this.usuariosDisponibles = res),
+    });
 
-  // Si estamos editando, cargar datos del cliente
-  if (this.id) {
-    this.cargarCliente();
+    // Si estamos editando, cargar datos del cliente
+    if (this.id) {
+      this.cargarCliente();
+    }
+
+    // 🔥 Inicializar visibilidad de retenciones basado en el valor actual
+    this.mostrarRetenciones = this.form.get('usa_retenciones')?.value;
   }
-}
 
 
-cargarCliente() {
-  if (!this.id) return;
+   // 🔥 Método para toggle de retenciones
+  toggleRetenciones() {
+    this.mostrarRetenciones = !this.mostrarRetenciones;
+  }
 
-  this.api.getByIdDetalle(this.id).subscribe({
-    next: (cliente) => {
-      const cert = cliente.certificados_sat?.[0];
 
-      this.form.patchValue({
-        usuario_id: cliente.usuario_id,
-        razon_social: cliente.razon_social,
-        telefono: cliente.telefono,
-        correo_electronico: cliente.correo_electronico,
-        direccion: cliente.direccion,
-        honorarios_subtotal: cliente.honorarios_subtotal,
-        rfc: cert?.rfc || '',
-        contrasena: cert?.contrasena || '',
-        estatus: cliente.estatus
-      });
-    },
-    error: (err) => console.error('Error al cargar cliente', err),
-  });
-}
+  cargarCliente() {
+    if (!this.id) return;
 
+    this.api.getByIdDetalle(this.id).subscribe({
+      next: (cliente) => {
+        const cert = cliente.certificados_sat?.[0];
+
+        this.form.patchValue({
+          usuario_id: cliente.usuario_id,
+          razon_social: cliente.razon_social,
+          telefono: cliente.telefono,
+          correo_electronico: cliente.correo_electronico,
+          direccion: cliente.direccion,
+          honorarios_subtotal: cliente.honorarios_subtotal,
+          rfc: cert?.rfc || '',
+          contrasena: cert?.contrasena || '',
+          estatus: cliente.estatus,
+          usa_retenciones: cliente.usa_retenciones,
+          porc_isr_ret: cliente.porc_isr_ret,
+          porc_iva_ret: cliente.porc_iva_ret,
+        });
+
+        // 🔥 Actualizar visibilidad basado en los datos cargados
+        this.mostrarRetenciones = cliente.usa_retenciones;
+      },
+      error: (err) => console.error('Error al cargar cliente', err),
+    });
+  }
 
 
 
@@ -251,6 +353,11 @@ if (this.id) fd.append('id', String(this.id));
   // ✅ Archivos: solo si el usuario seleccionó nuevos
   if (v.cer instanceof File) fd.append('cer', v.cer);
   if (v.key instanceof File) fd.append('key', v.key);
+
+  fd.append('usa_retenciones', this.form.value.usa_retenciones ? 'true' : 'false');
+fd.append('porc_isr_ret', String(this.form.value.porc_isr_ret));
+fd.append('porc_iva_ret', String(this.form.value.porc_iva_ret));
+
 
   // ===============================================================
   // 🔹 Envío a la API

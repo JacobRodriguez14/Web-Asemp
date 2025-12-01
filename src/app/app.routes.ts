@@ -36,6 +36,14 @@ import { ClientesListComponent } from './pages/dashboard/clientes/list/clientes-
 import { DepartamentosList } from './pages/dashboard/departamentos/list/departamentos-list';
 import { DepartamentosFormComponent } from './pages/dashboard/departamentos/form/departamentos-form';
 
+
+//========================================================
+// Cobros
+//========================================================
+
+import { CobrosListComponent } from './pages/dashboard/cobros/list/cobros-list';
+
+
 // =======================================================
 // RUTAS PRINCIPALES
 // =======================================================
@@ -126,6 +134,14 @@ export const routes: Routes = [
         canActivate: [permisoGuard],
         data: { permiso: 'sat.ver' }
       },
+      // COBROS
+      {
+  path: 'cobros',
+  component: CobrosListComponent,
+  canActivate: [permisoGuard],
+  data: { permiso: 'ccobros.ver' }
+},
+
 
       // =======================================================
       // SEGURIDAD DEL SISTEMA (ROLES, ACCIONES, PERMISOS)

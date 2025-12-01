@@ -79,6 +79,15 @@
       <span>SAT</span>
     </a>
 
+
+    <!-- Cobros -->
+<a *ngIf="sesion.tiene('ccobros.ver')"
+   routerLink="/dashboard/cobros"
+   routerLinkActive="active">
+   <i data-feather="dollar-sign"></i>
+   <span>Cobros</span>
+</a>
+
     <!-- Reportes -->
     <a *ngIf="sesion.tiene('dashboard.ver')"
        routerLink="/dashboard/reportes"

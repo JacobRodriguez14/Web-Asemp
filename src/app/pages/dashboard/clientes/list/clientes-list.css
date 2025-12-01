@@ -689,3 +689,21 @@ td {
 .orden-icon.neutro {
   color: inherit;
 }
+
+
+
+
+
+.btn-pagar {
+  background: #f1f3f4;
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.btn-pagar:hover {
+  background: #dcdfe2;
+}

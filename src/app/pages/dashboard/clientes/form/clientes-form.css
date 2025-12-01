@@ -4,9 +4,11 @@
 
 /* Fondo general desenfocado */
 .modal {
-  background: rgba(0, 0, 0, 0.15);
+ background: rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(3px);
   animation: fadeIn 0.3s ease-in-out;
+  overflow-y: auto;           /* ← AGREGAR: Habilita scroll en el modal completo */
+  max-height: 100vh;          /* ← AGREGAR: Limita altura al viewport */
 }
 
 /* Contenedor principal */
@@ -18,6 +20,8 @@
   color: var(--color-text) !important;
   border: 1px solid var(--color-navbar) !important;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  max-height: 90vh;           /* ← AGREGAR: Altura máxima del contenido */
+  margin: 2rem auto;          /* ← AGREGAR: Margen para no pegar a los bordes */
 }
 
 /* Encabezado */
@@ -34,10 +38,13 @@
 }
 
 /* Cuerpo */
+/* Cuerpo */
 .modal-body {
   background-color: var(--color-background) !important;
   color: var(--color-text) !important;
   padding: 1.5rem;
+  overflow-y: auto;           /* ← AGREGAR: Scroll interno si es necesario */
+  max-height: calc(90vh - 140px); /* ← AGREGAR: Calcula altura restando header/footer */
 }
 
 /* Campos */
@@ -68,6 +75,9 @@
   background-color: var(--color-background);
   padding: 1.25rem 1.5rem;
 }
+
+
+
 
 /* Botones */
 .btn {
@@ -359,4 +369,186 @@
 [data-theme="dark"] .custom-btn-float-rojo {
   background-color: #bb2d3b !important;
   color: #f8f9fa !important;
+}
+
+
+
+
+
+
+
+
+/* ============================= */
+/*  SECCIÓN RETENCIONES MEJORADA */
+/* ============================= */
+.retenciones-section {
+  background: linear-gradient(135deg, 
+    color-mix(in srgb, var(--color-primary) 8%, transparent) 0%, 
+    color-mix(in srgb, var(--color-primary) 4%, transparent) 100%);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  border: 1px solid color-mix(in srgb, var(--color-primary) 20%, transparent);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Estado activo de retenciones */
+.retenciones-section.active {
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 15px color-mix(in srgb, var(--color-primary) 15%, transparent);
+  background: linear-gradient(135deg, 
+    color-mix(in srgb, var(--color-primary) 12%, transparent) 0%, 
+    color-mix(in srgb, var(--color-primary) 6%, transparent) 100%);
+}
+
+/* Indicador visual de estado activo */
+.retenciones-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--color-primary);
+  transform: scaleY(0);
+  transition: transform 0.3s ease;
+}
+
+.retenciones-section.active::before {
+  transform: scaleY(1);
+}
+
+/* Header de la sección retenciones */
+.retenciones-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  padding-right: 1rem;
+}
+
+.retenciones-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.retenciones-toggle {
+  color: var(--color-primary);
+  transition: transform 0.3s ease;
+}
+
+.retenciones-section.active .retenciones-toggle {
+  transform: rotate(180deg);
+}
+
+/* Contenido de retenciones con animación */
+.retenciones-content {
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.retenciones-content.collapsed {
+  max-height: 0;
+  opacity: 0;
+  margin: 0;
+}
+
+.retenciones-content.expanded {
+  max-height: 200px;
+  opacity: 1;
+  margin-top: 1rem;
+}
+
+/* Campos de porcentajes con mejor estilo */
+.porcentaje-input-group {
+  position: relative;
+}
+
+.porcentaje-input-group::after {
+  content: '%';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: color-mix(in srgb, var(--color-text) 60%, transparent);
+  font-weight: 500;
+  pointer-events: none;
+}
+
+.porcentaje-input-group input {
+  padding-right: 2.5rem !important;
+}
+
+/* Badge informativo */
+.retenciones-badge {
+  background: color-mix(in srgb, var(--color-primary) 15%, transparent);
+  color: var(--color-primary);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-left: auto;
+}
+
+/* ============================= */
+/*  MEJORAS RESPONSIVAS */
+/* ============================= */
+@media (max-width: 768px) {
+  .modal-dialog {
+    margin: 1rem auto;
+    max-height: 95vh;
+  }
+  
+  .modal-content {
+    max-height: 90vh;
+  }
+  
+  .modal-body {
+    max-height: calc(90vh - 120px);
+  }
+  
+  .retenciones-section {
+    padding: 1rem;
+    margin: 0.75rem 0;
+  }
+  
+  .retenciones-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .retenciones-badge {
+    margin-left: 0;
+    align-self: flex-start;
+  }
+}
+
+
+
+/* Scrollbar personalizado */
+.modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+  background: color-mix(in srgb, var(--color-primary) 5%, transparent);
+  border-radius: 3px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--color-primary) 30%, transparent);
+  border-radius: 3px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--color-primary) 50%, transparent);
 }

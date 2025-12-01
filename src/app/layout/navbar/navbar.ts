@@ -225,6 +225,9 @@ updatePageInfo(url: string): void {
 
   // REPORTES
   '/dashboard/reportes': { title: 'Reportes', breadcrumb: 'Análisis y Reportes' },
+
+  //cobros
+  '/dashboard/cobros': { title: 'Cobros', breadcrumb: 'Gestión de Cobros' },
 };
 
 

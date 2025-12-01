@@ -40,6 +40,13 @@ export interface ClienteDetalle {
   direccion?: string;
   honorarios_subtotal?: number;
   estatus: boolean;
+
+  // NUEVOS CAMPOS
+  usa_retenciones: boolean;
+  porc_isr_ret: number;
+  porc_iva_ret: number;
+
+
   certificados_sat?: CertificadoResumen[]; // lista completa de certificados
 }
 
@@ -83,4 +90,10 @@ getByIdDetalle(id: number): Observable<ClienteDetalle> {
   getUsuariosDisponibles() {
     return this.http.get<any[]>(`${environment.apiUrl}/usuarios/disponibles`);
   }
+
+
+  getListaConCertificados() {
+  return this.http.get(this.url + '/lista-con-certificados');
+}
+
 }
