@@ -163,6 +163,17 @@ export const routes: Routes = [
         data: { permiso: 'certificados.ver' }
       },
 
+      // TABLERO IVA
+{
+  path: 'impuestos/iva',
+  loadComponent: () =>
+    import('./pages/dashboard/impuestos/tablero-iva/tablero-iva.component')
+      .then(m => m.TableroIvaComponent),
+  canActivate: [permisoGuard],
+  data: { permiso: 'impuestos.ver' }   // ← Debes crear este permiso en tu sistema RBAC
+},
+
+
       // DEFAULT
       { path: '', redirectTo: 'home', pathMatch: 'full' }
     ]

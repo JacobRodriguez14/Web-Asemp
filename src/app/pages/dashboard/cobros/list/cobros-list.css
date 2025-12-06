@@ -486,6 +486,7 @@ td {
   gap: 0.5rem;
   justify-content: center;   /* ← centra horizontalmente */
   align-items: center;       /* opcional, por si cambia la altura */
+
 }
 
 .estado-filtros-grandes {
@@ -510,7 +511,7 @@ td {
 }
 
 .estado-chip.activo {
-  background: #7b1b1b;           /* guinda de tu header */
+  background: var(--color-primary);           /* guinda de tu header */
   color: #fff;
   font-weight: 600;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);

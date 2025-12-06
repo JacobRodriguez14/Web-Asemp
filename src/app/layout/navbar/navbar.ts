@@ -223,11 +223,19 @@ updatePageInfo(url: string): void {
   // SAT
   '/dashboard/sat': { title: 'SAT', breadcrumb: 'Documentos Fiscales' },
 
+   // 🔥 NUEVA RUTA DEL TABLERO IVA
+  '/dashboard/impuestos/iva': { 
+    title: 'Tablero IVA', 
+    breadcrumb: 'Dashboard / Impuestos / IVA' 
+  },
+
   // REPORTES
   '/dashboard/reportes': { title: 'Reportes', breadcrumb: 'Análisis y Reportes' },
 
   //cobros
   '/dashboard/cobros': { title: 'Cobros', breadcrumb: 'Gestión de Cobros' },
+
+
 };
 
 
