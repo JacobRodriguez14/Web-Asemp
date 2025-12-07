@@ -44,6 +44,12 @@ import { DepartamentosFormComponent } from './pages/dashboard/departamentos/form
 import { CobrosListComponent } from './pages/dashboard/cobros/list/cobros-list';
 
 
+//======================================================
+//Reportes Cobros
+//======================================================
+
+import { ReportesCobrosComponent } from './pages/dashboard/cobros/reportes/reportes.cobros';
+
 // =======================================================
 // RUTAS PRINCIPALES
 // =======================================================
@@ -138,6 +144,16 @@ export const routes: Routes = [
       {
   path: 'cobros',
   component: CobrosListComponent,
+  canActivate: [permisoGuard],
+  data: { permiso: 'ccobros.ver' }
+},
+
+
+{
+  path: 'cobros/reportes',
+  loadComponent: () =>
+    import('./pages/dashboard/cobros/reportes/reportes.cobros')
+      .then(m => m.ReportesCobrosComponent),
   canActivate: [permisoGuard],
   data: { permiso: 'ccobros.ver' }
 },

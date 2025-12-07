@@ -90,20 +90,23 @@
 
 
     <!-- Cobros -->
+<!-- Cobros -->
 <a *ngIf="sesion.tiene('ccobros.ver')"
    routerLink="/dashboard/cobros"
-   routerLinkActive="active">
+   routerLinkActive="active"
+   [routerLinkActiveOptions]="{ exact: true }">
    <i data-feather="dollar-sign"></i>
    <span>Cobros</span>
 </a>
 
-    <!-- Reportes -->
-    <a *ngIf="sesion.tiene('dashboard.ver')"
-       routerLink="/dashboard/reportes"
-       routerLinkActive="active">
-      <i data-feather="bar-chart-2"></i>
-      <span>Reportes</span>
-    </a>
+<!-- Reportes de Cobros -->
+<a *ngIf="sesion.tiene('ccobros.ver')"
+   routerLink="/dashboard/cobros/reportes"
+   routerLinkActive="active"
+   [routerLinkActiveOptions]="{ exact: true }">
+   <i data-feather="bar-chart-2"></i>
+   <span>Reportes de Cobros</span>
+</a>
 
     <p class="sidebar-section" *ngIf="rol === 'Administrador'">
       SISTEMA

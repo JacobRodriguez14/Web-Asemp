@@ -234,7 +234,7 @@ updatePageInfo(url: string): void {
 
   //cobros
   '/dashboard/cobros': { title: 'Cobros', breadcrumb: 'Gestión de Cobros' },
-
+  '/dashboard/cobros/reportes': { title: 'Reportes de Cobros', breadcrumb: 'Reportes de Cobros' },
 
 };
 

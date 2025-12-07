@@ -1,0 +1,67 @@
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.titulo {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-primary, #7A003C);
+  margin-bottom: 20px;
+}
+
+.filtros {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.filtros label {
+  font-weight: 600;
+}
+
+.form-control {
+  width: 200px;
+}
+
+.btn {
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.buscar {
+  background: var(--color-primary);
+  color: white;
+}
+
+.excel {
+  background: #1d6f42;
+  color: white;
+}
+
+.pdf {
+  background: #8b0000;
+  color: white;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.tabla th {
+  background: #f4f4f4;
+  font-weight: 600;
+  text-align: left;
+  padding: 8px;
+}
+
+.tabla td {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}

@@ -1,0 +1,90 @@
+<div class="card p-4">
+
+  <h2 class="titulo">Reportes de Cobros</h2>
+
+  <div class="filtros">
+
+    <!-- CLIENTE -->
+    <div>
+      <label>Cliente</label>
+      <select [(ngModel)]="filtro.ClienteId" class="form-control">
+        <option [ngValue]="0">Todos</option>
+        <option *ngFor="let c of clientes" [ngValue]="c.id">
+          {{ c.razon_social }}
+        </option>
+      </select>
+    </div>
+
+    <!-- MES -->
+    <div>
+      <label>Mes</label>
+      <select [(ngModel)]="filtro.Mes" class="form-control">
+        <option *ngFor="let m of meses" [ngValue]="m.id">
+          {{ m.nombre }}
+        </option>
+      </select>
+    </div>
+
+    <!-- AÑO -->
+    <div>
+      <label>Año</label>
+      <input type="number"
+             [(ngModel)]="filtro.Anio"
+             class="form-control" />
+    </div>
+
+    <!-- TIPO -->
+    <div>
+      <label>Tipo</label>
+      <select [(ngModel)]="filtro.Tipo" class="form-control">
+        <option *ngFor="let t of tipos" [ngValue]="t.id">
+          {{ t.nombre }}
+        </option>
+      </select>
+    </div>
+
+    <!-- BOTONES -->
+    <button class="btn buscar" (click)="buscar()">
+      Buscar
+    </button>
+
+    <button class="btn excel" (click)="descargarExcel()">
+      Excel
+    </button>
+
+    <button class="btn pdf" (click)="descargarPdf()">
+      PDF
+    </button>
+
+  </div>
+
+  <!-- TABLA -->
+  <table class="tabla">
+    <thead>
+      <tr>
+        <th>Cliente</th>
+        <th>RFC</th>
+        <th>Mes</th>
+        <th>Año</th>
+        <th>Total</th>
+        <th>Estado</th>
+        <th>Folio</th>
+        <th>Fecha Pago</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let item of lista">
+        <td>{{ item.cliente }}</td>
+        <td>{{ item.rfc }}</td>
+        <td>{{ item.mes }}</td>
+        <td>{{ item.anio }}</td>
+        <td>{{ item.total | currency }}</td>
+        <td>{{ item.estadoPago }}</td>
+        <td>{{ item.folio }}</td>
+        <td>{{ item.fechaPago | date:'dd/MM/yyyy' }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>

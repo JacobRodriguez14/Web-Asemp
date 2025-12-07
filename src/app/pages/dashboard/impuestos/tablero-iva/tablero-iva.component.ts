@@ -136,43 +136,66 @@ async cargarDetalle(): Promise<void> {
 async exportarPDF() {
   if (!this.clienteId || !this.anio || !this.mes) return;
 
-  await this.cargarDetalle();
+  await this.cargarDetalle();await this.cargarDetalle();
 
   const doc = new jsPDF("p", "mm", "letter");
 
   // ===========================
-  // ENCABEZADO BONITO
+  // INSERTAR LOGO
+  // ===========================
+  const logo = new Image();
+  logo.src = "assets/images/Logo-de-la Empresa.png";
+
+  await new Promise(res => {
+    logo.onload = res;  // esperar a que cargue
+  });
+
+  // Tamaño del logo
+  const logoWidth = 50;
+  const logoHeight = 30;
+
+  // Centrado
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const logoX = (pageWidth - logoWidth) / 2;
+
+  // Colocar en la parte superior
+  doc.addImage(logo, "PNG", logoX, 10, logoWidth, logoHeight);
+
+  // ===========================
+  // TÍTULO
   // ===========================
   doc.setFont("helvetica", "bold");
   doc.setFontSize(18);
   doc.setTextColor(30, 30, 30);
-  doc.text("Reporte IVA Detallado", 105, 18, { align: "center" });
+  doc.text("Reporte IVA Detallado", 105, 52, { align: "center" });
 
   // Línea decorativa
   doc.setDrawColor(70, 130, 180);
   doc.setLineWidth(0.7);
-  doc.line(20, 22, 195, 22);
+  doc.line(20, 56, 195, 56);
 
-  // Datos del contribuyente
+  // ===========================
+  // DATOS DEL CLIENTE
+  // ===========================
   doc.setFontSize(12);
   doc.setTextColor(50, 50, 50);
   doc.setFont("helvetica", "normal");
 
-  doc.text("Cliente:", 20, 35);
+  doc.text("Cliente:", 20, 70);
   doc.setFont("helvetica", "bold");
-  doc.text(`${this.clienteSeleccionado?.razon_social ?? ""}`, 50, 35);
+  doc.text(`${this.clienteSeleccionado?.razon_social ?? ""}`, 50, 70);
 
   doc.setFont("helvetica", "normal");
-  doc.text("RFC:", 20, 42);
+  doc.text("RFC:", 20, 77);
   doc.setFont("helvetica", "bold");
-  doc.text(`${this.tableroDetalle?.rfc ?? ""}`, 50, 42);
+  doc.text(`${this.tableroDetalle?.rfc ?? ""}`, 50, 77);
 
   doc.setFont("helvetica", "normal");
-  doc.text("Periodo:", 20, 49);
+  doc.text("Periodo:", 20, 84);
   doc.setFont("helvetica", "bold");
-  doc.text(`${this.getNombreMes(this.mes)} ${this.anio}`, 50, 49);
+  doc.text(`${this.getNombreMes(this.mes)} ${this.anio}`, 50, 84);
 
-  let startY = 58;
+  let startY = 95;
 
   // ===========================
   // TABLA DEL TABLERO CON COLORES
