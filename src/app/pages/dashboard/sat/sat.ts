@@ -15,6 +15,8 @@ import { PermisoDirective } from '../../../shared/directivas/permiso.directive';
 
 import { finalize } from 'rxjs/operators';
 
+import { SatAutomaticoComponent } from './sat-automatico/sat.automatico';
+
 
 //PAGINACION
 import { NgxPaginationModule } from 'ngx-pagination';
@@ -40,7 +42,8 @@ interface ArchivoDto {
   FormsModule,
   NgxPaginationModule,
   HistorialVerificacionesComponent,
-  PermisoDirective
+  PermisoDirective,
+  SatAutomaticoComponent   // 👈 AGREGARLO AQUÍ
 ]
 
 
@@ -104,6 +107,13 @@ document.addEventListener('click', () => {
 }
 
   
+tab: 'manual' | 'auto' = 'manual';
+
+
+
+
+
+
 
   ngOnInit() {
     this.cargarSolicitudes();
@@ -111,6 +121,13 @@ document.addEventListener('click', () => {
     this.detectarTema();     // aplica modo claro/oscuro
   }
   
+
+  fixDisplayDate(fecha: string): string {
+  if (!fecha) return '';
+  const soloFecha = fecha.split('T')[0]; // "2025-08-31"
+  const [year, month, day] = soloFecha.split('-');
+  return `${day}/${month}/${year}`;
+}
 
 
 onIntentarVerificar(s: any) {
@@ -234,9 +251,15 @@ abrirHistorialVerificaciones(s: any) {
 
   //PAGINACION
 actualizarRango() {
+  if (this.totalSolicitudes === 0) {
+    this.mostrandoDesde = 0;
+    this.mostrandoHasta = 0;
+    return;
+  }
+  
   const inicio = (this.page - 1) * this.itemsPerPage + 1;
   const fin = Math.min(inicio + this.itemsPerPage - 1, this.totalSolicitudes);
-
+  
   this.mostrandoDesde = inicio;
   this.mostrandoHasta = fin;
 }
@@ -578,6 +601,13 @@ cambiarPagina(p: number) {
   this.page = p;
   this.cargarSolicitudes();
 }
+
+// Agrega este método a tu componente SatComponent
+cambiarItemsPorPagina() {
+  this.page = 1; // Volver a la primera página cuando cambia el tamaño
+  this.cargarSolicitudes(); // Esto hará que el backend reciba el nuevo itemsPerPage
+}
+
 
 
 //carga

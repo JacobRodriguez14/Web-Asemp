@@ -18,29 +18,29 @@
 
             <!-- Nombres -->
             <div class="col-md-6">
-              <label class="form-label fw-semibold">Nombres *</label>
-              <input type="text" class="form-control" name="nombres"
+              <label class="form-label fw-semibold"required-label>Nombres</label>
+              <input type="text" class="form-control" name="nombres" maxlength="20"
                      [(ngModel)]="usuario.nombres" required autocomplete="off">
             </div>
 
             <!-- Apellido paterno -->
             <div class="col-md-6">
-              <label class="form-label fw-semibold">Apellido Paterno</label>
-              <input type="text" class="form-control" name="apellido_paterno"
+              <label class="form-label fw-semibold" required-label>Apellido Paterno</label>
+              <input type="text" class="form-control" name="apellido_paterno" maxlength="20"
                      [(ngModel)]="usuario.apellido_paterno" autocomplete="off">
             </div>
 
             <!-- Apellido materno -->
             <div class="col-md-6">
               <label class="form-label fw-semibold">Apellido Materno</label>
-              <input type="text" class="form-control" name="apellido_materno"
+              <input type="text" class="form-control" name="apellido_materno" maxlength="20"
                      [(ngModel)]="usuario.apellido_materno" autocomplete="off">
             </div>
 
             <!-- Usuario -->
             <div class="col-md-6">
-              <label class="form-label fw-semibold">Usuario *</label>
-              <input type="text" class="form-control" name="usuario"
+              <label class="form-label fw-semibold"required-label>Usuario</label>
+              <input type="text" class="form-control" name="usuario" maxlength="12"
                      [(ngModel)]="usuario.usuario" required autocomplete="off">
             </div>
 
@@ -49,7 +49,7 @@
 <!-- Contraseña -->
 <div class="col-md-6">
   <div class="d-flex justify-content-between align-items-center mb-1">
-    <label class="form-label fw-semibold mb-0">Contraseña</label>
+    <label class="form-label fw-semibold mb-0"required-label>Contraseña</label>
     <button
       *ngIf="editando"
       type="button"
@@ -71,6 +71,7 @@
         placeholder="Escribe una contraseña"
         required
         minlength="6"
+        maxlength="15"
         autocomplete="new-password">
       <i
         class="fas position-absolute top-50 end-0 translate-middle-y me-3 text-secondary"
@@ -110,13 +111,13 @@
             <!-- Correo -->
             <div class="col-12 col-md-6">
 
-              <label class="form-label fw-semibold">Correo Electrónico</label>
-              <input type="email" class="form-control" name="correo" [(ngModel)]="usuario.correo">
+              <label class="form-label fw-semibold"required-label>Correo Electrónico</label>
+              <input type="email" class="form-control" name="correo" maxlength="25" [(ngModel)]="usuario.correo">
             </div>
 
             <!-- Rol dinámico -->
             <div class="col-md-6">
-              <label class="form-label fw-semibold">Rol</label>
+              <label class="form-label fw-semibold"required-label>Rol</label>
              <select class="form-select" name="rol_id" [(ngModel)]="usuario.rol_id" required>
   <option [ngValue]="0" disabled>Seleccionar rol</option>
   <option *ngFor="let rol of roles" [ngValue]="rol.id">{{ rol.nombre }}</option>
@@ -125,7 +126,7 @@
 
             <!-- Departamento -->
 <div class="col-md-6">
-  <label class="form-label fw-semibold">Departamento</label>
+  <label class="form-label fw-semibold"required-label>Departamento</label>
 
   <!-- Cuando NO es cliente -->
   <select

@@ -1,9 +1,40 @@
-<div class="sat-container">
-  <!-- ===== ENCABEZADO ===== -->
+<!-- ⭐⭐⭐ TABS MEJORADOS - estilo seguridad ⭐⭐⭐ -->
+<div class="sat-container-tabs">
+  <div class="sat-tabs-header">
+    <h2 class="sat-titulo">Gestión de Solicitudes SAT</h2>
+    <p class="sat-subtitulo">Consulta, verifica y descarga CFDI de forma automatizada</p>
+  </div>
+
+  <div class="sat-tabs">
+    <button 
+      class="tab-button" 
+      [class.active]="tab === 'manual'"
+      (click)="tab = 'manual'">
+      <i class="fas fa-hand-paper"></i>
+      Descarga manual
+    </button>
+
+    <button 
+      class="tab-button" 
+      [class.active]="tab === 'auto'"
+      (click)="tab = 'auto'">
+      <i class="fas fa-robot"></i>
+      Descarga automática
+    </button>
+  </div>
+</div>
+
+<!-- ⭐⭐⭐ CONTENIDO MANUAL ⭐⭐⭐ -->
+<div *ngIf="tab === 'manual'" class="sat-tab-content">
+    <!-- AQUÍ va TODO tu HTML actual (sin cambios) -->
+    <div class="sat-container">
+
+      
+  <!-- ===== ENCABEZADO ===== 
   <div class="sat-header">
     <h2>Gestión de Solicitudes SAT</h2>
     <p>Consulta, verifica y descarga CFDI de forma automatizada</p>
-  </div>
+  </div>-->
 
 <div class="filters-card">
   <div class="filters-header" (click)="toggleSolicitudForm()">
@@ -23,7 +54,7 @@
 
         <!-- CLIENTE -->
         <div class="filter-group-improved full-cell">
-          <label class="filter-label">
+          <label class="filter-label"required-label>
             <i class="fas fa-user"></i> Seleccionar cliente
           </label>
 
@@ -59,7 +90,7 @@
 
         <!-- TIPO -->
         <div class="filter-group-improved">
-          <label class="filter-label">
+          <label class="filter-label"required-label>
             <i class="fas fa-tasks"></i> Tipo de solicitud
           </label>
           <select class="form-select-improved"
@@ -74,7 +105,7 @@
 
         <!-- FECHA INICIO -->
         <div class="filter-group-improved">
-          <label class="filter-label">
+          <label class="filter-label"required-label>
             <i class="fas fa-calendar-alt"></i> Fecha inicio
           </label>
           <input type="date"
@@ -86,7 +117,7 @@
 
         <!-- FECHA FIN -->
         <div class="filter-group-improved">
-          <label class="filter-label">
+          <label class="filter-label"required-label>
             <i class="fas fa-calendar-check"></i> Fecha fin
           </label>
           <input type="date"
@@ -145,7 +176,8 @@
                  class="form-control-improved" 
                  placeholder="Buscar en solicitudes..."
                  [(ngModel)]="texto"
-                 (input)="page = 1; cargarSolicitudes()">
+                 (input)="page = 1; cargarSolicitudes()"
+                 maxlength="30">
         </div>
       </div>
 
@@ -274,13 +306,22 @@
       <td>{{ s.usuario }}</td>
       <td>{{ s.cliente }}</td>
       <td>{{ s.tipo_solicitud }}</td>
-      <td>{{ s.rfc_emisor }}</td>
+     <td>
+  <ng-container *ngIf="s.tipo_solicitud === 'emitidos'; else recibido">
+    {{ s.rfc_emisor }}
+  </ng-container>
+  <ng-template #recibido>
+    {{ '' }}
+  </ng-template>
+</td>
+
     <!--<td>{{ s.rfc_receptor }}</td>-->
 
       <td>
-        {{ s.fecha_inicio | date:'shortDate' }} → 
-        {{ s.fecha_fin | date:'shortDate' }}
-      </td>
+  {{ fixDisplayDate(s.fecha_inicio) }} →
+  {{ fixDisplayDate(s.fecha_fin) }}
+</td>
+
 
       <td>{{ s.fecha_creacion | date:'short' }}</td>
       <td>{{ s.fecha_ultima_verificacion | date:'short' }}</td>
@@ -369,24 +410,53 @@
 
 
 <!-- PAGINACION -->
-<div class="d-flex justify-content-center align-items-center gap-3 my-3">
+<!-- ===== PAGINACIÓN CON SELECT DE ITEMS ===== -->
+<div class="card-footer border-0" *ngIf="totalSolicitudes > 0">
+  <div class="d-flex justify-content-between align-items-center flex-wrap">
+    
+    <!-- Contador de resultados -->
+    <div class="pagina-contador mb-2 mb-md-0">
+      Mostrando <strong>{{mostrandoDesde}}–{{mostrandoHasta}}</strong> 
+      de <strong>{{totalSolicitudes}}</strong> solicitudes
+    </div>
+    
+    <!-- Botones de navegación (mantiene tu lógica actual) -->
+    <div class="mb-2 mb-md-0">
+      <div class="d-flex justify-content-center align-items-center gap-3">
+        <button class="btn btn-outline-secondary btn-sm"
+                [disabled]="page <= 1"
+                (click)="cambiarPagina(page - 1)">
+          ‹ Anterior
+        </button>
+        
+        <span class="pagina-actual">Página {{page}} de {{paginasTotales}}</span>
+        
+        <button class="btn btn-outline-secondary btn-sm"
+                [disabled]="page >= paginasTotales"
+                (click)="cambiarPagina(page + 1)">
+          Siguiente ›
+        </button>
+      </div>
+    </div>
+    
+    <!-- Select de items por página (NUEVO) -->
+    <select class="select-items-pagina" 
+        [(ngModel)]="itemsPerPage" 
+        (change)="cambiarItemsPorPagina()">
 
-  <button class="btn btn-outline-secondary"
-          [disabled]="page <= 1"
-          (click)="cambiarPagina(page - 1)">
-    Anterior
-  </button>
+  <option value="8" disabled selected>— Mostrar por página —</option>
 
-  <span>Página {{page}} de {{paginasTotales}}</span>
 
-  <button class="btn btn-outline-secondary"
-          [disabled]="page >= paginasTotales"
-          (click)="cambiarPagina(page + 1)">
-    Siguiente
-  </button>
+  <option value="5">5 por página</option>
+  <option value="10">10 por página</option>
+  <option value="15">15 por página</option>
+  <option value="20">20 por página</option>
+  <option value="30">30 por página</option>
+  <option value="50">50 por página</option>
+</select>
 
+  </div>
 </div>
-
 
 <sat-historial-verificaciones
   [visible]="historialVisible"
@@ -532,4 +602,10 @@
       Cerrar
     </button>
   </div>
+</div>
+</div>
+
+<!-- ⭐⭐⭐ CONTENIDO AUTOMÁTICO ⭐⭐⭐ -->
+<div *ngIf="tab === 'auto'" class="sat-tab-content">
+    <app-sat-automatico></app-sat-automatico>
 </div>

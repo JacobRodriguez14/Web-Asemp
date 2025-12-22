@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SatService } from '../../../core/services/sat.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { CobrosClientesService } from '../../../core/services/cobros-clientes.service';
 
 @Component({
   selector: 'app-home',
@@ -20,9 +21,13 @@ export class HomeComponent implements OnInit {
 
   rol: string | null = null;
 
+  // === NUEVO PARA LA ALERTA DEL CLIENTE ===
+  tienePagosPendientes: boolean = false;
+
   constructor(
     private satService: SatService,
-    private auth: AuthService
+    private auth: AuthService,
+    private cobrosService: CobrosClientesService
   ) { }
 
   ngOnInit(): void {
@@ -30,43 +35,65 @@ export class HomeComponent implements OnInit {
 
     if (this.rol !== 'Cliente') {
       this.cargarDatosDashboard();
+    } else {
+      this.verificarCobrosPendientesCliente();
     }
+
+    console.log("ROL:", this.rol);
+console.log("CLIENTE ID desde token:", this.auth.getClienteId());
+
   }
 
- cargarDatosDashboard(): void {
-  this.satService.getSolicitudes().subscribe({
-    next: (data: any[]) => {
+  // ============================================================
+  // VERIFICAR SI EL CLIENTE TIENE PAGOS PENDIENTES
+  // ============================================================
+  verificarCobrosPendientesCliente(): void {
+    const clienteId = this.auth.getClienteId();
+    if (!clienteId) return;
 
-      // === CONTADORES ===
-      this.totalSolicitudes = data.length;
+    this.cobrosService.tienePendientes(clienteId).subscribe({
+      next: (resp) => {
+        this.tienePagosPendientes = resp.pendiente;
+      },
+      error: (err) => console.error('Error verificando pendientes:', err)
+    });
+  }
 
-      this.descargasExitosas = data.filter(s => s.estado_solicitud === 3).length;
+  // ============================================================
+  // CARGAR DASHBOARD DEL ADMIN/EMPLEADO
+  // ============================================================
+  cargarDatosDashboard(): void {
+    this.satService.getSolicitudes().subscribe({
+      next: (data: any[]) => {
 
-      this.solicitudesPendientes = data.filter(s =>
-        s.estado_solicitud === 1 || s.estado_solicitud === 2
-      ).length;
+        this.totalSolicitudes = data.length;
+        this.descargasExitosas = data.filter(s => s.estado_solicitud === 3).length;
 
-      this.erroresSat = data.filter(s =>
-        s.estado_solicitud === 0 ||
-        s.estado_solicitud === 4 ||
-        s.estado_solicitud === 5 ||
-        s.estado_solicitud === 6
-      ).length;
+        this.solicitudesPendientes = data.filter(s =>
+          s.estado_solicitud === 1 || s.estado_solicitud === 2
+        ).length;
 
-      // === ÚLTIMAS 5 SOLICITUDES ===
-      this.ultimasSolicitudes = data
-        .sort((a, b) =>
-          new Date(b.fecha_creacion).getTime() -
-          new Date(a.fecha_creacion).getTime()
-        )
-        .slice(0, 5);
-    },
-    error: (err) => console.error('Error cargando solicitudes:', err)
-  });
-}
+        this.erroresSat = data.filter(s =>
+          s.estado_solicitud === 0 ||
+          s.estado_solicitud === 4 ||
+          s.estado_solicitud === 5 ||
+          s.estado_solicitud === 6
+        ).length;
 
+        this.ultimasSolicitudes = data
+          .sort((a, b) =>
+            new Date(b.fecha_creacion).getTime() -
+            new Date(a.fecha_creacion).getTime()
+          )
+          .slice(0, 5);
+      },
+      error: (err) => console.error('Error cargando solicitudes:', err)
+    });
+  }
 
-  // ===== Mismo método que usas en el SAT =====
+  // ============================================================
+  // TEXTO DEL ESTADO SAT
+  // ============================================================
   getEstadoTexto(estado: number): string {
     switch (estado) {
       case 0: return 'Creada';

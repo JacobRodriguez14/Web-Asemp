@@ -93,21 +93,32 @@ export class NavbarComponent implements OnInit {
     this.replaceIcons();
   }
 
- logout(): void {
+logout(): void {
   this.isUserMenuOpen = false;
 
-  // ✅ Lógica real de cierre de sesión
-  this.authSrv.logout(); // ← elimina el token y limpia usuario
-  localStorage.clear();  // opcional: limpia todo (tema, configuraciones, etc.)
+  // 🔹 Guardar preferencias visuales
+  const theme = localStorage.getItem('theme');
+  const config = localStorage.getItem('configuracion');
+  const applyGlobally = localStorage.getItem('applyGlobally');
 
-  // Redirige al login
+  // 🔹 Cerrar sesión (token / usuario)
+  this.authSrv.logout();
+
+  // 🔹 Limpiar storage
+  localStorage.clear();
+
+  // 🔹 Restaurar preferencias de UI
+  if (theme) localStorage.setItem('theme', theme);
+  if (config) localStorage.setItem('configuracion', config);
+  if (applyGlobally) localStorage.setItem('applyGlobally', applyGlobally);
+
+  // 🔹 Ir al login
   this.router.navigate(['/login']);
 
-  // Forzar recarga para reiniciar el estado global
-  setTimeout(() => window.location.reload(), 300);
-
-  this.replaceIcons();
+  // 🔹 Recargar para limpiar estado
+  setTimeout(() => window.location.reload(), 200);
 }
+
 
 
   @HostListener('document:click', ['$event'])

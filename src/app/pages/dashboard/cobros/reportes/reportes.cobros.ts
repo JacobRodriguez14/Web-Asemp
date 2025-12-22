@@ -64,11 +64,28 @@ export class ReportesCobrosComponent implements OnInit {
     private clienteService: ClientesService
   ) {}
 
-  ngOnInit(): void {
-    this.cargarClientes();
-    this.buscar();
-    this.detectarTema();
+
+esCliente = false;
+
+ngOnInit(): void {
+  const rol = localStorage.getItem('rol'); // 'Administrador' | 'Empleado' | 'Cliente'
+  this.esCliente = rol === 'Cliente';
+
+  if (this.esCliente) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Acceso no permitido',
+      text: 'No tienes permiso para ver reportes de cobros'
+    });
+    return;
   }
+
+  this.cargarClientes();
+  this.buscar();
+  this.detectarTema();
+}
+
+
 
   ngAfterViewInit(): void {
     setTimeout(() => feather?.replace(), 0);

@@ -94,4 +94,26 @@ export class AuthService {
   return localStorage.getItem('rol');
 }
 
+
+// ======================================================
+// =========== OBTENER CLIENTE_ID DEL TOKEN ==============
+// ======================================================
+getClienteId(): number | null {
+  const token = localStorage.getItem('token');
+  if (!token) return null;
+
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+
+    // Ajusta el nombre del claim si tu backend lo manda distinto
+    return payload.cliente_id ? Number(payload.cliente_id) : null;
+
+  } catch (e) {
+    console.error('Error leyendo cliente_id del token:', e);
+    return null;
+  }
+}
+
+
+
 }

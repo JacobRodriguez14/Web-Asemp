@@ -97,6 +97,18 @@
         <p>Consulta y descarga tus archivos desde “Certificados”.</p>
       </div>
     </div>
+
+    
+<div class="cards">
+    <div *ngIf="tienePagosPendientes" class="alerta-pago">
+  <i class="fa-solid fa-exclamation-circle"></i>
+  Tienes pagos pendientes. Consulta tu sección de Cobros.
+</div>
+
+</div>
+
+
+    
   </ng-template>
 
 </div>

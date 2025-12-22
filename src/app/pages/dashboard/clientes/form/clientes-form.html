@@ -18,7 +18,7 @@
 
             <!-- Información Básica -->
             <div class="col-12 col-md-6">
-              <label class="form-label fw-semibold">Usuario Asignado</label>
+              <label class="form-label fw-semibold" required-label>Usuario Asignado</label>
               <select class="form-select" formControlName="usuario_id">
                 <option [ngValue]="null" disabled>Seleccionar usuario disponible</option>
                 <option *ngFor="let u of usuariosDisponibles" [ngValue]="u.id">
@@ -28,32 +28,32 @@
             </div>
 
             <div class="col-12 col-md-6">
-              <label class="form-label fw-semibold">Razón Social *</label>
-              <input type="text" class="form-control" formControlName="razon_social">
+              <label class="form-label fw-semibold" required-label>Razón Social</label>
+              <input type="text" class="form-control" formControlName="razon_social" maxlength="20">
             </div>
 
             <div class="col-12 col-md-6">
-              <label class="form-label fw-semibold">Teléfono</label>
+              <label class="form-label fw-semibold"required-label>Teléfono</label>
               <input type="text"
        class="form-control"
        formControlName="telefono"
-       (input)="formatearTelefono()">
+       (input)="formatearTelefono()"maxlength="15">
 
             </div>
 
             <div class="col-12 col-md-6">
-              <label class="form-label fw-semibold">Correo Electrónico</label>
-              <input type="email" class="form-control" formControlName="correo_electronico">
+              <label class="form-label fw-semibold"required-label>Correo Electrónico</label>
+              <input type="email" class="form-control" formControlName="correo_electronico"maxlength="20">
             </div>
 
             <!-- Segunda fila de campos -->
             <div class="col-12 col-md-6">
               <label class="form-label fw-semibold">Dirección</label>
-              <input type="text" class="form-control" formControlName="direccion">
+              <input type="text" class="form-control" formControlName="direccion"maxlength="25">
             </div>
 
             <div class="col-12 col-md-6">
-              <label class="form-label fw-semibold">Honorarios Subtotal *</label>
+              <label class="form-label fw-semibold" required-label>Honorarios Subtotal</label>
               <input type="number" class="form-control" formControlName="honorarios_subtotal">
             </div>
             <div class="col-12 mt-4">
@@ -122,13 +122,15 @@
 
             <!-- Tercera fila de campos -->
             <div class="col-12 col-md-6">
-              <label class="form-label fw-semibold">Contraseña del Certificado *</label>
+              <label class="form-label fw-semibold" required-label>Contraseña del Certificado</label>
               <div class="position-relative">
                 <input
                   [type]="mostrarContrasena ? 'text' : 'password'"
                   class="form-control pe-5"
                   formControlName="contrasena"
-                  placeholder="Contraseña del certificado">
+                  placeholder="Contraseña del certificado"
+                  maxlength="20">
+                  
                 <i
                   class="fas position-absolute top-50 end-0 translate-middle-y me-3 text-secondary"
                   [class.fa-eye]="!mostrarContrasena"
@@ -140,7 +142,7 @@
             </div>
 
             <div class="col-12 col-md-6">
-              <label class="form-label fw-semibold">RFC *</label>
+              <label class="form-label fw-semibold" required-label>RFC</label>
               <input
                 type="text"
                 class="form-control text-uppercase"
@@ -163,7 +165,7 @@
                 <div class="row g-3">
                   <!-- .cer -->
                   <div class="col-12 col-md-6">
-                    <label class="form-label fw-semibold">Archivo .cer *</label>
+                    <label class="form-label fw-semibold" required-label>Archivo .cer</label>
                     <div class="file-input-group">
                       <div class="file-input-container">
                         <input 
@@ -193,7 +195,7 @@
 
                   <!-- .key -->
                   <div class="col-12 col-md-6">
-                    <label class="form-label fw-semibold">Archivo .key *</label>
+                    <label class="form-label fw-semibold" required-label>Archivo .key</label>
                     <div class="file-input-group">
                       <div class="file-input-container">
                         <input 

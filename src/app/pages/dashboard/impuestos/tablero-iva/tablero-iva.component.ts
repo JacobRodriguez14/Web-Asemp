@@ -15,10 +15,13 @@ import autoTable from 'jspdf-autotable';
 // import * as XLSX from 'xlsx';
 
 // Después
-import * as XLSX from 'xlsx-js-style';
+import ExcelJS from 'exceljs';
+
 import { saveAs } from 'file-saver';
 import Swal from 'sweetalert2';
 import { IvaXmlDetalle, TableroIvaConDetalle } from '../../../../core/models/tablero-iva-detalle.model';
+
+import { AuthService } from '../../../../core/services/auth.service';
 
 @Component({
   selector: 'app-tablero-iva',
@@ -36,6 +39,9 @@ export class TableroIvaComponent implements OnInit, AfterViewInit, OnDestroy {
   clientesFiltrados: ClienteLista[] = []; // Clientes filtrados
   mostrarSugerencias: boolean = false;
   clienteSeleccionado: ClienteLista | null = null;
+  clienteFijoNombre = '';
+clienteFijoRfc = '';
+
 
   // Variables para fecha
   anio = new Date().getFullYear();
@@ -69,7 +75,8 @@ export class TableroIvaComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private tableroSvc: TableroIvaService,
-    private clientesSvc: ClientesService
+    private clientesSvc: ClientesService,
+    private authSrv: AuthService   // 👈 AÑADIR
   ) {
     Chart.register(...registerables);
   }
@@ -77,30 +84,79 @@ export class TableroIvaComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
 
+usuarioNombreCompleto = 'Sistema ASEMP';
 
+esAdmin = false;
+esEmpleado = false;
+esCliente = false;
 
-  
+ngOnInit() {
 
-  ngOnInit() {
-    // Cargar lista de clientes al iniciar
-    this.cargarClientes();
-    
-    // Cargar último cliente consultado si existe
-    const clienteGuardado = localStorage.getItem('ultimoClienteConsultado');
-    if (clienteGuardado) {
-      try {
-        this.clienteSeleccionado = JSON.parse(clienteGuardado);
-        this.clienteNombre = this.clienteSeleccionado!.razon_social;
-        this.clienteId = this.clienteSeleccionado!.id;
-      } catch (e) {
-        console.error('Error al cargar cliente guardado', e);
+  this.authSrv.getPerfil().subscribe({
+    next: (res: any) => {
+
+      const rol = res.rol;
+
+      this.esAdmin = rol === 'Administrador';
+      this.esEmpleado = rol === 'Empleado';
+      this.esCliente = rol === 'Cliente';
+
+      // Nombre para PDF / Excel
+      this.usuarioNombreCompleto =
+        `${res.nombres ?? ''} ${res.apellido_paterno ?? ''}`.trim()
+        || res.usuario
+        || 'Sistema ASEMP';
+
+      // ===============================
+      // ADMIN
+      // ===============================
+      if (this.esAdmin) {
+        this.cargarClientes();
+
+        const clienteGuardado = localStorage.getItem('ultimoClienteConsultado');
+        if (clienteGuardado) {
+          try {
+            const cliente: ClienteLista = JSON.parse(clienteGuardado);
+            this.clienteSeleccionado = cliente;
+            this.clienteNombre = cliente.razon_social;
+            this.clienteId = cliente.id;
+          } catch (e) {
+            console.error('Error al cargar cliente guardado', e);
+          }
+        }
       }
-    }
-  }
 
-  ngAfterViewInit() {
-    // Inicialización de Chart.js se hará cuando haya datos
-  }
+      // ===============================
+      // CLIENTE
+      // ===============================
+      if (this.esCliente) {
+        // 🔥 NO USAMOS clienteId
+        this.clienteId = undefined as any;
+
+        // 🔥 Tomamos el cliente desde el perfil
+        if (res.cliente) {
+          this.clienteSeleccionado = {
+            id: res.cliente.id,
+            razon_social: res.cliente.razon_social
+          } as ClienteLista;
+
+          this.clienteNombre = res.cliente.razon_social;
+        }
+
+        localStorage.removeItem('ultimoClienteConsultado');
+      }
+    },
+
+    error: () => {
+      this.usuarioNombreCompleto = 'Sistema ASEMP';
+    }
+  });
+
+}
+
+ngAfterViewInit() {
+  // Inicialización de Chart.js se hará cuando haya datos
+}
 
   
 //=============================================================================================
@@ -133,69 +189,135 @@ async cargarDetalle(): Promise<void> {
   });
 }
 
+
+
 async exportarPDF() {
   if (!this.clienteId || !this.anio || !this.mes) return;
 
-  await this.cargarDetalle();await this.cargarDetalle();
+  await this.cargarDetalle();
 
   const doc = new jsPDF("p", "mm", "letter");
 
-  // ===========================
-  // INSERTAR LOGO
-  // ===========================
+  // ✅ DECLARACIÓN ÚNICA DE startY (ANTES DE USARLO)
+  let startY = 0;
+
+  // =====================================================
+  // HEADER ASEMP — ESTILO QUESTPDF (ROW)
+  // =====================================================
+  const marginX = 20;
+  const headerY = 12;
+
   const logo = new Image();
   logo.src = "assets/images/Logo-de-la Empresa.png";
 
-  await new Promise(res => {
-    logo.onload = res;  // esperar a que cargue
+  await new Promise<void>((resolve, reject) => {
+    logo.onload = () => resolve();
+    logo.onerror = () => reject("No se pudo cargar el logo");
   });
 
-  // Tamaño del logo
-  const logoWidth = 50;
-  const logoHeight = 30;
+  const logoWidth = 32;
+  const logoHeight = 16;
 
-  // Centrado
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const logoX = (pageWidth - logoWidth) / 2;
+  doc.addImage(logo, "PNG", marginX, headerY, logoWidth, logoHeight);
 
-  // Colocar en la parte superior
-  doc.addImage(logo, "PNG", logoX, 10, logoWidth, logoHeight);
+  const textStartX = marginX + logoWidth + 8;
 
-  // ===========================
-  // TÍTULO
-  // ===========================
+  // Título
   doc.setFont("helvetica", "bold");
   doc.setFontSize(18);
-  doc.setTextColor(30, 30, 30);
-  doc.text("Reporte IVA Detallado", 105, 52, { align: "center" });
+  doc.setTextColor(122, 0, 60);
+  doc.text("ASEMP — Reporte Tablero de Impuestos", textStartX, headerY + 7);
 
-  // Línea decorativa
-  doc.setDrawColor(70, 130, 180);
-  doc.setLineWidth(0.7);
-  doc.line(20, 56, 195, 56);
+  // Fecha
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(80, 80, 80);
+  doc.text(
+    `Fecha de generación: ${new Date().toLocaleDateString("es-MX")}`,
+    textStartX,
+    headerY + 13
+  );
+
+  // Línea fina
+  doc.setDrawColor(200, 200, 200);
+  doc.setLineWidth(0.4);
+  doc.line(20, headerY + 20, 195, headerY + 20);
+
+  // =====================================================
+  // INICIO DEL CONTENIDO
+  // =====================================================
+  startY = headerY + 26;
 
   // ===========================
   // DATOS DEL CLIENTE
   // ===========================
-  doc.setFontSize(12);
-  doc.setTextColor(50, 50, 50);
-  doc.setFont("helvetica", "normal");
+  // ===========================
+// DATOS DEL CLIENTE (USANDO startY)
+// ===========================
+// ===========================
+// DATOS DEL CLIENTE — TARJETA SUAVE
+// ===========================
+const cardX = 18;
+const cardY = startY;
+const cardWidth = 175;
+const cardHeight = 26;
 
-  doc.text("Cliente:", 20, 70);
-  doc.setFont("helvetica", "bold");
-  doc.text(`${this.clienteSeleccionado?.razon_social ?? ""}`, 50, 70);
+// Fondo
+doc.setFillColor(245, 247, 250);
+doc.roundedRect(cardX, cardY, cardWidth, cardHeight, 3, 3, "F");
 
-  doc.setFont("helvetica", "normal");
-  doc.text("RFC:", 20, 77);
-  doc.setFont("helvetica", "bold");
-  doc.text(`${this.tableroDetalle?.rfc ?? ""}`, 50, 77);
+// Borde sutil
+doc.setDrawColor(220, 220, 220);
+doc.roundedRect(cardX, cardY, cardWidth, cardHeight, 3, 3);
 
-  doc.setFont("helvetica", "normal");
-  doc.text("Periodo:", 20, 84);
-  doc.setFont("helvetica", "bold");
-  doc.text(`${this.getNombreMes(this.mes)} ${this.anio}`, 50, 84);
+// Contenido
+let textY = cardY + 8;
 
-  let startY = 95;
+doc.setFontSize(11);
+doc.setFont("helvetica", "normal");
+doc.setTextColor(90, 90, 90);
+doc.text("Cliente:", cardX + 6, textY);
+doc.setFont("helvetica", "bold");
+doc.setTextColor(30, 30, 30);
+doc.text(this.clienteSeleccionado?.razon_social ?? "", cardX + 30, textY);
+
+textY += 7;
+
+doc.setFont("helvetica", "normal");
+doc.setTextColor(90, 90, 90);
+doc.text("RFC:", cardX + 6, textY);
+doc.setFont("helvetica", "bold");
+doc.setTextColor(30, 30, 30);
+doc.text(this.tableroDetalle?.rfc ?? "", cardX + 30, textY);
+
+doc.text("Periodo:", cardX + 100, textY);
+doc.text(`${this.getNombreMes(this.mes)} ${this.anio}`, cardX + 125, textY);
+
+
+// ===========================
+// GENERADO POR (DENTRO DE LA TARJETA)
+// ===========================
+// ===========================
+// GENERADO POR (DEBAJO DE PERIODO, DERECHA)
+// ===========================
+const generadoPor = this.usuarioNombreCompleto;
+
+
+doc.setFontSize(9);
+doc.setFont("helvetica", "italic");
+doc.setTextColor(120, 120, 120);
+
+doc.text(
+  `Generado por: ${generadoPor}`,
+  cardX + cardWidth - 6,
+  textY + 6,
+  { align: "right" }
+);
+
+
+startY = cardY + cardHeight + 8;
+
+
 
   // ===========================
   // TABLA DEL TABLERO CON COLORES
@@ -393,181 +515,322 @@ if (this.chartInstance) {
   const url = URL.createObjectURL(blob);
 
   Swal.fire({
-    title: "Vista Previa del PDF",
-    html: `<iframe src="${url}" width="100%" height="600px"></iframe>`,
-    width: "80%",
-    showConfirmButton: true,
+  title: "Vista Previa del PDF",
+  html: `<iframe src="${url}" width="100%" height="600px"></iframe>`,
+  width: "80%",
+  showCancelButton: true,
+  confirmButtonText: "Descargar",
+  cancelButtonText: "Cerrar"
+}).then(result => {
+  if (result.isConfirmed) {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Reporte_IVA_${this.mes}_${this.anio}.pdf`;
+    a.click();
+  }
+});
+
+
+}
+
+
+
+
+
+
+
+
+private async cargarImagenBase64(url: string): Promise<string> {
+  const res = await fetch(url);
+  const blob = await res.blob();
+
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
   });
 }
+
+
+
+
 async descargarExcelReal() {
   if (!this.tableroDetalle || !this.detalleIva.length) return;
 
-  const wb = XLSX.utils.book_new();
+  const wb = new ExcelJS.Workbook();
+
+  // ==========================
+  // COLORES
+  // ==========================
+  const GUINDA = 'FF7A003C';     // argb (FF + hex)
+  const AZUL_HDR = 'FF1F4E79';
+  const GRIS_TARJ = 'FFF4F6F8';
+  const AZUL_SUAVE = 'FFE8F3FF';
+  const VERDE_SUAVE = 'FFE6F6E6';
+  const ROSA_SUAVE = 'FFFCE4EC';
+  const BORDE = 'FFD9D9D9';
+
   const t = this.tableroDetalle;
 
+  const generadoPor = this.usuarioNombreCompleto ?? 'Sistema ASEMP';
+  const fechaGen = new Date().toLocaleDateString('es-MX');
+
   // ==========================
-  // HOJA 1: RESUMEN BONITO
+  // HOJA 1: RESUMEN
   // ==========================
-  const resumen = [
-    ['REPORTE IVA DETALLADO', '', '', ''],
-    [],
-    ['Cliente:', this.clienteSeleccionado?.razon_social ?? '', '', ''],
-    ['RFC:', t.rfc, '', ''],
-    ['Periodo:', `${this.getNombreMes(this.mes)} ${this.anio}`, '', ''],
-    [],
-    ['Concepto', 'PUE', 'PPD', 'Total'],
-    ['IVA Causado', t.ivaCausado.pue, t.ivaCausado.ppd, t.ivaCausado.total],
-    ['IVA Acreditable', t.ivaAcreditable.pue, t.ivaAcreditable.ppd, t.ivaAcreditable.total],
-    ['IVA Neto', '', '', t.ivaAPagar],
-  ];
-
-  const wsResumen = XLSX.utils.aoa_to_sheet(resumen);
-
-  // Combinar título A1:D1
-  wsResumen['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } }];
-
-  // Asegurar ref
-  if (!wsResumen['!ref']) {
-    wsResumen['!ref'] = XLSX.utils.encode_range({
-      s: { r: 0, c: 0 },
-      e: { r: resumen.length - 1, c: resumen[0].length - 1 }
-    });
-  }
-
-  // Helper para estilos
-  const set = (cell: any, style: any) => {
-    if (cell) cell.s = style;
-  };
-
-  // Colores
-  const azulHeader = '1F4E79';
-  const azulSuave = 'E8F3FF';
-  const verdeSuave = 'E6F6E6';
-  const rosaSuave = 'FCE4EC';
-
-  // Título A1:D1
-  set(wsResumen['A1'], {
-    font: { name: 'Calibri', sz: 16, bold: true, color: { rgb: 'FFFFFF' } },
-    fill: { fgColor: { rgb: azulHeader } },
-    alignment: { horizontal: 'center', vertical: 'center' }
+  const wsResumen = wb.addWorksheet('Resumen', {
+    views: [{ state: 'frozen', ySplit: 6 }] // congela encabezado/cliente
   });
 
-  // Etiquetas “Cliente: / RFC: / Periodo:”
-  ['A3', 'A4', 'A5'].forEach(addr =>
-    set(wsResumen[addr], { font: { bold: true, sz: 12 } })
-  );
-
-  // Encabezado de tabla (fila 7 → A7:D7)
-  ['A7', 'B7', 'C7', 'D7'].forEach(addr =>
-    set(wsResumen[addr], {
-      font: { bold: true, color: { rgb: 'FFFFFF' } },
-      fill: { fgColor: { rgb: azulHeader } },
-      alignment: { horizontal: 'center' }
-    })
-  );
-
-  // Fila IVA Causado (A8:D8) – azul suave
-  ['A8', 'B8', 'C8', 'D8'].forEach(addr =>
-    set(wsResumen[addr], { fill: { fgColor: { rgb: azulSuave } } })
-  );
-
-  // Fila IVA Acreditable (A9:D9) – verde suave
-  ['A9', 'B9', 'C9', 'D9'].forEach(addr =>
-    set(wsResumen[addr], { fill: { fgColor: { rgb: verdeSuave } } })
-  );
-
-  // Fila IVA Neto (A10:D10) – rosa suave
-  ['A10', 'B10', 'C10', 'D10'].forEach(addr =>
-    set(wsResumen[addr], { fill: { fgColor: { rgb: rosaSuave } } })
-  );
-
-  // Ancho de columnas
-  wsResumen['!cols'] = [
-    { wch: 18 }, // A
-    { wch: 18 }, // B
-    { wch: 18 }, // C
-    { wch: 18 }, // D
+  // Columnas (A-D)
+  wsResumen.columns = [
+    { width: 18 },
+    { width: 24 },
+    { width: 16 },
+    { width: 26 },
   ];
 
-  XLSX.utils.book_append_sheet(wb, wsResumen, 'Resumen');
+  // --------------------------
+  // LOGO (imagen)
+  // --------------------------
+  // Ajusta la ruta a tu logo real
+  const logoBase64 = await this.cargarImagenBase64('assets/images/Logo-de-la Empresa.png');
+  const logoId = wb.addImage({ base64: logoBase64, extension: 'png' });
+
+  // Tamaño real aproximado del logo MRD (ajusta si quieres)
+const LOGO_WIDTH = 110;      // ancho fijo
+const LOGO_RATIO = 110 / 230; // proporción aproximada (alto/ancho)
+const LOGO_HEIGHT = LOGO_WIDTH * LOGO_RATIO;
+
+wsResumen.addImage(logoId, {
+  tl: { col: 0.15, row: 0.25 },  // pequeño margen
+  ext: {
+    width: LOGO_WIDTH,
+    height: LOGO_HEIGHT
+  }
+});
+
+
+  // --------------------------
+  // HEADER GUINDA (B1:D2) para dejar espacio al logo en A
+  // --------------------------
+  wsResumen.mergeCells('B1:D1');
+  wsResumen.getCell('B1').value = 'ASEMP — Reporte Tablero de Impuestos';
+  wsResumen.getCell('B1').font = { bold: true, size: 16, color: { argb: 'FFFFFFFF' } };
+  wsResumen.getCell('B1').alignment = { horizontal: 'center', vertical: 'middle' };
+  ['B1','C1','D1'].forEach(a => {
+    wsResumen.getCell(a).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: GUINDA } };
+  });
+
+  wsResumen.mergeCells('B2:D2');
+  wsResumen.getCell('B2').value = `Fecha de generación: ${fechaGen}`;
+  wsResumen.getCell('B2').font = { italic: true, size: 11, color: { argb: 'FFFFFFFF' } };
+  wsResumen.getCell('B2').alignment = { horizontal: 'center', vertical: 'middle' };
+  ['B2','C2','D2'].forEach(a => {
+    wsResumen.getCell(a).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: GUINDA } };
+  });
+
+ 
+
+  // Altura filas header
+  wsResumen.getRow(1).height = 26;
+  wsResumen.getRow(2).height = 18;
+
+  // --------------------------
+  // FILA 3 vacía
+  // --------------------------
+  wsResumen.addRow([]);
+  wsResumen.getRow(3).height = 8;
+
+  // --------------------------
+  // TARJETA CLIENTE (A4:D5)
+  // --------------------------
+  wsResumen.getCell('A4').value = 'Cliente:';
+  wsResumen.getCell('B4').value = this.clienteSeleccionado?.razon_social ?? '';
+  wsResumen.getCell('C4').value = 'Periodo:';
+  wsResumen.getCell('D4').value = `${this.getNombreMes(this.mes)} ${this.anio}`;
+
+  wsResumen.getCell('A5').value = 'RFC:';
+  wsResumen.getCell('B5').value = t.rfc ?? '';
+  wsResumen.getCell('C5').value = 'Generado por:';
+  wsResumen.getCell('D5').value = generadoPor;
+
+  // estilo tarjeta
+  ['A4','B4','C4','D4','A5','B5','C5','D5'].forEach(addr => {
+    const cell = wsResumen.getCell(addr);
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: GRIS_TARJ } };
+    cell.border = {
+      top: { style: 'thin', color: { argb: BORDE } },
+      left: { style: 'thin', color: { argb: BORDE } },
+      bottom: { style: 'thin', color: { argb: BORDE } },
+      right: { style: 'thin', color: { argb: BORDE } },
+    };
+    cell.alignment = { vertical: 'middle' };
+  });
+
+  // labels bold + valores bold
+  ['A4','C4','A5','C5'].forEach(a => wsResumen.getCell(a).font = { bold: true, size: 11 });
+  ['B4','D4','B5','D5'].forEach(a => wsResumen.getCell(a).font = { bold: true, size: 11 });
+
+  wsResumen.getRow(4).height = 20;
+  wsResumen.getRow(5).height = 20;
+
+  // --------------------------
+  // FILA 6 vacía
+  // --------------------------
+  wsResumen.addRow([]);
+  wsResumen.getRow(6).height = 8;
+
+  // --------------------------
+  // TABLA RESUMEN (fila 7+)
+  // --------------------------
+  wsResumen.addRow(['Concepto', 'PUE', 'PPD', 'Total']);
+
+  const rowHeader = wsResumen.getRow(7);
+  rowHeader.height = 18;
+  rowHeader.eachCell(cell => {
+    cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL_HDR } };
+    cell.alignment = { horizontal: 'center', vertical: 'middle' };
+    cell.border = {
+      top: { style: 'thin', color: { argb: BORDE } },
+      left: { style: 'thin', color: { argb: BORDE } },
+      bottom: { style: 'thin', color: { argb: BORDE } },
+      right: { style: 'thin', color: { argb: BORDE } },
+    };
+  });
+
+  // filas
+  const r8 = wsResumen.addRow(['IVA Causado', t.ivaCausado.pue, t.ivaCausado.ppd, t.ivaCausado.total]);
+  const r9 = wsResumen.addRow(['IVA Acreditable', t.ivaAcreditable.pue, t.ivaAcreditable.ppd, t.ivaAcreditable.total]);
+  const r10 = wsResumen.addRow(['IVA Neto', '', '', t.ivaAPagar]);
+
+  const applyRowFill = (rowNumber: number, argb: string) => {
+    const row = wsResumen.getRow(rowNumber);
+    row.eachCell(cell => {
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb } };
+      cell.border = {
+        top: { style: 'thin', color: { argb: BORDE } },
+        left: { style: 'thin', color: { argb: BORDE } },
+        bottom: { style: 'thin', color: { argb: BORDE } },
+        right: { style: 'thin', color: { argb: BORDE } },
+      };
+      cell.alignment = { vertical: 'middle' };
+    });
+  };
+
+  applyRowFill(8, AZUL_SUAVE);
+  applyRowFill(9, VERDE_SUAVE);
+  applyRowFill(10, ROSA_SUAVE);
+
+  // Formato numérico/moneda para columnas B-D en filas 8-10
+  const moneyFmt = '$#,##0.00';
+  [8, 9, 10].forEach(rn => {
+    ['B','C','D'].forEach(col => {
+      const c = wsResumen.getCell(`${col}${rn}`);
+      if (typeof c.value === 'number') {
+        c.numFmt = moneyFmt;
+      }
+      c.alignment = { horizontal: 'right', vertical: 'middle' };
+    });
+  });
 
   // ==========================
-  // HOJA 2: EMITIDOS
+  // HOJA 2: EMITIDOS (con header azul)
   // ==========================
-  const emitidos = this.detalleIva
+  const wsEmitidos = wb.addWorksheet('Emitidos', {
+    views: [{ state: 'frozen', ySplit: 1 }]
+  });
+
+  wsEmitidos.columns = [
+    { header: 'UUID', key: 'uuid', width: 40 },
+    { header: 'Tipo', key: 'tipo', width: 6 },
+    { header: 'Método', key: 'metodo', width: 10 },
+    { header: 'Emisor', key: 'emisor', width: 18 },
+    { header: 'Receptor', key: 'receptor', width: 18 },
+    { header: 'IVA', key: 'iva', width: 12 },
+    { header: 'Retenido', key: 'retenido', width: 12 },
+    { header: 'Incluido', key: 'incluido', width: 10 },
+  ];
+
+  // Header azul
+  const eh = wsEmitidos.getRow(1);
+  eh.eachCell(cell => {
+    cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL_HDR } };
+    cell.alignment = { horizontal: 'center', vertical: 'middle' };
+  });
+
+  this.detalleIva
     .filter(x => x.tipoMovimiento === 'Emitido')
-    .map(x => ({
-      UUID: x.uuid,
-      Tipo: x.tipoCfdi,
-      Método: x.metodoPago,
-      Emisor: x.rfcEmisor,
-      Receptor: x.rfcReceptor,
-      IVA: x.ivaTrasladado,
-      Retenido: x.ivaRetenido,
-      Incluido: x.incluidoEnCalculo ? 'Sí' : 'No'
-    }));
+    .forEach(x => {
+      const row = wsEmitidos.addRow({
+        uuid: x.uuid,
+        tipo: x.tipoCfdi,
+        metodo: x.metodoPago,
+        emisor: x.rfcEmisor,
+        receptor: x.rfcReceptor,
+        iva: Number(x.ivaTrasladado ?? 0),
+        retenido: Number(x.ivaRetenido ?? 0),
+        incluido: x.incluidoEnCalculo ? 'Sí' : 'No'
+      });
 
-  const wsEmitidos = XLSX.utils.json_to_sheet(emitidos);
-  wsEmitidos['!cols'] = [
-    { wch: 40 }, { wch: 6 }, { wch: 10 }, { wch: 22 },
-    { wch: 22 }, { wch: 10 }, { wch: 10 }, { wch: 10 }
-  ];
-
-  // Estilos encabezado EMITIDOS (fila 1)
-  ['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1'].forEach(addr =>
-    set(wsEmitidos[addr], {
-      font: { bold: true, color: { rgb: 'FFFFFF' } },
-      fill: { fgColor: { rgb: azulHeader } },
-      alignment: { horizontal: 'center' }
-    })
-  );
-
-  XLSX.utils.book_append_sheet(wb, wsEmitidos, 'Emitidos');
+      // Formato numérico
+      row.getCell('F').numFmt = moneyFmt;
+      row.getCell('G').numFmt = moneyFmt;
+      row.getCell('F').alignment = { horizontal: 'right' };
+      row.getCell('G').alignment = { horizontal: 'right' };
+    });
 
   // ==========================
-  // HOJA 3: RECIBIDOS
+  // HOJA 3: RECIBIDOS (con header azul)
   // ==========================
-  const recibidos = this.detalleIva
+  const wsRecibidos = wb.addWorksheet('Recibidos', {
+    views: [{ state: 'frozen', ySplit: 1 }]
+  });
+
+  wsRecibidos.columns = wsEmitidos.columns as any;
+
+  const rh = wsRecibidos.getRow(1);
+  rh.eachCell(cell => {
+    cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: AZUL_HDR } };
+    cell.alignment = { horizontal: 'center', vertical: 'middle' };
+  });
+
+  this.detalleIva
     .filter(x => x.tipoMovimiento === 'Recibido')
-    .map(x => ({
-      UUID: x.uuid,
-      Tipo: x.tipoCfdi,
-      Método: x.metodoPago,
-      Emisor: x.rfcEmisor,
-      Receptor: x.rfcReceptor,
-      IVA: x.ivaTrasladado,
-      Retenido: x.ivaRetenido,
-      Incluido: x.incluidoEnCalculo ? 'Sí' : 'No'
-    }));
+    .forEach(x => {
+      const row = wsRecibidos.addRow({
+        uuid: x.uuid,
+        tipo: x.tipoCfdi,
+        metodo: x.metodoPago,
+        emisor: x.rfcEmisor,
+        receptor: x.rfcReceptor,
+        iva: Number(x.ivaTrasladado ?? 0),
+        retenido: Number(x.ivaRetenido ?? 0),
+        incluido: x.incluidoEnCalculo ? 'Sí' : 'No'
+      });
 
-  const wsRecibidos = XLSX.utils.json_to_sheet(recibidos);
-  wsRecibidos['!cols'] = wsEmitidos['!cols'];
-
-  ['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1'].forEach(addr =>
-    set(wsRecibidos[addr], {
-      font: { bold: true, color: { rgb: 'FFFFFF' } },
-      fill: { fgColor: { rgb: azulHeader } },
-      alignment: { horizontal: 'center' }
-    })
-  );
-
-  XLSX.utils.book_append_sheet(wb, wsRecibidos, 'Recibidos');
+      row.getCell('F').numFmt = moneyFmt;
+      row.getCell('G').numFmt = moneyFmt;
+      row.getCell('F').alignment = { horizontal: 'right' };
+      row.getCell('G').alignment = { horizontal: 'right' };
+    });
 
   // ==========================
   // DESCARGA
   // ==========================
-  const excelBuffer = XLSX.write(wb, {
-    bookType: 'xlsx',
-    type: 'array'
-  });
-
+  const buffer = await wb.xlsx.writeBuffer();
   saveAs(
-    new Blob([excelBuffer], {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    }),
+    new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
     `IVA_${t.rfc}_${this.mes}_${this.anio}.xlsx`
   );
 }
+
+
+
 
 async exportarExcel() {
   if (!this.detalleIva || this.detalleIva.length === 0) {
@@ -952,9 +1215,15 @@ async exportarExcel() {
   }
 
   // Método para validar si se puede consultar
-  puedeConsultar(): boolean {
-    return (!!this.clienteId || !!this.clienteSeleccionado) && !this.cargando;
+puedeConsultar(): boolean {
+  if (this.esCliente) {
+    return !this.cargando; // solo mes/año
   }
+
+  return (!!this.clienteId || !!this.clienteSeleccionado) && !this.cargando;
+}
+
+
 
   // Método para limpiar errores
   limpiarError() {

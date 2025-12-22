@@ -1,3 +1,4 @@
+<div *ngIf="!esCliente; else accesoDenegado">
 <div class="container-fluid mt-4">
   <div class="card shadow-lg border-0 rounded-3 overflow-hidden custom-card">
     <!-- Header -->
@@ -32,7 +33,8 @@
                     (input)="filtrarClientes($event)"
                     (focus)="mostrarSugerencias = true"
                     #clienteInput
-                    autocomplete="off">
+                    autocomplete="off"
+                    maxlength="40">
                   
                   <button
                     *ngIf="filtro.ClienteId !== 0"
@@ -266,3 +268,18 @@
     </div>
   </div>
 </div>
+
+</div>
+<ng-template #accesoDenegado>
+  <div class="container-fluid mt-5">
+    <div class="alert alert-warning text-center shadow-sm">
+      <h5 class="mb-2">
+        <i class="fas fa-lock me-2"></i>
+        Acceso restringido
+      </h5>
+      <p class="mb-0">
+        Los reportes de cobros solo están disponibles para personal autorizado.
+      </p>
+    </div>
+  </div>
+</ng-template>

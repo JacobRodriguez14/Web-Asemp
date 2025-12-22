@@ -100,13 +100,14 @@
 </a>
 
 <!-- Reportes de Cobros -->
-<a *ngIf="sesion.tiene('ccobros.ver')"
+<a *ngIf="sesion.tiene('ccobros.ver') && rol !== 'Cliente'"
    routerLink="/dashboard/cobros/reportes"
    routerLinkActive="active"
    [routerLinkActiveOptions]="{ exact: true }">
    <i data-feather="bar-chart-2"></i>
    <span>Reportes de Cobros</span>
 </a>
+
 
     <p class="sidebar-section" *ngIf="rol === 'Administrador'">
       SISTEMA

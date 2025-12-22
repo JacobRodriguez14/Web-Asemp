@@ -37,7 +37,8 @@
           class="form-control custom-input"
           placeholder="Buscar roles..."
           [(ngModel)]="busqueda"
-          (input)="filtrar()">
+          (input)="filtrar()"
+          maxlength="30">
       </div>
     </div>
 
@@ -164,13 +165,13 @@
     </div>
 
     <div class="modal-body-custom">
-      <label>Nombre del Rol *</label>
-      <input
-        type="text"
+      <label required-label="true">Nombre del Rol</label>
+<input type="text" required
         class="form-control-custom"
         [(ngModel)]="form.nombre"
         maxlength="100"
         placeholder="Ingrese el nombre del rol"
+        maxlength="20"
       />
 
       <label>Descripción</label>
@@ -180,6 +181,7 @@
         [(ngModel)]="form.descripcion"
         maxlength="255"
         placeholder="Ingrese una descripción del rol (opcional)"
+        maxlength="200"
       ></textarea>
     </div>
 

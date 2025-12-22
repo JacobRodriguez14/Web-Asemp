@@ -1,57 +1,181 @@
-// certificados.ts
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';             // 👈 para [(ngModel)]
+import { FormsModule } from '@angular/forms';
+import { NgxPaginationModule } from 'ngx-pagination';
 import { HttpResponse } from '@angular/common/http';
 import Swal from 'sweetalert2';
 
 import { CertificadosService } from '../../../core/services/certificados.service';
 
+declare const feather: any;
+
 @Component({
-  standalone: true,
   selector: 'app-certificados',
+  standalone: true,
   templateUrl: './certificados.html',
   styleUrls: ['./certificados.css'],
-  imports: [CommonModule, FormsModule]                    // 👈 agrega FormsModule
+  imports: [
+    CommonModule,
+    FormsModule,
+    NgxPaginationModule
+  ]
 })
-export class CertificadosComponent implements OnInit {
+export class CertificadosComponent implements OnInit, AfterViewInit {
 
-  certificados: any[] = [];
-  busqueda: string = '';                                  // 👈 texto del filtro
 
-  constructor(private certSrv: CertificadosService) {}
 
-  ngOnInit() {
-    this.cargar();
+// 👇 roles
+  esAdmin = false;
+  esEmpleado = false;
+  esCliente = false;
+  
+  // ==============================
+  // VARIABLES PRINCIPALES (IGUAL QUE DEPARTAMENTOS)
+  // ==============================
+
+  certificados: any[] = [];            
+  certificadosFiltrados: any[] = [];   
+  terminoBusqueda = '';                
+  criterioBusqueda: 'cliente' | 'rfc' | 'id' = 'cliente';
+  page = 1;                            
+  temaActual: 'light' | 'dark' = 'light';
+  
+  // ==============================
+  // ORDENAMIENTO (IGUAL QUE DEPARTAMENTOS)
+  // ==============================
+
+  orden = {
+    columna: '',
+    asc: true
+  };
+
+  constructor(private certificadosService: CertificadosService) {
+    this.detectarTema();
   }
 
-  cargar() {
-    this.certSrv.listar().subscribe({
-      next: data => {
-        this.certificados = data ?? [];
-        this.refrescarIconos();
+  // ==============================
+  // CICLO DE VIDA
+  // ==============================
+
+  ngOnInit(): void {
+  const rol = localStorage.getItem('rol');
+
+  this.esAdmin = rol === 'Administrador';
+  this.esEmpleado = rol === 'Empleado';
+  this.esCliente = rol === 'Cliente';
+
+  this.cargarCertificados();
+}
+
+
+  ngAfterViewInit(): void {
+    setTimeout(() => feather?.replace(), 0);
+    const observer = new MutationObserver(() => this.detectarTema());
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  }
+
+  // ==============================
+  // TEMA E ÍCONOS
+  // ==============================
+
+  private refreshIcons(): void {
+    setTimeout(() => feather?.replace(), 0);
+  }
+
+  private detectarTema(): void {
+    const temaGuardado = localStorage.getItem('theme');
+    this.temaActual = temaGuardado === 'dark' ? 'dark' : 'light';
+  }
+
+  // ==============================
+  // CRUD - OBTENER DATOS
+  // ==============================
+
+  cargarCertificados(): void {
+    this.certificadosService.listar().subscribe({
+      next: res => {
+        this.certificados = res;
+        this.certificadosFiltrados = res;
+        this.refreshIcons();
       },
-      error: () =>
-        Swal.fire('Error', 'No se pudieron cargar los certificados', 'error')
+      error: err => console.error('Error al cargar certificados', err)
     });
   }
 
-  // ==========================
-  // DESCARGA TIPO SAT
-  // ==========================
-  descargar(c: any, tipo: 'cer' | 'key' | 'pfx' | 'password') {
+  // ==============================
+  // FILTRO DE BÚSQUEDA (IGUAL QUE DEPARTAMENTOS)
+  // ==============================
 
-    this.certSrv.descargar(c.id, tipo).subscribe({
+  filtrarCertificados(): void {
+    const t = this.terminoBusqueda.trim().toLowerCase();
+
+    if (!t) {
+      this.certificadosFiltrados = this.certificados;
+      this.page = 1;
+      return;
+    }
+
+    this.certificadosFiltrados = this.certificados.filter(c => {
+      switch (this.criterioBusqueda) {
+        case 'cliente': 
+          return c.cliente?.toLowerCase().includes(t);
+        case 'rfc': 
+          return c.rfc?.toLowerCase().includes(t);
+        case 'id': 
+          return c.id?.toString().includes(t);
+        default: 
+          return false;
+      }
+    });
+
+    this.page = 1;
+  }
+
+  // ==============================
+  // ORDENAMIENTO (IGUAL QUE DEPARTAMENTOS)
+  // ==============================
+
+  ordenarPor(columna: string) {
+    if (this.orden.columna === columna) {
+      this.orden.asc = !this.orden.asc;
+    } else {
+      this.orden.columna = columna;
+      this.orden.asc = true;
+    }
+
+    this.certificadosFiltrados.sort((a, b) => {
+      let x = a[columna];
+      let y = b[columna];
+
+      if (x == null) x = '';
+      if (y == null) y = '';
+
+      if (typeof x === 'string') x = x.toLowerCase();
+      if (typeof y === 'string') y = y.toLowerCase();
+
+      return this.orden.asc ? (x > y ? 1 : -1) : (x > y ? -1 : 1);
+    });
+  }
+
+  getIconoOrden(columna: string) {
+    if (this.orden.columna !== columna) {
+      return 'fas fa-sort orden-icon neutro';
+    }
+    return this.orden.asc
+      ? 'fas fa-sort-up orden-icon activo'
+      : 'fas fa-sort-down orden-icon activo';
+  }
+
+  // ==============================
+  // DESCARGA DE ARCHIVOS
+  // ==============================
+
+  descargar(c: any, tipo: 'cer' | 'key' | 'pfx') {
+    this.certificadosService.descargar(c.id, tipo).subscribe({
       next: (resp: HttpResponse<Blob>) => {
-
-        const mime = this.getMime(tipo);
         const nombre = this.getNombreArchivo(c, tipo);
-
-        this.saveResponseWithPicker(resp, nombre, mime)
-          .catch(() => {
-            const blob = resp.body as Blob;
-            this.descargarConAnchor(blob, nombre);
-          });
+        const blob = resp.body as Blob;
+        this.descargarArchivo(blob, nombre);
       },
       error: (e) => {
         const msg = e?.error || 'No se pudo descargar el archivo';
@@ -60,48 +184,40 @@ export class CertificadosComponent implements OnInit {
     });
   }
 
-  private getMime(tipo: 'cer' | 'key' | 'pfx' | 'password'): string {
-    switch (tipo) {
-      case 'cer':       return 'application/x-x509-ca-cert';
-      case 'key':       return 'application/octet-stream';
-      case 'pfx':       return 'application/x-pkcs12';
-      case 'password':  return 'text/plain';
-      default:          return 'application/octet-stream';
-    }
+  // ==============================
+  // VER CONTRASEÑA
+  // ==============================
+
+  verPassword(c: any) {
+    // Si no tienes método getPassword, usa lo que ya tienes en el objeto
+    const password = c.password || c.contrasena || c.clave || 'No disponible';
+    
+    Swal.fire({
+      title: `Contraseña para ${c.rfc}`,
+      html: `
+        <div class="text-center">
+          <p class="mb-2">Cliente: <strong>${c.cliente}</strong></p>
+          <p class="mb-3">RFC: <code>${c.rfc}</code></p>
+          <div class="password-display mb-3">
+            <code style="font-size: 1.2rem; background: #f8f9fa; padding: 0.5rem 1rem; border-radius: 6px;">
+              ${password}
+            </code>
+          </div>
+          <small class="text-muted">Esta información es confidencial</small>
+        </div>
+      `,
+      icon: 'info',
+      confirmButtonText: 'Cerrar',
+      confirmButtonColor: '#0d6efd'
+    });
   }
 
-  private getNombreArchivo(c: any, tipo: 'cer' | 'key' | 'pfx' | 'password'): string {
+  private getNombreArchivo(c: any, tipo: 'cer' | 'key' | 'pfx'): string {
     const base = (c?.rfc || `certificado_${c?.id || ''}`).trim();
-    if (tipo === 'password') return `${base}_password.txt`;
     return `${base}.${tipo}`;
   }
 
-  // ===== helpers tipo SAT =====
-  private async saveResponseWithPicker(resp: HttpResponse<Blob>, nombre: string, mime: string) {
-    const blob = resp.body as Blob;
-    await this.saveWithPicker(blob, nombre, mime);
-  }
-
-  private async saveWithPicker(blob: Blob, suggestedName: string, mime: string) {
-    const w: any = window as any;
-
-    if (w.showSaveFilePicker) {
-      const ext = suggestedName.split('.').pop()?.toLowerCase() || '';
-      const accept: Record<string, string[]> = { [mime]: [`.${ext}`] };
-
-      const handle = await w.showSaveFilePicker({
-        suggestedName,
-        types: [{ description: mime, accept }]
-      });
-      const writable = await handle.createWritable();
-      await writable.write(blob);
-      await writable.close();
-    } else {
-      this.descargarConAnchor(blob, suggestedName);
-    }
-  }
-
-  private descargarConAnchor(blob: Blob, nombre: string) {
+  private descargarArchivo(blob: Blob, nombre: string) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -110,32 +226,5 @@ export class CertificadosComponent implements OnInit {
     a.click();
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 10000);
-  }
-
-  // ============================================================
-  // REFRESCAR ICONOS FEATHER
-  // ============================================================
-  refrescarIconos() {
-    setTimeout(() => {
-      if ((window as any).feather) {
-        (window as any).feather.replace();
-      }
-    }, 50);
-  }
-
-  // ============================================================
-  // FILTRO / BÚSQUEDA
-  // ============================================================
-  get certificadosFiltrados(): any[] {
-    const term = this.busqueda.trim().toLowerCase();
-    if (!term) return this.certificados;
-
-    return this.certificados.filter(c => {
-      const id = (c.id ?? '').toString();
-      const cliente = (c.cliente ?? '').toLowerCase();
-      const rfc = (c.rfc ?? '').toLowerCase();
-
-      return id.includes(term) || cliente.includes(term) || rfc.includes(term);
-    });
   }
 }

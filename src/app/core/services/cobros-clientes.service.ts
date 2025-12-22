@@ -93,4 +93,13 @@ confirmarPago(body: any): Observable<any> {
 }
 
 
+
+tienePendientes(clienteId: number) {
+  return this.http.get<{ pendiente: boolean }>(
+    `${this.url}/cliente/${clienteId}/pendientes`
+  );
+}
+
+
+
 }

@@ -10,6 +10,8 @@ import { HttpResponse } from '@angular/common/http';
 import { NgxPaginationModule } from 'ngx-pagination';
 import Swal from 'sweetalert2';
 
+import { AuthService } from '../../../../core/services/auth.service';
+
 declare const feather: any;
 
 @Component({
@@ -69,42 +71,78 @@ export class CobrosListComponent implements OnInit {
 
   constructor(
     private apiCobros: CobrosClientesService,
-    private apiClientes: ClientesService
+    private apiClientes: ClientesService,
+    private authSrv: AuthService
   ) {
     document.addEventListener('click', () => {
       this.menu.visible = false;
     });
   }
 
-  ngOnInit() {
-    this.cargar();
-    this.detectarTema();
-  }
+esAdmin = false;
+esEmpleado = false;
+esCliente = false;
+
+// permisos derivados
+puedeGestionar = false; // pagar, editar, eliminar
+ngOnInit() {
+  this.authSrv.getPerfil().subscribe({
+    next: (res: any) => {
+      const rol = res.rol;
+
+      this.esAdmin = rol === 'Administrador';
+      this.esEmpleado = rol === 'Empleado';
+      this.esCliente = rol === 'Cliente';
+
+      // Admin y Empleado gestionan
+      this.puedeGestionar = this.esAdmin || this.esEmpleado;
+
+      // 🔴 CLAVE: filtro inicial
+      this.modoFiltro = 'todos';
+
+      // 🔴 CLAVE: primera carga
+      this.cargar();
+
+      this.detectarTema();
+    },
+    error: () => {
+      // fallback seguro
+      this.modoFiltro = 'todos';
+      this.cargar();
+      this.detectarTema();
+    }
+  });
+}
+
 
   // ==============================
   // CARGA DE COBROS
   // ==============================
-  cargar() {
-    const params: any = {};
+cargar() {
+  const params: any = {};
 
-    if (this.filtroMes) params.mes = this.filtroMes;
-    if (this.filtroAnio) params.anio = this.filtroAnio;
-    if (this.texto) params.texto = this.texto;
+  if (this.filtroMes) params.mes = this.filtroMes;
+  if (this.filtroAnio) params.anio = this.filtroAnio;
+  if (this.texto) params.texto = this.texto;
 
-    if (this.modoFiltro === 'pendientes') params.pendientes = true;
-    if (this.modoFiltro === 'pagados') params.pagados = true;
-    if (this.modoFiltro === 'atrasados') params.atrasados = true;
-    if (this.modoFiltro === 'todos') params.todos = true;
+  // flags
+  if (this.modoFiltro === 'pendientes') params.pendientes = true;
+  if (this.modoFiltro === 'pagados') params.pagados = true;
+  if (this.modoFiltro === 'atrasados') params.atrasados = true;
 
-    this.apiCobros.lista(params).subscribe({
-      next: res => {
-        this.lista = res;
-        if (this.orden.columna) {
-          this.aplicarOrdenamiento();
-        }
-      }
-    });
+  // ✅ fallback: si no mandaste ninguno, manda TODOS
+  if (!params.pendientes && !params.pagados && !params.atrasados) {
+    params.todos = true;
   }
+
+  this.apiCobros.lista(params).subscribe({
+    next: res => {
+      this.lista = res;
+      if (this.orden.columna) this.aplicarOrdenamiento();
+    }
+  });
+}
+
 
 cambiarModo(modo: 'todos' | 'pendientes' | 'pagados' | 'atrasados') {
   this.modoFiltro = modo;

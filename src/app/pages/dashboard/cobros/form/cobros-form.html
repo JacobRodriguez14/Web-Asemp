@@ -19,7 +19,7 @@
 
       <!-- Cliente con Autocomplete Personalizado -->
       <div class="form-group">
-        <label class="form-label form-label-with-icon">
+        <label class="form-label form-label-with-icon"required-label>
           <i class="fas fa-user label-icon"></i>
           Cliente
         </label>
@@ -35,7 +35,8 @@
   (focus)="mostrarSugerencias = true"
   (blur)="onInputBlur()"
   placeholder="Escriba para buscar cliente..."
-  autocomplete="off">
+  autocomplete="off"
+  maxlength="40">
 
 
           <!-- Lista de sugerencias -->
@@ -85,13 +86,14 @@
 
       <!-- Descripción -->
       <div class="form-group">
-        <label class="form-label form-label-with-icon">
+        <label class="form-label form-label-with-icon" required-label>
           <i class="fas fa-file-alt label-icon"></i>
           Descripción del servicio
         </label>
         <input class="custom-input" 
                formControlName="descripcion" 
-               placeholder="Ingrese la descripción del servicio...">
+               placeholder="Ingrese la descripción del servicio..."
+               maxlength="40">
       </div>
 
       <!-- Información Fiscal -->
@@ -128,7 +130,7 @@
 
         <div class="col-md-6">
           <div class="form-group">
-            <label class="form-label">Mes</label>
+            <label class="form-label"required-label>Mes</label>
             <select class="custom-select" formControlName="mes">
               <option *ngFor="let i of [1,2,3,4,5,6,7,8,9,10,11,12]" [ngValue]="i">
                 {{ getMesNombre(i) }}
@@ -139,7 +141,7 @@
 
         <div class="col-md-6">
           <div class="form-group">
-            <label class="form-label">Año</label>
+            <label class="form-label"required-label>Año</label>
             <input class="custom-input" formControlName="anio" readonly>
           </div>
         </div>
@@ -180,7 +182,7 @@
 
         <div class="col-md-6">
           <div class="form-group">
-            <label class="form-label">Estado de Pago</label>
+            <label class="form-label" required-label>Estado de Pago</label>
             <select class="custom-select" formControlName="estado_pago">
               <option value="PENDIENTE">Pendiente</option>
               <option value="PAGADO" [disabled]="form.get('estado_pago')?.value !== 'PAGADO'">

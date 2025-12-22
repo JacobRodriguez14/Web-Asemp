@@ -35,7 +35,7 @@
               class="form-control custom-input"
               placeholder="Buscar acciones..."
               [(ngModel)]="busqueda"
-              (input)="filtrarAcciones()">
+              (input)="filtrarAcciones()"maxlength="30">
           </div>
         </div>
 
@@ -157,20 +157,23 @@
     </div>
 
     <div class="modal-body-custom">
-      <label>Nombre de la Acción *</label>
+      <label required-label>Nombre de la Acción</label>
       <input
         type="text"
+        required=""
         class="form-control-custom"
         [(ngModel)]="form.nombre"
         name="nombre"
         maxlength="150"
         placeholder="Ingrese el nombre de la acción"
         required
+        maxlength="20"
       />
 
-      <label>ID Catálogo (opcional)</label>
+      <label required-label>ID Catálogo</label>
       <input
         type="number"
+        required
         class="form-control-custom"
         [(ngModel)]="form.catalogo_id"
         name="catalogo_id"

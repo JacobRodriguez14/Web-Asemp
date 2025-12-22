@@ -140,6 +140,7 @@ export const routes: Routes = [
         canActivate: [permisoGuard],
         data: { permiso: 'sat.ver' }
       },
+      
       // COBROS
       {
   path: 'cobros',

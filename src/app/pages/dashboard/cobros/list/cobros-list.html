@@ -13,6 +13,7 @@
         <!-- Botón "Nuevo cobro" -->
         <button
           class="btn custom-btn-float-azul d-flex align-items-center shadow"
+          *ngIf="puedeGestionar "
           (click)="abrirNuevo()">
           <i data-feather="plus" class="me-2"></i>
           <span>Nuevo cobro</span>
@@ -27,7 +28,7 @@
   <div class="row g-3 align-items-center mb-3">
 
     <!-- Buscar cliente -->
-    <div class="col-md-5">
+    <div class="col-md-5" *ngIf="!esCliente">
       <div class="input-group custom-input-group">
         <span class="input-group-text custom-input-icon">
           <i data-feather="search" class="search-icon"></i>
@@ -37,7 +38,8 @@
           class="form-control custom-input"
           placeholder="Buscar cliente..."
           [(ngModel)]="texto"
-          (input)="cargar()">
+          (input)="cargar()"
+          maxlength="40">
       </div>
     </div>
 
@@ -177,18 +179,21 @@
         </table>
 
         <!-- MENÚ FLOTANTE -->
+        <!-- MENÚ FLOTANTE -->
         <div
           class="menu-flotante"
           *ngIf="menu.visible"
           [ngStyle]="{ top: menu.y + 'px', left: menu.x + 'px' }">
 
+          <!-- PAGAR → ADMIN y EMPLEADO -->
           <button
             class="accion-btn verde"
-            *ngIf="menu.cobro?.estado_pago !== 'PAGADO'"
+            *ngIf="puedeGestionar && menu.cobro?.estado_pago !== 'PAGADO'"
             (click)="abrirModalPagoDesdeMenu()">
             <i class="fas fa-check"></i> Pagar
           </button>
 
+          <!-- RECIBO → TODOS (si está pagado) -->
           <button
             class="accion-btn info"
             *ngIf="menu.cobro?.estado_pago === 'PAGADO' && menu.cobro?.comprobante_pdf"
@@ -196,18 +201,24 @@
             <i class="fas fa-file-pdf"></i> Recibo
           </button>
 
+          <!-- EDITAR → ADMIN y EMPLEADO -->
           <button
             class="accion-btn editar"
+            *ngIf="puedeGestionar"
             (click)="editarDesdeMenu()">
             <i class="fas fa-pen"></i> Editar
           </button>
 
+          <!-- ELIMINAR → SOLO ADMIN (opcional, tú decides) -->
           <button
             class="accion-btn eliminar"
+            *ngIf="!esCliente"
             (click)="eliminarDesdeMenu()">
             <i class="fas fa-trash"></i> Eliminar
           </button>
+
         </div>
+
       </div>
     </div>
 

@@ -146,19 +146,46 @@ formatearTelefono() {
   usuariosDisponibles: any[] = [];
 
 ngOnInit() {
-    // Cargar usuarios disponibles
-    this.api.getUsuariosDisponibles().subscribe({
-      next: (res) => (this.usuariosDisponibles = res),
-    });
 
-    // Si estamos editando, cargar datos del cliente
-    if (this.id) {
-      this.cargarCliente();
-    }
+  // 1) Cargar usuarios disponibles
+  this.api.getUsuariosDisponibles().subscribe({
+    next: (res) => {
+      this.usuariosDisponibles = res;
 
-    // 🔥 Inicializar visibilidad de retenciones basado en el valor actual
-    this.mostrarRetenciones = this.form.get('usa_retenciones')?.value;
-  }
+      // ==========================================================
+      // 🔥 AUTOLLENAR CUANDO SE SELECCIONA UN USUARIO (YA HAY DATOS)
+      // ==========================================================
+      this.form.get("usuario_id")?.valueChanges.subscribe((usuarioId: number) => {
+        if (!usuarioId) return;
+
+        const usuario = this.usuariosDisponibles.find(u => u.id === usuarioId);
+        if (!usuario) return;
+
+        const nombreCompleto =
+          usuario.nombre_completo ||
+          (usuario.nombres
+            ? `${usuario.nombres} ${usuario.apellido_paterno ?? ''} ${usuario.apellido_materno ?? ''}`.trim()
+            : usuario.usuario);
+
+        this.form.patchValue({
+          razon_social: nombreCompleto,
+          correo_electronico: usuario.correo || '',
+          telefono: usuario.telefono || ''
+        });
+      });
+
+      // Si se está editando, cargar datos del cliente (AL FINAL)
+      if (this.id) {
+        this.cargarCliente();
+      }
+    },
+    error: () => console.error('Error cargando usuarios disponibles')
+  });
+
+  // 2) Configuración del estado inicial de retenciones
+  this.mostrarRetenciones = this.form.get('usa_retenciones')?.value;
+}
+  // ==============================================================
 
 
    // 🔥 Método para toggle de retenciones
@@ -166,36 +193,55 @@ ngOnInit() {
     this.mostrarRetenciones = !this.mostrarRetenciones;
   }
 
+cargarCliente() {
+  if (!this.id) return;
 
-  cargarCliente() {
-    if (!this.id) return;
+  this.api.getByIdDetalle(this.id).subscribe({
+    next: (cliente) => {
 
-    this.api.getByIdDetalle(this.id).subscribe({
-      next: (cliente) => {
-        const cert = cliente.certificados_sat?.[0];
+      const cert = cliente.certificados_sat?.[0];
+
+      // Carga normal del cliente
+      this.form.patchValue({
+        usuario_id: cliente.usuario_id,
+        razon_social: cliente.razon_social,
+        telefono: cliente.telefono,
+        correo_electronico: cliente.correo_electronico,
+        direccion: cliente.direccion,
+        honorarios_subtotal: cliente.honorarios_subtotal,
+        rfc: cert?.rfc || '',
+        contrasena: cert?.contrasena || '',
+        estatus: cliente.estatus,
+        usa_retenciones: cliente.usa_retenciones,
+        porc_isr_ret: cliente.porc_isr_ret,
+        porc_iva_ret: cliente.porc_iva_ret,
+      });
+
+      this.mostrarRetenciones = cliente.usa_retenciones;
+
+      // ======================================================
+      // 🔥 Autollenar datos del usuario asignado (solo en edición)
+      // ======================================================
+      const usuario = this.usuariosDisponibles.find(u => u.id === cliente.usuario_id);
+      if (usuario) {
+
+        // Construir nombre completo si existe
+        const nombreCompleto =
+          (usuario.nombres && usuario.apellido_paterno)
+            ? `${usuario.nombres} ${usuario.apellido_paterno} ${usuario.apellido_materno ?? ''}`.trim()
+            : usuario.usuario;  // fallback si no existen los nombres
 
         this.form.patchValue({
-          usuario_id: cliente.usuario_id,
-          razon_social: cliente.razon_social,
-          telefono: cliente.telefono,
-          correo_electronico: cliente.correo_electronico,
-          direccion: cliente.direccion,
-          honorarios_subtotal: cliente.honorarios_subtotal,
-          rfc: cert?.rfc || '',
-          contrasena: cert?.contrasena || '',
-          estatus: cliente.estatus,
-          usa_retenciones: cliente.usa_retenciones,
-          porc_isr_ret: cliente.porc_isr_ret,
-          porc_iva_ret: cliente.porc_iva_ret,
+          razon_social: nombreCompleto,
+          correo_electronico: usuario.correo || cliente.correo_electronico,
+          telefono: usuario.telefono || cliente.telefono
         });
+      }
 
-        // 🔥 Actualizar visibilidad basado en los datos cargados
-        this.mostrarRetenciones = cliente.usa_retenciones;
-      },
-      error: (err) => console.error('Error al cargar cliente', err),
-    });
-  }
-
+    },
+    error: (err) => console.error('Error al cargar cliente', err),
+  });
+}
 
 
   // ==============================================================

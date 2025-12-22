@@ -135,6 +135,7 @@
 }
 
 .sat-header h2 {
+  text-align: center;
   color: var(--color-text);
   font-weight: 700;
 }
@@ -310,6 +311,7 @@
   border-radius: 6px;
   padding: 4px 10px;
   color: white;
+  background-color: var(--color-primary);
   margin: 2px;
   cursor: pointer;
   font-size: 0.85rem;
@@ -1446,4 +1448,292 @@ button.btn-sm:hover {
   overflow: hidden !important;
   max-height: 0 !important;
   transition: all 0.25s ease;
+}
+
+
+
+
+
+/* ======================= */
+/*      SAT TABS MEJORADOS */
+/* ======================= */
+
+.sat-container-tabs {
+  text-align: center;
+  background: white;
+  margin: 0;
+  padding: 0;
+}
+
+.sat-tabs-header {
+  padding: 2rem 2rem 0.5rem;
+  margin: 0;
+}
+
+.sat-titulo {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #1e293b;
+}
+
+.sat-subtitulo {
+  font-size: 15px;
+  color: #64748b;
+  margin-bottom: 0;
+  font-weight: 400;
+}
+
+/* TABS - Estilo profesional */
+.sat-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid #e2e8f0;
+  margin-bottom: 0;
+  background: white;
+  padding: 0 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.sat-tabs .tab-button {
+  background: transparent;
+  border: none;
+  padding: 1.2rem 1.8rem;
+  font-size: 15px;
+  cursor: pointer;
+  color: #64748b;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sat-tabs .tab-button:hover {
+  color: var(--color-primary, #8B2942);
+  background: #f8fafc;
+}
+
+.sat-tabs .tab-button.active {
+  color: var(--color-primary, #8B2942);
+  font-weight: 600;
+  border-bottom: 3px solid var(--color-primary, #8B2942);
+}
+
+/* Contenido de los tabs */
+.sat-tab-content {
+  background: transparent;
+  padding: 2rem;
+  border-radius: 0;
+  box-shadow: none;
+  min-height: calc(100vh - 200px);
+}
+
+/* Ajustar el contenedor principal para que no duplique padding */
+.sat-container {
+  background: var(--fondo-claro);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 0; /* Quitamos el padding porque ahora está en .sat-tab-content */
+}
+
+/* MODO OSCURO */
+[data-theme="dark"] .sat-container-tabs {
+  background: #1e293b;
+}
+
+[data-theme="dark"] .sat-tabs-header {
+  background: #1e293b;
+}
+
+[data-theme="dark"] .sat-titulo {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .sat-subtitulo {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .sat-tabs {
+  background: #1e293b;
+  border-bottom-color: #334155;
+}
+
+[data-theme="dark"] .sat-tabs .tab-button {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .sat-tabs .tab-button:hover {
+  color: var(--color-primary);
+  background: #334155;
+}
+
+[data-theme="dark"] .sat-tab-content {
+  background: transparent;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .sat-titulo {
+    padding: 1.5rem 1rem 0.5rem;
+    font-size: 24px;
+  }
+  
+  .sat-subtitulo {
+    padding: 0 1rem 1rem;
+  }
+  
+  .sat-tabs {
+    padding: 0 1rem;
+    overflow-x: auto;
+  }
+  
+  .sat-tabs .tab-button {
+    padding: 1rem 1.2rem;
+    white-space: nowrap;
+    font-size: 14px;
+  }
+  
+  .sat-tab-content {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .sat-tabs .tab-button {
+    padding: 0.8rem 1rem;
+  }
+  
+  .sat-tab-content {
+    padding: 0.5rem;
+  }
+}
+
+/* Iconos para los tabs */
+.sat-tabs .tab-button i {
+  font-size: 14px;
+}
+
+/* Mantener los estilos existentes pero ajustar */
+.sat-container {
+  background: var(--fondo-claro);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 0; /* El padding ahora está en .sat-tab-content */
+}
+
+/* Si necesitas que el contenido manual tenga fondo, agrega esto: */
+.sat-tab-content .sat-container {
+  padding: 0; /* El padding se maneja desde .sat-tab-content */
+}
+
+
+
+
+/* ===== ESTILOS PARA EL SELECT DE ITEMS POR PÁGINA ===== */
+.select-items-pagina {
+  padding: 0.4rem 1rem;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  background-color: white;
+  color: #495057;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 130px;
+}
+
+.select-items-pagina:hover {
+  border-color: var(--color-primary);
+  background-color: #f8f9fa;
+}
+
+.select-items-pagina:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.25);
+}
+
+/* Contador de página */
+.pagina-contador {
+  font-size: 0.9rem;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.pagina-actual {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #495057;
+}
+
+/* Estilos para el footer */
+.card-footer {
+  padding: 1rem 1.5rem !important;
+  background-color: var(--color-navbar) !important;
+  border-top: 1px solid #dee2e6 !important;
+}
+
+.card-footer .d-flex {
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+
+/* Botones más pequeños */
+.btn-sm {
+  padding: 0.25rem 0.75rem !important;
+  font-size: 0.85rem !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .card-footer .d-flex {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+  }
+  
+  .select-items-pagina {
+    width: 100%;
+    max-width: 200px;
+  }
+  
+  .pagina-contador {
+    order: 1;
+  }
+  
+  .pagina-actual {
+    order: 2;
+  }
+  
+  .select-items-pagina {
+    order: 3;
+  }
+}
+
+/* Modo oscuro */
+[data-theme="dark"] .select-items-pagina {
+  background-color: #2b2b2b;
+  border-color: #444;
+  color: #ddd;
+}
+
+[data-theme="dark"] .select-items-pagina:hover {
+  background-color: #3a3a3a;
+  border-color: var(--color-primary);
+}
+
+[data-theme="dark"] .pagina-contador {
+  color: #aaa;
+}
+
+[data-theme="dark"] .pagina-actual {
+  color: #ccc;
 }

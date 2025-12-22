@@ -18,14 +18,15 @@
 
             <!-- Nombre -->
             <div class="col-12">
-              <label class="form-label fw-semibold">Nombre del Departamento *</label>
+              <label class="form-label fw-semibold" required-label>Nombre del Departamento</label>
               <input 
                 type="text" 
                 class="form-control" 
                 [(ngModel)]="model.nombre" 
                 name="nombre" 
                 placeholder="Ingrese el nombre del departamento"
-                required>
+                required
+                maxlength="20">
             </div>
 
             <!-- Descripción -->
@@ -36,7 +37,8 @@
                 [(ngModel)]="model.descripcion" 
                 name="descripcion" 
                 rows="4"
-                placeholder="Ingrese una descripción del departamento (opcional)"></textarea>
+                placeholder="Ingrese una descripción del departamento (opcional)"
+                maxlength="300"></textarea>
             </div>
 
           </div>

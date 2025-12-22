@@ -214,4 +214,35 @@
   background: #ececec;
 }
 
+.alerta-pago {
+  background: linear-gradient(135deg, #fff0a8, #ffe27a);
+  padding: 16px 22px;
+  border-radius: 12px;
+  color: #4b3b00;
+  font-weight: 700;
+  border: 2px solid #ffce45;
+  margin-bottom: 1.4rem;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(255, 193, 7, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 1.05rem;
+
+  animation: alertaPulse 1.6s ease-in-out infinite;
+}
+
+.alerta-pago i {
+  font-size: 1.4rem;
+  color: #b27900;
+}
+
+@keyframes alertaPulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+
 
