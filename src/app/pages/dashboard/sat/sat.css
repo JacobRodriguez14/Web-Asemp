@@ -1737,3 +1737,234 @@ button.btn-sm:hover {
 [data-theme="dark"] .pagina-actual {
   color: #ccc;
 }
+
+
+
+/* =====================================================================
+   SAT SOLICITUDES - THEME SAFE (NO TOCAR TABLA)
+   Solo: parte de arriba (tabs/título), Nueva Solicitud, Filtros
+   Usa: --color-primary, --color-navbar, --color-background, --color-text
+===================================================================== */
+
+/* ===== TOP: contenedor + header + tabs ===== */
+.sat-container-tabs{
+  background: var(--color-background) !important;
+}
+
+.sat-tabs-header{
+  background: var(--color-navbar) !important;
+}
+
+.sat-titulo{
+  color: var(--color-text) !important;
+}
+
+.sat-subtitulo{
+  color: color-mix(in srgb, var(--color-text) 60%, transparent) !important;
+}
+
+/* Tabs */
+.sat-tabs{
+  background: var(--color-navbar) !important;
+  border-bottom: 2px solid color-mix(in srgb, var(--color-text) 12%, transparent) !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.sat-tabs .tab-button{
+  color: color-mix(in srgb, var(--color-text) 65%, transparent) !important;
+}
+
+.sat-tabs .tab-button:hover{
+  color: var(--color-text) !important;
+  background: color-mix(in srgb, var(--color-navbar) 55%, transparent) !important;
+}
+
+.sat-tabs .tab-button.active{
+  color: var(--color-text) !important;
+  border-bottom-color: var(--color-text) !important;
+}
+
+/* Contenido del tab */
+.sat-tab-content{
+  background: transparent !important;
+}
+
+/* Asegura que el contenido use el mismo fondo del sistema */
+.sat-container{
+  background: var(--color-background) !important;
+}
+
+
+/* ===== Cards: Nueva Solicitud + Filtros (mismo look de roles/acciones) ===== */
+.solicitud-card,
+.filters-card{
+  background: var(--color-navbar) !important;
+  color: var(--color-text) !important;
+  border-radius: 12px !important;
+  border: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent) !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08) !important;
+  overflow: visible !important;
+}
+
+/* Header de tarjetas desplegables */
+.filters-header{
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-navbar) 92%, white) 0%,
+    color-mix(in srgb, var(--color-navbar) 75%, white) 100%
+  ) !important;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent) !important;
+}
+
+.filters-header:hover{
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-navbar) 86%, white) 0%,
+    color-mix(in srgb, var(--color-navbar) 68%, white) 100%
+  ) !important;
+}
+
+.filters-header .section-title{
+  color: var(--color-text) !important;
+}
+
+.filters-header .header-content i,
+.filters-header .toggle-icon{
+  color: var(--color-primary) !important;
+}
+
+/* Cuerpo */
+.filters-body{
+  background: var(--color-navbar) !important;
+}
+
+/* Cuando expande: no recortes autocomplete */
+.filters-body.expanded{
+  background: var(--color-background) !important;
+  overflow: visible !important;
+}
+
+.filters-grid,
+.filters-grid-improved{
+  overflow: visible !important;
+}
+
+/* Labels */
+.filter-label,
+.form-group label{
+  color: var(--color-text) !important;
+}
+
+/* Inputs / selects */
+.form-control-improved,
+.form-select-improved,
+.form-control,
+.form-select{
+  background: var(--color-navbar) !important;
+  color: var(--color-text) !important;
+  border: 2px solid color-mix(in srgb, var(--color-text) 12%, transparent) !important;
+  border-radius: 10px !important;
+}
+
+.form-control-improved::placeholder{
+  color: color-mix(in srgb, var(--color-text) 55%, transparent) !important;
+}
+
+.form-control-improved:focus,
+.form-select-improved:focus,
+.form-control:focus,
+.form-select:focus{
+  outline: none !important;
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent) !important;
+}
+
+/* Search icon (wrapper) */
+.search-input-wrapper i{
+  color: color-mix(in srgb, var(--color-text) 55%, transparent) !important;
+}
+
+/* Autocomplete (sin tocar tu lógica) */
+.autocomplete-list-improved{
+  background: var(--color-background) !important;
+  border-color: var(--color-primary) !important;
+  color: var(--color-text) !important;
+  z-index: 9999999 !important;
+}
+
+.autocomplete-list-improved li{
+  border-bottom: 1px solid color-mix(in srgb, var(--color-text) 8%, transparent) !important;
+}
+
+.autocomplete-list-improved li:hover{
+  background: color-mix(in srgb, var(--color-primary) 6%, transparent) !important;
+}
+
+.client-name{
+  color: var(--color-text) !important;
+}
+
+.client-rfc{
+  color: var(--color-primary) !important;
+}
+
+.client-email,
+.client-separator{
+  color: color-mix(in srgb, var(--color-text) 60%, transparent) !important;
+}
+
+/* Botón Crear Solicitud */
+.btn-create-request{
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-primary) 35%, #0d6efd) 0%,
+    #0b5ed7 100%
+  ) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 12px !important;
+  box-shadow: 0 6px 18px rgba(13,110,253,0.25) !important;
+}
+
+.btn-create-request:hover:not(:disabled){
+  transform: translateY(-2px) !important;
+  box-shadow: 0 10px 24px rgba(13,110,253,0.35) !important;
+}
+
+.btn-create-request:disabled{
+  opacity: .55 !important;
+}
+
+/* Botón limpiar filtros */
+.btn-clear-filters{
+  border: 1px solid color-mix(in srgb, #dc2626 85%, black) !important;
+  color: color-mix(in srgb, #dc2626 85%, black) !important;
+}
+
+.btn-clear-filters:hover{
+  background: color-mix(in srgb, #dc2626 85%, black) !important;
+  color: #fff !important;
+}
+
+/* ===== Dark mode: ajusta fondos de headers y cuerpo ===== */
+[data-theme="dark"] .filters-header{
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-navbar) 85%, black) 0%,
+    color-mix(in srgb, var(--color-navbar) 70%, black) 100%
+  ) !important;
+  border-bottom-color: color-mix(in srgb, var(--color-text) 12%, transparent) !important;
+}
+
+[data-theme="dark"] .filters-body{
+  background: var(--color-navbar) !important;
+}
+
+[data-theme="dark"] .form-control-improved,
+[data-theme="dark"] .form-select-improved,
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select{
+  background: color-mix(in srgb, var(--color-navbar) 85%, black) !important;
+  border-color: color-mix(in srgb, var(--color-text) 14%, transparent) !important;
+  color: var(--color-text) !important;
+}

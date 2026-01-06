@@ -62,10 +62,20 @@ export class SatAutomaticoComponent {
     private satJobs: SatJobsService
   ) {}
 
+
+  setTheme(theme: 'light' | 'dark') {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('theme', theme);
+}
+
+
   ngOnInit() {
     this.cargarClientes();
     this.cargarJobs();
     this.detectarTema();
+    const saved = (localStorage.getItem('theme') as 'light' | 'dark') || 'light';
+document.documentElement.setAttribute('data-theme', saved);
+
   }
 
   // ===============================

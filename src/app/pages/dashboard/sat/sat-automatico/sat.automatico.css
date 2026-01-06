@@ -386,31 +386,60 @@
 }
 
 /* ===== TABLA DE JOBS ===== */
+/* ===== TABLA (BASE) ===== */
 .jobs-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9rem;
+  color: var(--color-text);
 }
 
-.jobs-table th {
-  background: #f8fafc;
-  padding: 1rem;
-  text-align: left;
-  font-weight: 600;
-  color: #374151;
-  border-bottom: 2px solid #e2e8f0;
-  white-space: nowrap;
+.jobs-table thead th {
+  background: var(--color-navbar) !important;
+  color: var(--color-text) !important;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-text) 15%, transparent) !important;
 }
 
+/* Quita fondos “raros” en celdas */
 .jobs-table td {
-  padding: 1rem;
-  border-bottom: 1px solid #e2e8f0;
-  vertical-align: middle;
+  background: transparent !important;
+  color: var(--color-text) !important;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-text) 12%, transparent) !important;
 }
 
-.jobs-table tr:hover {
-  background: #f8fafc;
+/* ===== STRIPED (CLARO) ===== */
+.jobs-table.table-striped > tbody > tr:nth-of-type(odd) > * {
+  background: color-mix(in srgb, var(--color-navbar) 35%, transparent) !important;
 }
+
+.jobs-table.table-striped > tbody > tr:nth-of-type(even) > * {
+  background: transparent !important;
+}
+
+/* Hover */
+.jobs-table tbody tr:hover > * {
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent) !important;
+}
+
+/* ===== OSCURO: cuando el root tiene data-theme="dark" ===== */
+[data-theme="dark"] .jobs-table {
+  color: var(--color-text) !important;
+}
+
+[data-theme="dark"] .jobs-table thead th {
+  background: color-mix(in srgb, var(--color-navbar) 80%, black) !important;
+}
+
+/* El punto crítico: striped en oscuro */
+[data-theme="dark"] .jobs-table.table-striped > tbody > tr:nth-of-type(odd) > * {
+  background: color-mix(in srgb, var(--color-navbar) 55%, black) !important;
+}
+
+[data-theme="dark"] .jobs-table.table-striped > tbody > tr:nth-of-type(even) > * {
+  background: transparent !important;
+}
+
+[data-theme="dark"] .jobs-table tbody tr:hover > * {
+  background: color-mix(in srgb, var(--color-primary) 12%, black) !important;
+}
+
 
 /* Badges y estados */
 .badge-tipo {
@@ -1195,4 +1224,282 @@
 
 [data-theme="dark"] .orden-icon.neutro {
   color: #aaa;
+}
+
+
+
+
+
+/* ============================================================
+   SAT AUTOMÁTICO - THEME SAFE (alineado a tus variables)
+   Objetivo:
+   - Quitar hardcode (#f8fafc, #1e293b, etc.)
+   - Evitar choques con .card-header/.card-body globales
+   - Mantener tu diseño, pero “responsive” a tema claro/oscuro
+   IMPORTANTE: pega esto AL FINAL del CSS del módulo
+============================================================ */
+
+/* 1) Fondo del módulo */
+.sat-auto-container{
+  background: var(--color-background) !important;
+}
+
+/* 2) Card principal */
+.sat-auto-card{
+  background: var(--color-navbar) !important;
+  border-color: color-mix(in srgb, var(--color-text) 10%, transparent) !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,.08) !important;
+}
+
+/* 3) Evita que el CSS global de Bootstrap/otros te rompa header/body:
+      (solo afectamos los header/body dentro de .sat-auto-card) */
+.sat-auto-card > .card-header{
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-navbar) 92%, white) 0%,
+    color-mix(in srgb, var(--color-navbar) 80%, white) 100%
+  ) !important;
+  border-bottom-color: color-mix(in srgb, var(--color-text) 10%, transparent) !important;
+}
+
+.sat-auto-card > .card-header h3{
+  color: var(--color-text) !important;
+}
+
+.sat-auto-card > .card-header .card-subtitle{
+  color: color-mix(in srgb, var(--color-text) 60%, transparent) !important;
+}
+
+.sat-auto-card > .card-body{
+  background: transparent !important;
+  color: var(--color-text) !important;
+}
+
+/* 4) Form controls */
+.form-label,
+.radio-text,
+.clientes-resumen{
+  color: var(--color-text) !important;
+}
+
+.form-control-auto,
+.search-input{
+  background: var(--color-background) !important;
+  color: var(--color-text) !important;
+  border-color: color-mix(in srgb, var(--color-text) 12%, transparent) !important;
+}
+
+.form-control-auto:focus,
+.search-input:focus{
+  outline: none !important;
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent) !important;
+}
+
+/* 5) Sección clientes */
+.clientes-section{
+  background: color-mix(in srgb, var(--color-navbar) 70%, white) !important;
+  border-color: color-mix(in srgb, var(--color-text) 10%, transparent) !important;
+}
+
+.section-title{
+  color: var(--color-text) !important;
+}
+
+.clientes-panel,
+.clientes-list-container{
+  background: var(--color-background) !important;
+  border-color: color-mix(in srgb, var(--color-text) 10%, transparent) !important;
+}
+
+.search-wrapper i{
+  color: color-mix(in srgb, var(--color-text) 55%, transparent) !important;
+}
+
+/* Cards de cliente */
+.cliente-card{
+  border-bottom-color: color-mix(in srgb, var(--color-text) 10%, transparent) !important;
+}
+
+.cliente-card:hover{
+  background: color-mix(in srgb, var(--color-primary) 6%, transparent) !important;
+}
+
+.cliente-nombre{
+  color: var(--color-text) !important;
+}
+
+.cliente-email,
+.cliente-separator{
+  color: color-mix(in srgb, var(--color-text) 60%, transparent) !important;
+}
+
+/* 6) Botones toolbar */
+.btn-toolbar{
+  background: var(--color-background) !important;
+  color: var(--color-text) !important;
+  border-color: color-mix(in srgb, var(--color-text) 12%, transparent) !important;
+}
+
+.btn-toolbar:hover{
+  background: color-mix(in srgb, var(--color-navbar) 55%, transparent) !important;
+  border-color: color-mix(in srgb, var(--color-text) 20%, transparent) !important;
+}
+
+/* 7) Botón crear */
+.btn-create-job{
+  box-shadow: 0 6px 18px rgba(13,110,253,.25) !important;
+}
+
+/* 8) Filtros de JOBS (tu bloque que usa custom-filters/custom-input-group) */
+.sat-jobs-filtros{
+  background: var(--color-navbar) !important;
+}
+
+.sat-jobs-filtros .custom-input-group{
+  background: var(--color-background) !important;
+  border-color: color-mix(in srgb, var(--color-primary) 20%, transparent) !important;
+}
+
+.sat-jobs-filtros .custom-input-icon{
+  color: var(--color-primary) !important;
+}
+
+.sat-jobs-filtros .custom-input{
+  color: var(--color-text) !important;
+}
+
+.sat-jobs-filtros .custom-input::placeholder{
+  color: color-mix(in srgb, var(--color-text) 55%, transparent) !important;
+}
+
+.sat-jobs-filtros .custom-select{
+  background: var(--color-background) !important;
+  color: var(--color-text) !important;
+  border-color: color-mix(in srgb, var(--color-text) 12%, transparent) !important;
+}
+
+/* 9) Tabla jobs (solo colores base; estados ya los tienes) */
+.jobs-table th{
+  background: color-mix(in srgb, var(--color-navbar) 70%, white) !important;
+  color: var(--color-text) !important;
+  border-bottom-color: color-mix(in srgb, var(--color-text) 12%, transparent) !important;
+}
+
+.jobs-table td{
+  color: var(--color-text) !important;
+  border-bottom-color: color-mix(in srgb, var(--color-text) 10%, transparent) !important;
+}
+
+.jobs-table tr:hover{
+  background: color-mix(in srgb, var(--color-primary) 6%, transparent) !important;
+}
+
+/* 10) Modal logs (por encima de navbar/sidebar) */
+.modal-backdrop{
+  z-index: 2000 !important;
+  background: rgba(0,0,0,.35) !important;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.sat-modal{
+  z-index: 2100 !important;
+  background: var(--color-navbar) !important;
+  border: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent) !important;
+}
+
+.sat-modal .modal-header h3{
+  color: var(--color-text) !important;
+}
+
+.sat-modal .btn-close{
+  color: color-mix(in srgb, var(--color-text) 60%, transparent) !important;
+}
+
+.log-item{
+  background: var(--color-background) !important;
+  border-color: color-mix(in srgb, var(--color-text) 10%, transparent) !important;
+}
+
+.log-accion,
+.log-detalle,
+.log-cliente{
+  color: var(--color-text) !important;
+}
+
+.log-fecha{
+  color: color-mix(in srgb, var(--color-text) 60%, transparent) !important;
+}
+
+/* 11) Dark mode: solo ajustes finos (sin hardcode fuerte) */
+[data-theme="dark"] .clientes-section{
+  background: color-mix(in srgb, var(--color-navbar) 88%, black) !important;
+}
+
+[data-theme="dark"] .jobs-table tr:hover{
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent) !important;
+}
+
+
+
+/* ===========================
+   JOBS TABLE - THEME FIX
+   (sin cambiar tu HTML)
+=========================== */
+
+/* Contenedor tabla */
+.custom-table-container,
+.tabla-card {
+  background: var(--color-navbar) !important;
+}
+
+/* Base table */
+table.jobs-table {
+  width: 100%;
+  background: transparent !important;
+  color: var(--color-text) !important;
+}
+
+/* Header */
+table.jobs-table thead th {
+  background: color-mix(in srgb, var(--color-navbar) 70%, white) !important;
+  color: var(--color-text) !important;
+  border-bottom: 2px solid color-mix(in srgb, var(--color-text) 12%, transparent) !important;
+}
+
+/* Celdas */
+table.jobs-table td {
+  color: var(--color-text) !important;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent) !important;
+}
+
+/* Quita el blanco/negro feo que mete bootstrap con striped */
+table.jobs-table.table-striped > tbody > tr:nth-of-type(odd) > * {
+  background-color: color-mix(in srgb, var(--color-background) 35%, transparent) !important;
+  color: var(--color-text) !important;
+}
+
+/* Hover */
+table.jobs-table tbody tr:hover > * {
+  background-color: color-mix(in srgb, var(--color-primary) 7%, transparent) !important;
+}
+
+/* Cuando aplicas table-dark, que no reviente colores */
+table.jobs-table.table-dark {
+  background: transparent !important;
+}
+table.jobs-table.table-dark thead th {
+  background: color-mix(in srgb, var(--color-navbar) 85%, black) !important;
+  color: var(--color-text) !important;
+}
+table.jobs-table.table-dark td {
+  color: var(--color-text) !important;
+}
+
+/* badges dentro de tabla (si se apagan en dark) */
+.badge-tipo,
+.badge-clientes,
+.estado-badge {
+  color: inherit;
 }

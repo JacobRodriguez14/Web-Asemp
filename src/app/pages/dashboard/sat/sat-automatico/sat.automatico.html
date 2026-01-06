@@ -218,7 +218,10 @@
     <!-- TABLA -->
     <div class="card-body p-0 custom-table-container tabla-card">
       <div class="table-responsive">
-        <table class="table table-striped jobs-table" [ngClass]="{'table-dark': temaActual === 'dark'}">
+       <table class="table table-striped jobs-table" [ngClass]="{'table-dark': temaActual === 'dark'}">
+
+
+
           <thead class="custom-table-header">
             <tr>
               <th class="th-sortable ps-4" (click)="ordenarJobsPor('id')">
@@ -363,3 +366,4 @@
   </div>
 
 </div>
+

@@ -82,7 +82,8 @@ clienteFijoRfc = '';
   }
 
 
-
+temaActual: 'light' | 'dark' = 'light';
+private themeObserver: MutationObserver | null = null;
 
 usuarioNombreCompleto = 'Sistema ASEMP';
 
@@ -91,7 +92,7 @@ esEmpleado = false;
 esCliente = false;
 
 ngOnInit() {
-
+ this.detectarTema(); // <-- AGREGAR ESTA LÍNEA
   this.authSrv.getPerfil().subscribe({
     next: (res: any) => {
 
@@ -155,7 +156,14 @@ ngOnInit() {
 }
 
 ngAfterViewInit() {
-  // Inicialización de Chart.js se hará cuando haya datos
+  // Observar cambios en el tema
+  this.themeObserver = new MutationObserver(() => this.detectarTema());
+  this.themeObserver.observe(document.documentElement, { 
+    attributes: true, 
+    attributeFilter: ['data-theme'] 
+  });
+  
+  // Si ya tienes código aquí, agrega esto al inicio
 }
 
   
@@ -1259,14 +1267,29 @@ puedeConsultar(): boolean {
   }
 
   ngOnDestroy() {
-    // Limpiar timer
-    if (this.blurTimer) {
-      clearTimeout(this.blurTimer);
-    }
-    
-    // Destruir gráfica
-    if (this.chartInstance) {
-      this.chartInstance.destroy();
-    }
+     // Limpiar observer del tema
+  if (this.themeObserver) {
+    this.themeObserver.disconnect();
   }
+  
+  // Limpiar timer
+  if (this.blurTimer) {
+    clearTimeout(this.blurTimer);
+  }
+  
+  // Destruir gráfica
+  if (this.chartInstance) {
+    this.chartInstance.destroy();
+  }
+  }
+
+  // Agregar este método privado (en cualquier lugar dentro de la clase):
+private detectarTema(): void {
+  const temaGuardado = localStorage.getItem('theme');
+  this.temaActual = temaGuardado === 'dark' ? 'dark' : 'light';
+
+   // Debug: ver en consola
+  console.log('Tema detectado:', this.temaActual, 
+              'data-theme en HTML:', document.documentElement.getAttribute('data-theme'));
+}
 }

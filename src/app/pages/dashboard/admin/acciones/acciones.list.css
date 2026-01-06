@@ -1,36 +1,42 @@
-/* ============================= */
-/* ESTILOS MEJORADOS PARA ACCIONES */
-/* ============================= */
+/* =============================
+   ACCIONES LIST (THEME SAFE)
+   Usa: --color-primary, --color-navbar, --color-background, --color-text
+============================= */
 
 /* Card principal */
 .custom-card {
-  background: var(--color-card, #ffffff);
+  background: var(--color-background) !important;
+  color: var(--color-text) !important;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent) !important;
 }
 
 /* Header */
 .custom-header {
-  background: linear-gradient(135deg, var(--color-primary) 0%, color-mix(in srgb, var(--color-primary) 80%, black) 100%) !important;
-  color: white !important;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    color-mix(in srgb, var(--color-primary) 80%, black) 100%
+  ) !important;
+  color: #fff !important;
   border-bottom: none !important;
 }
 
 .custom-header .header-title {
-  color: white !important;
+  color: #fff !important;
   font-weight: 600;
 }
 
 .custom-header .header-icon {
-  color: white !important;
-  stroke: white !important;
+  color: #fff !important;
+  stroke: #fff !important;
 }
 
 /* Botón flotante */
 .custom-btn-float-azul {
   background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%) !important;
-  color: white !important;
+  color: #fff !important;
   border: none !important;
   border-radius: 10px !important;
   padding: 0.6rem 1.2rem !important;
@@ -46,15 +52,16 @@
 
 /* Filtros */
 .custom-filters {
-  background: var(--color-navbar, #f8f9fa) !important;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+  background: var(--color-navbar) !important;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent) !important;
 }
 
+/* Input group (buscador) */
 .custom-input-group {
   border: 2px solid color-mix(in srgb, var(--color-primary) 20%, transparent) !important;
   border-radius: 12px !important;
   overflow: hidden;
-  background: white !important;
+  background: var(--color-background) !important;
   transition: all 0.3s ease;
 }
 
@@ -68,11 +75,19 @@
   border: none !important;
   color: var(--color-primary) !important;
 }
+.custom-input-icon i {
+  stroke: currentColor;
+  color: inherit;
+}
 
 .custom-input {
   border: none !important;
   background: transparent !important;
+  color: var(--color-text) !important;
   font-size: 0.95rem;
+}
+.custom-input::placeholder {
+  color: color-mix(in srgb, var(--color-text) 55%, transparent) !important;
 }
 
 .custom-text-muted {
@@ -80,21 +95,70 @@
   font-size: 0.9rem;
 }
 
-/* Tabla */
-.custom-table-header {
-  background: var(--color-navbar, #f8f9fa) !important;
+/* =============================
+   TABLA (bootstrap striped + theme safe)
+============================= */
+/* =============================
+   TABLA (FIX STRIPED / HOVER)
+============================= */
+
+/* Base */
+.table {
+  color: var(--color-text) !important;
+  margin-bottom: 0;
 }
 
-.table th {
+/* IMPORTANTE: Bootstrap pinta el fondo en td/th.
+   Esto evita las franjas blancas raras. */
+.table > :not(caption) > * > * {
+  background-color: transparent !important;
+  color: var(--color-text) !important;
+  border-color: color-mix(in srgb, var(--color-text) 12%, transparent) !important;
+}
+
+/* Encabezado */
+.table thead th {
+  background: var(--color-navbar) !important;
+  color: var(--color-text) !important;
   font-weight: 600;
-  color: var(--color-text);
-  border-bottom: 2px solid var(--color-primary);
+  border-bottom: 2px solid color-mix(in srgb, var(--color-primary) 55%, transparent) !important;
 }
 
-/* Botones de acción */
+/* Zebra (odd/even) controlado por tema */
+.table.table-striped tbody tr {
+  background-color: color-mix(in srgb, var(--color-background) 92%, white) !important;
+}
+.table.table-striped tbody tr:nth-of-type(odd) {
+  background-color: color-mix(in srgb, var(--color-background) 86%, var(--color-navbar)) !important;
+}
+
+/* Dark: evita que se “aclare” a blanco */
+[data-theme="dark"] .table.table-striped tbody tr {
+  background-color: color-mix(in srgb, var(--color-background) 88%, black) !important;
+}
+[data-theme="dark"] .table.table-striped tbody tr:nth-of-type(odd) {
+  background-color: color-mix(in srgb, var(--color-background) 82%, var(--color-navbar)) !important;
+}
+
+/* Aplica el fondo del TR a las celdas (porque las celdas son transparentes) */
+.table.table-striped tbody tr > * {
+  background-color: inherit !important;
+}
+
+/* Hover uniforme (en todas las filas) */
+.table tbody tr:hover {
+  background-color: color-mix(in srgb, var(--color-primary) 10%, transparent) !important;
+}
+.table tbody tr:hover > * {
+  background-color: inherit !important;
+}
+
+/* =============================
+   BOTONES (reusa tus clases)
+============================= */
 .btn-azul {
   background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%) !important;
-  color: white !important;
+  color: #fff !important;
   border: none !important;
   border-radius: 8px !important;
   padding: 0.4rem 0.8rem !important;
@@ -102,7 +166,7 @@
 
 .btn-rojo {
   background: linear-gradient(135deg, #dc3545 0%, #bb2d3b 100%) !important;
-  color: white !important;
+  color: #fff !important;
   border: none !important;
   border-radius: 8px !important;
   padding: 0.4rem 0.8rem !important;
@@ -110,49 +174,56 @@
 
 .btn-verde {
   background: linear-gradient(135deg, #198754 0%, #157347 100%) !important;
-  color: white !important;
+  color: #fff !important;
   border: none !important;
   border-radius: 8px !important;
   padding: 0.4rem 0.8rem !important;
 }
 
-/* ============================= */
-/* MENÚ FLOTANTE - CORREGIDO */
-/* ============================= */
-
-/* BOTÓN ⋮ */
+/* =============================
+   MENÚ ⋮ (THEME SAFE + overflow fix)
+============================= */
 .menu-trigger {
-  background: #f1f3f4;
-  border: none;
+  background: color-mix(in srgb, var(--color-navbar) 85%, white);
+  border: 1px solid color-mix(in srgb, var(--color-text) 12%, transparent);
   width: 34px;
   height: 34px;
   border-radius: 8px;
   cursor: pointer;
   transition: .2s ease;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #5f6368;
+  color: color-mix(in srgb, var(--color-text) 70%, transparent);
   position: relative;
   z-index: 10;
 }
 
+[data-theme="dark"] .menu-trigger {
+  background: color-mix(in srgb, var(--color-navbar) 85%, black);
+}
+
 .menu-trigger:hover {
-  background: #e0e0e0;
-  color: #333;
+  background: color-mix(in srgb, var(--color-navbar) 70%, white);
+  color: var(--color-text);
+}
+
+[data-theme="dark"] .menu-trigger:hover {
+  background: color-mix(in srgb, var(--color-navbar) 70%, black);
 }
 
 .menu-trigger.abierto {
-  background: #d0d0d0 !important;
+  background: color-mix(in srgb, var(--color-primary) 12%, transparent) !important;
   transform: scale(1.05);
-  color: #333;
+  color: var(--color-text);
 }
 
-/* MENÚ FLOTANTE - POSICIÓN FIXED Y Z-INDEX ALTO */
+/* MENÚ FLOTANTE */
 .menu-flotante {
   position: absolute !important;
-  z-index: 9999 !important;
-  background: white;
+  z-index: 999999 !important;
+  background: var(--color-background) !important;
+  color: var(--color-text) !important;
   padding: 8px;
   width: 140px;
   border-radius: 12px;
@@ -161,10 +232,9 @@
   flex-direction: column;
   gap: 4px;
   animation: fadeIn .15s ease-out;
-  border: 1px solid #e0e0e0;
+  border: 1px solid color-mix(in srgb, var(--color-text) 12%, transparent) !important;
 }
 
-/* FLECHITA */
 .menu-flotante::before {
   content: "";
   position: absolute;
@@ -172,14 +242,13 @@
   right: 12px;
   width: 12px;
   height: 12px;
-  background: white;
+  background: var(--color-background) !important;
   transform: rotate(45deg);
-  border-left: 1px solid #e0e0e0;
-  border-top: 1px solid #e0e0e0;
-  z-index: 10000;
+  border-left: 1px solid color-mix(in srgb, var(--color-text) 12%, transparent) !important;
+  border-top: 1px solid color-mix(in srgb, var(--color-text) 12%, transparent) !important;
 }
 
-/* BOTONES DEL MENÚ */
+/* Botones del menú (mantengo colores de acción) */
 .accion-btn {
   display: flex;
   align-items: center;
@@ -192,66 +261,31 @@
   width: 100%;
   text-align: left;
   transition: .2s;
-  color: white;
+  color: #fff;
   text-decoration: none;
   font-weight: 500;
-  position: relative;
-  z-index: 10001;
 }
 
-.accion-btn.editar {
-  background: #007bff;
-}
-.accion-btn.editar:hover {
-  background: #0064cf;
-  color: white;
-  text-decoration: none;
-  transform: translateY(-1px);
-}
+.accion-btn.editar { background: #007bff; }
+.accion-btn.editar:hover { background: #0064cf; transform: translateY(-1px); }
 
-.accion-btn.eliminar {
-  background: #dc3545;
-}
-.accion-btn.eliminar:hover {
-  background: #b52a35;
-  transform: translateY(-1px);
-}
+.accion-btn.eliminar { background: #dc3545; }
+.accion-btn.eliminar:hover { background: #b52a35; transform: translateY(-1px); }
 
-/* PERMITIR QUE EL MENÚ SALGA COMPLETO */
-.tabla-card {
-  position: relative;
-  overflow: visible !important;
-}
+/* Permitir que el menú salga */
+.tabla-card { position: relative !important; overflow: visible !important; z-index: 1; }
+.table-responsive { overflow: visible !important; }
 
-.table-responsive {
-  overflow: visible !important;
-}
-
-/* Animación del menú */
-@keyframes fadeIn {
-  from { 
-    opacity: 0; 
-    transform: translateY(-8px) scale(0.95); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0) scale(1); 
-  }
-}
-
-/* ============================= */
-/* MODAL MEJORADO PARA ACCIONES */
-/* ============================= */
+/* =============================
+   MODAL (THEME SAFE)
+============================= */
 .modal-acciones-custom {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
+  z-index: 2100 !important;
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1060;
   pointer-events: auto;
 }
 
@@ -264,19 +298,11 @@
   z-index: 2000 !important;
   animation: backdropFadeIn .25s ease-out;
 }
-.modal-acciones-custom {
-  position: fixed;
-  inset: 0;
-  z-index: 2100 !important;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-
 
 .modal-content-custom {
-  background: white;
+  background: var(--color-background) !important;
+  color: var(--color-text) !important;
+  border: 1px solid color-mix(in srgb, var(--color-text) 12%, transparent) !important;
   border-radius: 16px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
   width: 90%;
@@ -284,17 +310,20 @@
   pointer-events: all;
   animation: modalSlideIn 0.3s ease-out;
   position: relative;
-  z-index: 1061;
 }
 
 .modal-header-custom {
   padding: 1.5rem;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent) !important;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, var(--color-primary) 0%, color-mix(in srgb, var(--color-primary) 80%, black) 100%);
-  color: white;
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    color-mix(in srgb, var(--color-primary) 80%, black) 100%
+  ) !important;
+  color: #fff !important;
   border-radius: 16px 16px 0 0;
 }
 
@@ -307,11 +336,16 @@
   font-weight: 600;
 }
 
+.modal-header-custom i {
+  stroke: currentColor;
+  color: inherit;
+}
+
 .close-btn-custom {
   background: none;
   border: none;
   font-size: 1.5rem;
-  color: white;
+  color: #fff;
   cursor: pointer;
   line-height: 1;
 }
@@ -324,115 +358,76 @@
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: var(--color-text);
+  color: var(--color-text) !important;
 }
 
 .form-control-custom {
   width: 100%;
   padding: 0.75rem;
-  border: 2px solid #e9ecef;
+  border: 2px solid color-mix(in srgb, var(--color-text) 12%, transparent) !important;
+  background: var(--color-navbar) !important;
+  color: var(--color-text) !important;
   border-radius: 8px;
   margin-bottom: 1rem;
   font-size: 0.95rem;
   transition: all 0.3s ease;
 }
 
+.form-control-custom::placeholder {
+  color: color-mix(in srgb, var(--color-text) 55%, transparent) !important;
+}
+
 .form-control-custom:focus {
   outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent);
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 15%, transparent) !important;
 }
 
 .modal-footer-custom {
   padding: 1rem 1.5rem;
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent) !important;
+  background: var(--color-background) !important;
   display: flex;
   justify-content: flex-end;
   gap: 0.75rem;
   border-radius: 0 0 16px 16px;
 }
 
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 1050;
-  
-}
-
-
-/* Animaciones del modal */
+/* Animaciones */
 @keyframes modalSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-20px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  from { opacity: 0; transform: translateY(-20px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-8px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes backdropFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .modal-content-custom {
-    width: 95%;
-    margin: 1rem;
-  }
-  
-  .modal-footer-custom {
-    flex-direction: column;
-  }
-  
-  .modal-footer-custom .btn {
-    width: 100%;
-  }
+  .modal-content-custom { width: 95%; margin: 1rem; }
+  .modal-footer-custom { flex-direction: column; }
+  .modal-footer-custom .btn { width: 100%; }
+
+  .menu-flotante { width: 130px; }
+  .accion-btn { padding: 6px 10px; font-size: 12px; }
 }
 
-/* ============================= */
-/* RESPONSIVO PARA EL MENÚ */
-/* ============================= */
-@media (max-width: 768px) {
-  .menu-flotante {
-    width: 130px;
-    z-index: 9999 !important;
-  }
-  
-  .accion-btn {
-    padding: 6px 10px;
-    font-size: 12px;
-  }
-}
-
-
+/* Centrar botón ⋮ */
 td.text-center {
   vertical-align: middle !important;
 }
-
-/* Centrar completamente el botón ⋮ dentro de su celda */
-td.text-center {
-  vertical-align: middle !important;
-}
-
 td.text-center.pe-4 {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-
-
-
-
-
-
-
-/*encabezados ordenar */
-
-/* Encabezados ordenables */
+/* Ordenamiento */
 .th-sortable {
   cursor: pointer;
   user-select: none;
@@ -443,7 +438,6 @@ td.text-center.pe-4 {
   margin-right: 4px;
 }
 
-/* Iconos de orden */
 .orden-icon {
   font-size: 0.75rem;
   opacity: 0.4;
@@ -463,4 +457,11 @@ td.text-center.pe-4 {
 
 .orden-icon.neutro {
   color: inherit;
+}
+
+/* Footer/paginación */
+.card-footer {
+  background: var(--color-navbar) !important;
+  border-top: 1px solid color-mix(in srgb, var(--color-text) 10%, transparent) !important;
+  color: var(--color-text) !important;
 }
